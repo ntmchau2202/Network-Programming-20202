@@ -1,0 +1,1 @@
+This folder saves game resource, eg. images, audio, etc.
