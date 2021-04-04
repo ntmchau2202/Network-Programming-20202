@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class Server : Socket{
+class Server : public Socket{
     private:
 
     struct sockaddr_in server;

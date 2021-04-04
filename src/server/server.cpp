@@ -1,5 +1,9 @@
 #include "server.hpp"
 
+#include <iostream>
+
+using namespace std;
+
 Server::Server(){
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->server_socket == INVALID_SOCKET){
@@ -38,6 +42,13 @@ SOCKET Server::Accept(){
     SOCKET return_socket = accept(this->server_socket, (struct sockaddr*)&this->server, (socklen_t*)&addr_len);
     if(return_socket < 0 ){
         throw ERROR_SERVER_ACCEPT_FAILED;
+    }
+    for(int i = 0; i < MAXIMUM_CLIENT; i++) {
+        if (this->list_client[i] == 0){
+            this->list_client[i] = return_socket;
+            cout << "Inserted at index: " << i << endl;
+            break;
+        }
     }
     return return_socket;
 }

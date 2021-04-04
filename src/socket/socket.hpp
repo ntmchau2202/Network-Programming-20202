@@ -30,8 +30,8 @@ using namespace std;
 
 class Socket {
     public:
-    int ReceiveMsg(char *recv_buff, SOCKET client_socket);
-    int SendMsg(string msg, SOCKET target_socket);
+    int ReceiveMsg(char *recv_buff, SOCKET *client_socket);
+    int SendMsg(string msg, SOCKET *target_socket);
 };
 
 #endif

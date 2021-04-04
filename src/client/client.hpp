@@ -3,13 +3,18 @@
 
 #include "../socket/socket.hpp"
 
-class Client : Socket {
+class Client : public Socket {
     private:
-    struct sockaddr_in client_socket;
-
-    public:
     Client();
     ~Client();
+
+    public:
+    SOCKET client_socket;
+    struct sockaddr_in client;
+    static Client* StartSession();
+    void Connect(char *host_ip, int port);
+    void Close();
+
 };
 
 #endif
