@@ -5,17 +5,30 @@
 
 #include "../socket/socket.hpp"
 
+#define MAXIMUM_CLIENT 10
+
 using namespace std;
 
 class Server : Socket{
     private:
-    struct sockaddr_in server;
-    map<int, SOCKET> list_client;
 
-    public:
+    struct sockaddr_in server;
+
     Server();
     ~Server();
-    map<int, SOCKET> GetClientList();
+
+    public:
+
+    SOCKET server_socket;
+    fd_set readfds;
+    map<int, SOCKET> list_client;
+    
+    void Listen();
+    void Bind();
+    SOCKET Accept();
+    static Server* StartSession();
+
+
 };
 
 #endif
