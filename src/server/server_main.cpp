@@ -27,12 +27,8 @@ int main(int argc, char *argv[]){
         for (int i = 0; i < MAXIMUM_CLIENT; i++){
             SOCKET child_socket = server_instance->list_client[i];
             if (child_socket > 0) {
-                FD_SET(server_instance->server_socket, &(server_instance->readfds));
+                FD_SET(child_socket, &(server_instance->readfds));
             }
-
-            // if  (child_socket > server_instance->server_socket) {
-            //     server_instance->server_socket = child_socket;
-            // }
         }
         cout << "Adding socket done\nserver_socket: " << server_instance->server_socket << endl;
         // wait for an activity on any of the socket, timeout = NULL ~> wait infinitely
@@ -58,7 +54,7 @@ int main(int argc, char *argv[]){
             // else, this is an io op from other sockets
             for (int i = 0; i < MAXIMUM_CLIENT; i++){
                 SOCKET cur_socket = server_instance->list_client[i];
-                if (FD_ISSET(cur_socket, &(server_instance->list_client))){
+                if (FD_ISSET(cur_socket, &(server_instance->readfds))){
                     // get information about client
                     sockaddr_in client_address;
                     int addr_len = sizeof(sockaddr_in);
