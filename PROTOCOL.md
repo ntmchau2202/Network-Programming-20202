@@ -226,18 +226,17 @@
     ```
 # CHAT
 
-- Private chat
-
 ## CLIENT -> SERVER
 
    ```
    {
-	"command_code": "PRIVMSG",
+	"command_code": "CHAT",
 	"info": {
 	     "from_user": "duongdz",
-             "to_user": "phuc",
+         "to_user": "phuc",
 	     "message": "helloooooooooo",
-	     "message_id": "PRIV1234"
+	     "message_id": "CHAT1234",
+         "match_id": 1234
 	}
    }
    ```
@@ -246,45 +245,13 @@
 
    ```
    {
-	"command_code": "PRIVMSG",
+	"command_code": "CHAT",
 	"info": {
 	     "from_user": "duongdz",
-             "to_user": "phuc",
+         "to_user": "phuc",
 	     "message": "helloooooooooo",
-	     "message_id": "PRIV1234"
-	}
-	"status_code": "success"/"error",
-        "error": ""
-   }
-   ```
-
-- Normal chat
-+ Note: Normal chat will
-	+ Send message to user in play room when user is in a game
-	+ Boardcast message when user is in a queue or in hall
-
-## CLIENT -> SERVER
-   
-   ```
-   {
-	"command_code": "MESSAGE",
-	"info": {
-	     "from_user": "duongdz",
-	     "message_id": "MESS1234",
-	     "message": "helloooooooooo",
-	}
-   }
-   ```
-
-## SERVER -> CLIENT
-
-   ```
-   {
-	"command_code": "MESSAGE",
-	"info": {
-	     "from_user": "duongdz",
-	     "message_id": "PRIV1234",
-	     "message": "helloooooooooo",
+	     "message_id": "CHAT1234",
+         "match_id": 1234
 	}
 	"status_code": "success"/"error",
         "error": ""
@@ -297,22 +264,24 @@
 
    ```
    {
-  	"command_code": "PRIVMSG"/"MESSAGE",
+  	"command_code": "CHATACK",
 	"info": {
-	     "message_id": "PRIV1234"/"MESS1234",
-             "status": "success"/"fail",
+	     "message_id": "CHAT1234",
+         "status": "success"/"error",
 	     "error": "",
 	}
    }
    ```
 
+## SERVER -> CLIENT
+
   ```
   {
-	"command_code": "PRIVMSG"/"MESSAGE",
+	"command_code": "CHATACK",
 	"info": {
-	     "message_id": "PRIV1234"/"MESS1234",
+	     "message_id": "CHAT1234",
 	}
-	"status": "success"/"fail",
+	"status": "success"/"error",
 	"error": "",
   }
   ```
