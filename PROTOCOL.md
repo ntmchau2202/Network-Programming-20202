@@ -18,7 +18,7 @@
     {
         "command_code":"LOGIN",
         "info":{
-            "session_id": "AOSJHBGASLGJB",
+            "session_id": "AOSJHBGASLGJB"/"",
 	    "username": "duongdz",
 	    "elo": 1500/0
         },
@@ -45,7 +45,7 @@
         {
             "command_code": "REGISTER",
             "info": {
-                "session_id": "AOSJHBGASLGJB",
+                "session_id": "AOSJHBGASLGJB"/"",
 	    	"username": "duongdz",
 	    	"elo": 1500
             },
@@ -232,11 +232,11 @@
    {
 	"command_code": "CHAT",
 	"info": {
-	     "from_user": "duongdz",
-         "to_user": "phuc",
+	     "from_user": "duongdz", 
+             "to_user": "phuc",
 	     "message": "helloooooooooo",
 	     "message_id": "CHAT1234",
-         "match_id": 1234
+             "match_id": 1234
 	}
    }
    ```
@@ -248,10 +248,10 @@
 	"command_code": "CHAT",
 	"info": {
 	     "from_user": "duongdz",
-         "to_user": "phuc",
+             "to_user": "phuc",
 	     "message": "helloooooooooo",
 	     "message_id": "CHAT1234",
-         "match_id": 1234
+             "match_id": 1234
 	}
 	"status_code": "success"/"error",
         "error": ""
@@ -267,7 +267,8 @@
   	"command_code": "CHATACK",
 	"info": {
 	     "message_id": "CHAT1234",
-         "status": "success"/"error",
+	     "match_id": 1234,
+             "status_code": "success"/"error",
 	     "error": "",
 	}
    }
@@ -280,8 +281,22 @@
 	"command_code": "CHATACK",
 	"info": {
 	     "message_id": "CHAT1234",
+	     "match_id": 1234,
 	}
 	"status": "success"/"error",
 	"error": "",
   }
+  ```
+
+# LOGOUT
+
+  ```
+  {
+      "command_code": "LOGOUT",
+      "info": {
+	  "username": "duongdz",
+          "session_id": "AOSJHBGASLGJB",
+      }
+  }
+
   ```
