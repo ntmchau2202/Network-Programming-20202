@@ -1,0 +1,43 @@
+Slide contents
+1. Slide 1
+- Team members
+- Team name (if required)
+- Team's project name (Gomoku (19x19) )
+
+2. Slide 2
+- Brief introduction about the game
+- Features:
++ Basic game: client - server - client
+	Initially, X goes first.
+	When user place a move, client will send coordinate to server
+	server will fwd this coordinate to the opponent
+	After getting the coordinate, the opponent's client will display the move on the gameboard
+	Then the previous player will wait for the second player to play the next move
+	They will take turns 'til one of them has 5 in a row 
+	or the board is filled
+	Each turn will last for a certain time. If any of the player cannot place a move in
+	time, he loses the game
+	The server will play the role of the referee of the game. It will need to fwd
+	all msg to the clients.
+	If server is down, all clients will be disconnected from the match
+	--- we have no protection mechanism for this case.
+
++ Ranking system: with register and login functions
+	Register: in order to play and have their score recorded, players must register an account with: username, email, password
+			If playing as a guest, their elo will not be recorded. They will be assigned
+		a temporary name for playing the game
+			
+	Login: send username and password to the server. Server will authenticate the login information and returns if the login successes or fails
+	
+	Ranking system: Based on the status of the gameplay. Each won will give 10 pts. A draws gives no points, and a lose takes 5 points
+
+	Matching mechanism: When a player gets in the game, he will have 2 choices: enter an empty room and wait/invite a components, or immediately enter a match. If he chooses to be randomed put into a match, the server will based on his own elo to find
+	a proper opponent.
+
++ Other features/side features
+	Chat: client - server - client
+	Using the same mechanism with the game, but will send message instead of coordinate
+	to the players.
+	During the game, players can offer a draw or resign the game
+
+	
