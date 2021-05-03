@@ -1,4 +1,4 @@
-package AsynchronousClient;
+package test;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -8,7 +8,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
 
-public class AsynchronousClient {	
+import client.network.WriteCompletionHandler;
+import protocol.Attachment;
+import protocol.ClientMessage;
+
+public class TestAsynchronousClient {	
 	public static void main(String[] args) throws Exception {
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 		String inputMessage;
@@ -24,12 +28,21 @@ public class AsynchronousClient {
 		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 		
 		while ((inputMessage = stdIn.readLine())!=null) {
-			if (inputMessage.length() == 0)
+			if (inputMessage.compareTo("c") != 0)
 				continue;
-			Attachment attachment = new Attachment(inputMessage, true);
-			buffer = ByteBuffer.wrap(inputMessage.getBytes(StandardCharsets.UTF_8));
+			ClientMessage loginRequest = new ClientMessage();
+			loginRequest.createLoginRequest("hikaru", "abcde");
+			String msgToSend = loginRequest.toString();
+			
+			Attachment attachment = new Attachment(msgToSend, true);
+			buffer = ByteBuffer.wrap(msgToSend.getBytes(StandardCharsets.UTF_8));
 			socketChannel.write(buffer, attachment, writeCompletionHandler);
+//			Attachment attachment = new Attachment(inputMessage, true);
+//			buffer = ByteBuffer.wrap(inputMessage.getBytes(StandardCharsets.UTF_8));
+//			socketChannel.write(buffer, attachment, writeCompletionHandler);
 		}
+		
+
 		
 		socketChannel.close();
 		System.out.println("Client done");

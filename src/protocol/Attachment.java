@@ -1,4 +1,4 @@
-package AsynchronousClient;
+package protocol;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

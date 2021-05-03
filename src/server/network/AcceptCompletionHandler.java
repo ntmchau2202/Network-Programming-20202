@@ -1,4 +1,4 @@
-package AsynchronousServer;
+package server.network;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;

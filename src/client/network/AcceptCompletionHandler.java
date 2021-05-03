@@ -1,9 +1,11 @@
-package AsynchronousClient;
+package client.network;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
+
+import protocol.Attachment;
 
 public class AcceptCompletionHandler implements CompletionHandler<Void, Attachment> {
 	private final AsynchronousSocketChannel socketChannel;

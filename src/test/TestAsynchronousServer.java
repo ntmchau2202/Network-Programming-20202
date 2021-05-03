@@ -1,9 +1,11 @@
-package AsynchronousServer;
+package test;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
 
-public class AsynchronousServer {
+import server.network.AcceptCompletionHandler;
+
+public class TestAsynchronousServer {
 	public static void main(String[] args) throws Exception {
 		AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel.open();
 		serverSocketChannel.bind(new InetSocketAddress(6666));
