@@ -2,6 +2,8 @@ package client.views.screen;
 
 import client.controller.HomeScreenController;
 import client.controller.LeaderBoardController;
+import client.controller.LoginFormController;
+import client.controller.RegisterFormController;
 import client.utils.Configs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,17 +18,17 @@ import java.util.ResourceBundle;
 public class HomeScreenHandler extends BaseScreenHandler
         implements Initializable {
 
-//    @FXML
-//    private ImageView leaderBoardImageView;
-//
-//    @FXML
-//    private Button guestPlayBtn;
-//
-//    @FXML
-//    private Button returnPlayerBtn;
-//
-//    @FXML
-//    private Label registerLabel;
+    @FXML
+    private ImageView leaderBoardImageView;
+
+    @FXML
+    private Button guestPlayBtn;
+
+    @FXML
+    private Button returnPlayerBtn;
+
+    @FXML
+    private Label registerLabel;
 
     private final HomeScreenController homeScreenController;
 
@@ -51,24 +53,40 @@ public class HomeScreenHandler extends BaseScreenHandler
     }
 
     @FXML
-    private void handleHomeBtn(javafx.event.ActionEvent evt) {
-//        if (evt.getSource() == guestPlayBtn) {
-//            System.out.println("guest player");
-//        } else if (evt.getSource() == returnPlayerBtn) {
-//            System.out.println("back to player");
-//        } else if (evt.getSource() == registerLabel) {
-//            System.out.println("register time");
-//        } else if (evt.getSource() == leaderBoardImageView) {
-//            System.out.println("leaderboard");
-//            try {
-//                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-//                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
-//                leaderboardHandler.setScreenTitle("Leaderboard");
-//                leaderboardHandler.show();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+    private void handleHomeAction(javafx.event.Event evt) {
+        if (evt.getSource() == guestPlayBtn) {
+            System.out.println("guest player");
+        } else if (evt.getSource() == returnPlayerBtn) {
+            System.out.println("back to player");
+            try {
+                BaseScreenHandler loginFormHandler = new LoginFormHandler(this.stage,
+                        Configs.LOGIN_FORM_PATH, new LoginFormController());
+                loginFormHandler.setScreenTitle("Login");
+                loginFormHandler.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (evt.getSource() == registerLabel) {
+            System.out.println("register time");
+            try {
+                BaseScreenHandler registerFormHandler = new RegisterFormHandler(this.stage,
+                        Configs.REGISTER_FORM_PATH, new RegisterFormController());
+                registerFormHandler.setScreenTitle("Register");
+                registerFormHandler.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (evt.getSource() == leaderBoardImageView) {
+            System.out.println("leaderboard");
+            try {
+                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+                leaderboardHandler.setScreenTitle("Leaderboard");
+                leaderboardHandler.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 

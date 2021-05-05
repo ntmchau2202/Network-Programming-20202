@@ -23,11 +23,11 @@
             <Image url="@assets/img/open.png" />
          </image>
       </ImageView>
-      <Button fx:id="guestPlayBtn" layoutX="510.0" layoutY="207.0" mnemonicParsing="false" onAction="#handleHomeAction" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(233,65,65);" text="Play as Guest" textFill="WHITE">
+      <Button fx:id="guestPlayBtn" layoutX="510.0" layoutY="207.0" mnemonicParsing="false" onMouseClicked="#handleHomeAction" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(233,65,65);" text="Play as Guest" textFill="WHITE">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button fx:id="returnPlayerBtn" layoutX="509.0" layoutY="286.0" mnemonicParsing="false" onAction="#handleHomeAction" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(0,134,244);" text="Returning player" textFill="WHITE">
+      <Button fx:id="returnPlayerBtn" layoutX="509.0" layoutY="286.0" mnemonicParsing="false" onMouseClicked="#handleHomeAction" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(0,134,244);" text="Returning player" textFill="WHITE">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>

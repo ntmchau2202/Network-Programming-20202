@@ -33,7 +33,6 @@
             <Font size="20.0" />
          </font>
          <stylesheets>
-            <URL value="@style.css" />
             <URL value="@assets/css/style.css" />
          </stylesheets>
       </TextField>
@@ -55,13 +54,11 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <stylesheets>
-            <URL value="@style.css" />
             <URL value="@assets/css/style.css" />
          </stylesheets>
       </Button>
       <PasswordField layoutX="130.0" layoutY="258.0" prefHeight="46.0" prefWidth="359.0" styleClass="payment-text-field">
          <stylesheets>
-            <URL value="@style.css" />
             <URL value="@assets/css/style.css" />
          </stylesheets></PasswordField>
    </children>

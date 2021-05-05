@@ -1,1 +1,0 @@
-This folder stores source code of the program
