@@ -1,6 +1,10 @@
 package client.utils;
 
 public class Configs {
+    public static final String IP_ADDRESS = "localhost";
+    public static final int PORT = 6666;
+
+
     // first slash indicate that FXMLLoader find from the root : Programming folder
     // i.e: "/client" is different from "client"
     // if no slash at the head, location will be the place we load the screen
