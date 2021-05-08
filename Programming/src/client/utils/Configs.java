@@ -13,5 +13,6 @@ public class Configs {
     public static final String HOME_SCREEN_PATH  = "/client/views/fxml/HomeScreen.fxml";
     public static final String LOGIN_FORM_PATH  = "/client/views/fxml/LoginForm.fxml";
     public static final String REGISTER_FORM_PATH  = "/client/views/fxml/RegisterForm.fxml";
+    public static final String GAME_MODE_SCREEN_PATH  = "/client/views/fxml/GameModeScreen.fxml";
     public static final String LEADERBOARD_SCREEN_PATH  = "/client/views/fxml/Leaderboard.fxml";
 }

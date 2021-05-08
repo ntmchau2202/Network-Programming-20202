@@ -8,18 +8,18 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1239.0" style="-fx-background-color: white;" stylesheets="@assets/css/style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1239.0" style="-fx-background-color: white;" stylesheets="@assets/css/style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView fitHeight="591.0" fitWidth="1241.0" layoutY="1.0" pickOnBounds="true">
          <image>
             <Image url="@assets/img/bg2.jpg" />
          </image>
       </ImageView>
-      <Button layoutX="510.0" layoutY="230.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(233,65,65);" text="Practice play" textFill="WHITE">
+      <Button fx:id="practicePlay" layoutX="510.0" layoutY="230.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(233,65,65);" text="Practice play" textFill="WHITE">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button layoutX="509.0" layoutY="309.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(0,134,244);" text="Rank play" textFill="WHITE">
+      <Button fx:id="rankPlay" layoutX="509.0" layoutY="309.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="228.0" style="-fx-base: rgb(0,134,244);" text="Rank play" textFill="WHITE">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
@@ -66,17 +66,17 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="232.0" layoutY="27.0" prefHeight="35.0" prefWidth="243.0" text="PhucNguyen">
+      <Label fx:id="username" layoutX="232.0" layoutY="27.0" prefHeight="35.0" prefWidth="243.0" text="PhucNguyen">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="232.0" layoutY="76.0" text="10">
+      <Label fx:id="rank" layoutX="232.0" layoutY="76.0" text="10">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="231.0" layoutY="126.0" text="1236">
+      <Label fx:id="elo" layoutX="231.0" layoutY="126.0" text="1236">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -89,17 +89,17 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label layoutX="1087.0" layoutY="26.0" text="120">
+      <Label fx:id="noPlayedMatch" layoutX="1087.0" layoutY="26.0" text="120">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="1087.0" layoutY="75.0" text="100">
+      <Label fx:id="noWonMatch" layoutX="1087.0" layoutY="75.0" text="100">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="1086.0" layoutY="125.0" text="83%">
+      <Label fx:id="winningRate" layoutX="1086.0" layoutY="125.0" text="83%">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>

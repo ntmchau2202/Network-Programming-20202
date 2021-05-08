@@ -1,6 +1,7 @@
 package client;
 
 import client.controller.HomeScreenController;
+import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import client.views.screen.HomeScreenHandler;
 import javafx.animation.FadeTransition;
@@ -43,7 +44,12 @@ public class ClientApp extends Application {
             fadeIn.play();
             fadeIn.setOnFinished((e) -> {
                 fadeOut.play();
-
+                // connect server
+                try {
+                    ClientSocketChannel.getSocketInstance();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             });
 
             // After fade out, load actual content
