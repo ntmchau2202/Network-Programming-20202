@@ -136,11 +136,25 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Void>{
 		}
 		
 		private void processRegisterRequest() {
+			String username = (String)msgParser.getInfoField(recvMsg, "username");
+			String password = (String)msgParser.getInfoField(recvMsg, "password");
+			
 			// TODO: Finish function
+			
+			serverResponse.createRegisterResponse();
+			sendResponse();
 		}
 		
 		private void processJoinQueueRequest() {
+			
+			String mode = (String)msgParser.getInfoField(recvMsg, "mode");
+			String sessionID = (String)msgParser.getInfoField(recvMsg, "session_id");
+			
 			// TODO: Finish function
+			
+			serverResponse.createJoinQueueResponse();
+			sendResponse();
+			
 		}
 		
 		private void notifyMatchFound() {

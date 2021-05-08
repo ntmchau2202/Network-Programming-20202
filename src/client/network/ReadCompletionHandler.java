@@ -7,12 +7,15 @@ import java.nio.charset.StandardCharsets;
 import helper.MessageParser;
 import protocol.Attachment;
 import protocol.Command;
+import protocol.StatusCode;
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{
 
 	private final ByteBuffer inputBuffer;
 	private MessageParser msgParser;
 	private String recvMsg;
+	private String errorMsg;
+	private StatusCode statusCode;
 	
 	// constructor
 	public ReadCompletionHandler(ByteBuffer buf) {
@@ -100,59 +103,131 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	
 	// ================== LOGICAL PROCESSES ========================
 	
-	private void processLoginResponse() {
-		// for testing purpose only
-		String username = (String)msgParser.getInfoField(recvMsg, "username");
-		String sessionID = (String)msgParser.getInfoField(recvMsg, "session_id");
-		int elo = (int)msgParser.getInfoField(recvMsg, "elo");
-		System.out.println("Username is: " + username);
-		System.out.println("session_id is: "+ sessionID);
-		System.out.println("elo of user is: " + Integer.toString(elo));
+	private boolean checkResponse() {
+		statusCode = msgParser.getStatusCode(recvMsg);
+		errorMsg = (String)msgParser.getErrorMessage(recvMsg);
 		
-		// TODO: Finish function
+		if (statusCode.compareTo(StatusCode.ERROR) == 0) {
+			return false;
+		} 
+		
+		return true;
+		
+	}
+	
+	private void processLoginResponse() {
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+			String username = (String)msgParser.getInfoField(recvMsg, "username");
+			String sessionID = (String)msgParser.getInfoField(recvMsg, "session_id");
+			int elo = (int)msgParser.getInfoField(recvMsg, "elo");
+			
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void processRegisterResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			String username = (String)msgParser.getInfoField(recvMsg, "username");
+			String sessionID = (String)msgParser.getInfoField(recvMsg, "session_id");
+			int elo = (int)msgParser.getInfoField(recvMsg, "elo");
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
+		
 	}
 	
 	private void processJoinQueueResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			String username = (String)msgParser.getInfoField(recvMsg, "username");
+			String sessionID = (String)msgParser.getInfoField(recvMsg, "session_id");
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}		
 	}
 	
 	private void processMatchFoundResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			int matchID = (int)msgParser.getInfoField(recvMsg,"match_id");
+			String opponent = (String)msgParser.getInfoField(recvMsg, "opponent");
+			int elo = (int)msgParser.getInfoField(recvMsg, "elo");
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}		
 	}
 	
 	private void processMoveResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void processEndgameResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void processRequestDrawResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void processConfirmDrawResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void processGetLeaderBoardResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void processChatResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void processChatACKResponse() {
-		// TODO: Finish function
+		if ( this.checkResponse() ) {
+			// TODO: Finish function for success case
+					
+		} else {
+			// TODO: Finish function for error case
+		}
 	}
 	
 	private void notifyUnknownCommand() {
+		// TODO: notify unknown command here
 		System.out.println("Unknown command");
 	}
 
