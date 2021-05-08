@@ -1,6 +1,5 @@
 package protocol;
 
-
 import org.json.JSONException;
 
 public class ClientMessage extends Message {

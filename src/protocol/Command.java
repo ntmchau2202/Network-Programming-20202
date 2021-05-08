@@ -23,4 +23,13 @@ public enum Command {
     public String getCommandString() {
         return this.command;
     }
+    
+    public static Command toCommand(String inputString) {
+    	for (Command c : Command.values()) {
+    		if (c.getCommandString().compareToIgnoreCase(inputString) == 0) {
+    			return c;
+    		}
+    	}
+    	return null;
+    }
 }
