@@ -63,7 +63,7 @@ public class LoginFormHandler extends BaseScreenHandler
             gameModeScreenHandler.setScreenTitle("Game Mode");
             gameModeScreenHandler.show();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

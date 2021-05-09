@@ -44,9 +44,10 @@ public class ClientApp extends Application {
             fadeIn.play();
             fadeIn.setOnFinished((e) -> {
                 fadeOut.play();
-                // connect server
+                // connect client
                 try {
-                    ClientSocketChannel.getSocketInstance();
+                	
+                	ClientSocketChannel.getSocketInstance();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
