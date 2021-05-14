@@ -11,6 +11,7 @@ import java.io.IOException;
 public class LoginFormController extends BaseController {
 	
 	private MessageParser msgParser = new MessageParser();
+	private Player loggedPlayer;
 	
     public boolean isLoginSuccessfully(String username, String password) throws Exception {
         String result = ClientSocketChannel.getSocketInstance().login(username, password);
@@ -18,6 +19,10 @@ public class LoginFormController extends BaseController {
         if (result.length() != 0) {
         	StatusCode stat = msgParser.getStatusCode(result);
 	        if (stat.compareTo(StatusCode.SUCCESS) == 0) {
+                String sessionID = String.valueOf(msgParser.getInfoField(result,"session_id"));
+                int elo = (int)msgParser.getInfoField(result, "elo");
+	            loggedPlayer = new Player(username, sessionID, elo);
+
 	        	return true;
 	        } 
         }
@@ -25,6 +30,6 @@ public class LoginFormController extends BaseController {
     }
 
     public Player getLoggedPlayer() {
-        return new Player("hehe", "nani");
+        return loggedPlayer;
     }
 }

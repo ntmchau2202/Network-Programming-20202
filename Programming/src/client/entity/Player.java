@@ -14,6 +14,12 @@ public class Player {
         this.sessionId = sessionId;
     }
 
+    public Player(String username, String sessionId, int elo) {
+        this.username = username;
+        this.sessionId = sessionId;
+        this.elo = elo;
+    }
+
     public Player(String username, String sessionId, int rank, int elo, int noPlayedMatch, int noWonMatch, float winningRate) {
         this.username = username;
         this.sessionId = sessionId;
