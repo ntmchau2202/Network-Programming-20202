@@ -1,6 +1,6 @@
 package client.controller;
 
-import client.entity.Player;
+import entity.Player.Player;
 
 public class GameModeScreenController extends BaseController{
     private Player curPlayer;

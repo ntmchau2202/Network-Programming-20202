@@ -53,7 +53,7 @@ public class LoginFormHandler extends BaseScreenHandler
             System.out.println("password is null. Insert again");
             return ;
         }
-        System.out.println("User name: " + username);
+        System.out.println("Username: " + username);
         System.out.println("Password: " + password);
         try {
             System.out.println(this.loginFormController.isLoginSuccessfully(username, password));

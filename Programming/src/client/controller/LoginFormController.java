@@ -1,12 +1,10 @@
 package client.controller;
 
-import client.entity.Player;
+import entity.Player.Player;
 import client.network.ClientSocketChannel;
+import entity.Player.RankPlayer;
 import helper.MessageParser;
-import protocol.ClientMessage;
 import protocol.StatusCode;
-
-import java.io.IOException;
 
 public class LoginFormController extends BaseController {
 	
@@ -21,8 +19,7 @@ public class LoginFormController extends BaseController {
 	        if (stat.compareTo(StatusCode.SUCCESS) == 0) {
                 String sessionID = String.valueOf(msgParser.getInfoField(result,"session_id"));
                 int elo = (int)msgParser.getInfoField(result, "elo");
-	            loggedPlayer = new Player(username, sessionID, elo);
-
+	            loggedPlayer = new RankPlayer(username, sessionID, elo);
 	        	return true;
 	        } 
         }
