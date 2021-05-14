@@ -3,16 +3,30 @@ package protocol;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RequestBody extends JSONObject {
+public class RequestBody {
+	
+	private JSONObject body;
 	
 	public RequestBody() {
-		super();
+		body = new JSONObject();
+	}
+	
+	public RequestBody(JSONObject obj) {
+		body = obj;
+	}
+	
+	public JSONObject getBody() {
+		return this.body;
+	}
+	
+	public void setBody(JSONObject body) {
+		this.body = body;
 	}
 	
 	public void createLoginBody(String username, String password) throws JSONException {
-		this.clear();
-		this.put("username", username);
-		this.put("password", password);
+		this.body.clear();
+		this.body.put("username", username);
+		this.body.put("password", password);
 	}
 	
 	public void createRegisterBody(String username, String password) throws JSONException {

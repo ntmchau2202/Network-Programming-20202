@@ -38,7 +38,7 @@ public class ServerMessage extends Message {
 	
 	public void createLoginResponse(String username, String sessionID, int elo, StatusCode statCode, String errDetails) throws JSONException {
 		// first, create the info body
-		this.responseInfo.createLoginBody(username, sessionID, elo);
+		// this.responseInfo.createLoginBody(username, sessionID, elo);
 	
 		// then, let the function do the rest
 		this.finalizeResponse(Command.LOGIN, statCode, errDetails);

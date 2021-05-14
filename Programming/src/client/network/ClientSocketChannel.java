@@ -1,6 +1,7 @@
 package client.network;
 
 import client.utils.Configs;
+import message.login.LoginClientRequest;
 import protocol.Attachment;
 import protocol.ClientMessage;
 
@@ -18,7 +19,7 @@ public class ClientSocketChannel {
     
     
     private Attachment attachment;
-    private ClientMessage clientMsg;
+    // private ClientMessage clientMsg;
     private ByteBuffer buffer;
     
     // ================= INITIALIZER ======================
@@ -38,7 +39,7 @@ public class ClientSocketChannel {
         writeCompletionHandler = new WriteCompletionHandler(socketChannel);
         
         // additional implementation for operations
-        clientMsg = new ClientMessage();
+        // clientMsg = new ClientMessage();
         buffer = ByteBuffer.allocate(4096);
         
 
@@ -52,8 +53,7 @@ public class ClientSocketChannel {
     
     // =================== FUNCTIONS =======================
     
-    private String sendRequest() throws Exception {
-		String strMsgToSend = clientMsg.toString();
+    private String sendRequest(String strMsgToSend) throws Exception {
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
@@ -66,54 +66,55 @@ public class ClientSocketChannel {
 	}
     
     public String login(String username, String password) throws Exception {
-		clientMsg.createLoginRequest(username, password);
-		return sendRequest();
+//		clientMsg.createLoginRequest(username, password);
+    	LoginClientRequest loginRequest = new LoginClientRequest(username, password);
+		return sendRequest(loginRequest.toString());
 	}
 	
 	public String register(String username, String password) throws Exception {
 		// TODO: Finish function
 		
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String joinQueue(String mode) throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String move(int x, int y, String state, String result) throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String requestDraw() throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String confirmDraw() throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String getLeaderBoard() throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String chat(String chatMsg) throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String chatACK() throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
 	
 	public String logout() throws Exception {
 		// TODO: Finish function
-		return sendRequest();
+		return sendRequest("");
 	}
     
 }

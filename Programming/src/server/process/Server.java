@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 //import java.util.ArrayList;
 
 import helper.MessageParser;
+import message.login.LoginClientRequest;
+import message.login.LoginServerResponse;
 import protocol.Attachment;
 import protocol.Command;
 import protocol.ServerMessage;
@@ -157,10 +159,11 @@ public class Server {
 	}
 	
 	private String processLoginRequest(String input) throws Exception {
-		ServerMessage serverResponse = new ServerMessage();
-		String username = (String)msgParser.getInfoField(input, "username");
-    	serverResponse.createLoginResponse(username, "AOUJBSGOAW01p39u5P", 15000, StatusCode.SUCCESS, "");
-    	return serverResponse.toString();		
+		LoginClientRequest clientRequest = new LoginClientRequest(input);
+		System.out.println("Message from client: " + clientRequest.toString());
+		
+		LoginServerResponse serverResponse = new LoginServerResponse(clientRequest.getUsername(), "ABCKASBDFOAWUE", 15000, 10000, (float)0.69, 1000, 10, StatusCode.SUCCESS, "");
+		return serverResponse.toString();	
 	}
 	
 	private String processRegisterRequest() throws Exception {
