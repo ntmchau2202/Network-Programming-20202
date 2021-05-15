@@ -12,13 +12,13 @@ public class RankPlayer extends Player {
         this.elo = elo;
     }
 
-    public RankPlayer(String username, String sessionId, int rank, int elo, int noPlayedMatch, int noWonMatch, float winningRate) {
+    public RankPlayer(String username, String sessionId, int rank, int elo, int noPlayedMatch, int noWonMatch) {
         super(username, sessionId);
         this.rank = rank;
         this.elo = elo;
         this.noPlayedMatch = noPlayedMatch;
         this.noWonMatch = noWonMatch;
-        this.winningRate = winningRate;
+        this.winningRate = (float)noWonMatch / noPlayedMatch;
     }
 
     public int getRank() {
@@ -41,11 +41,11 @@ public class RankPlayer extends Player {
         return winningRate;
     }
 
-    public void updatePlayerInfo(int rank, int elo, int noPlayedMatch, int noWonMatch, float winningRate) {
+    public void updatePlayerInfo(int rank, int elo, int noPlayedMatch, int noWonMatch) {
         this.rank = rank;
         this.elo = elo;
         this.noPlayedMatch = noPlayedMatch;
         this.noWonMatch = noWonMatch;
-        this.winningRate = winningRate;
+        this.winningRate = (float)noWonMatch / noPlayedMatch;
     }
 }

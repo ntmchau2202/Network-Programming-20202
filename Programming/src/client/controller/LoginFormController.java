@@ -1,6 +1,5 @@
 package client.controller;
 
-import entity.Player.Player;
 import client.network.ClientSocketChannel;
 import entity.Player.RankPlayer;
 import helper.MessageParser;
@@ -9,7 +8,7 @@ import protocol.StatusCode;
 public class LoginFormController extends BaseController {
 	
 	private MessageParser msgParser = new MessageParser();
-	private Player loggedPlayer;
+	private RankPlayer loggedPlayer;
 	
     public boolean isLoginSuccessfully(String username, String password) throws Exception {
         String result = ClientSocketChannel.getSocketInstance().login(username, password);
@@ -26,7 +25,7 @@ public class LoginFormController extends BaseController {
         return false;
     }
 
-    public Player getLoggedPlayer() {
+    public RankPlayer getLoggedPlayer() {
         return loggedPlayer;
     }
 }

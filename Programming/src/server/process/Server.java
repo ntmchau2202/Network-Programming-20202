@@ -8,11 +8,14 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 //import java.util.ArrayList;
 
+import entity.Player.Player;
+import entity.Player.RankPlayer;
 import helper.MessageParser;
 import protocol.Attachment;
 import protocol.Command;
 import protocol.ServerMessage;
 import protocol.StatusCode;
+import server.authentication.T3Authenticator;
 import server.network.ReadCompletionHandler;
 import server.network.WriteCompletionHandler;
 
@@ -159,7 +162,14 @@ public class Server {
 	private String processLoginRequest(String input) throws Exception {
 		ServerMessage serverResponse = new ServerMessage();
 		String username = (String)msgParser.getInfoField(input, "username");
-    	serverResponse.createLoginResponse(username, "AOUJBSGOAW01p39u5P", 15000, StatusCode.SUCCESS, "");
+		String password = (String)msgParser.getInfoField(input, "password");
+		// get logged player
+		RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+		if (loggedPlayer == null) {
+			serverResponse.createLoginResponse("", "", 0, StatusCode.ERROR, "Username / Password is invalid");
+		} else {
+			serverResponse.createLoginResponse(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), StatusCode.SUCCESS, "");
+		}
     	return serverResponse.toString();		
 	}
 	
