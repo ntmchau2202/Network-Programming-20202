@@ -3,12 +3,12 @@ package client.network;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
-
 import protocol.Attachment;
+
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{
 
-	private final ByteBuffer inputBuffer;
+private final ByteBuffer inputBuffer;
 	
 	// constructor
 	public ReadCompletionHandler(ByteBuffer buf) {
@@ -23,8 +23,10 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		// read message
 		try {
 			inputBuffer.flip();
-			System.out.println("Echo client received: " + StandardCharsets.UTF_8.newDecoder().decode(inputBuffer));
-			
+			String tmp = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
+			attachment.setReturnMessage(tmp);
+			attachment.getActive().set(false);
+			 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -36,5 +38,5 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		exc.printStackTrace();
 		
 	}
-	
+
 }

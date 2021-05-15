@@ -19,7 +19,7 @@ public class AcceptCompletionHandler implements CompletionHandler<Void, Attachme
 		// print out connection
 		System.out.println("Connection accepted: " + socketChannel.toString());
 		
-		String message = attachment.getMessage();
+		String message = attachment.getSendMessage();
 		System.out.println("Message to be sent: "+message);
 		
 		ByteBuffer buffer = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
