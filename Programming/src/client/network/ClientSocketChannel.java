@@ -71,8 +71,7 @@ public class ClientSocketChannel {
 	}
 	
 	public String register(String username, String password) throws Exception {
-		// TODO: Finish function
-		
+		clientMsg.createRegisterRequest(username, password);
 		return sendRequest();
 	}
 	

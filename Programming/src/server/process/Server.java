@@ -107,7 +107,7 @@ public class Server {
 				break;
 			}
 			case REGISTER: {
-				response = this.processRegisterRequest();
+				response = this.processRegisterRequest(recvMsg);
 				break;
 			}
 			case JOIN_QUEUE: {
@@ -177,10 +177,10 @@ public class Server {
 		ServerMessage serverResponse = new ServerMessage();
 		String username = (String)msgParser.getInfoField(input, "username");
 		String password = (String)msgParser.getInfoField(input, "password");
-		// get logged player
-		RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+		// register new player
+		RankPlayer loggedPlayer = new T3Authenticator().register(username, password);
 		if (loggedPlayer == null) {
-			serverResponse.createRegisterResponse("", "", 0, StatusCode.ERROR, "Username / Password is invalid");
+			serverResponse.createRegisterResponse("", "", 0, StatusCode.ERROR, "Username exists");
 		} else {
 			serverResponse.createRegisterResponse(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), StatusCode.SUCCESS, "");
 		}

@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="661.0" prefWidth="620.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="661.0" prefWidth="620.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView fitHeight="661.0" fitWidth="620.0" layoutY="7.0" pickOnBounds="true">
          <image>
@@ -28,12 +28,11 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <TextField fx:id="cardNumberTextField" layoutX="130.0" layoutY="167.0" prefHeight="46.0" prefWidth="359.0" styleClass="payment-text-field">
+      <TextField fx:id="usernameTextField" layoutX="130.0" layoutY="167.0" prefHeight="46.0" prefWidth="359.0" styleClass="payment-text-field">
          <font>
             <Font size="20.0" />
          </font>
          <stylesheets>
-            <URL value="@style.css" />
             <URL value="@assets/css/style.css" />
          </stylesheets>
       </TextField>
@@ -47,7 +46,7 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <Button fx:id="confirmPaymentButton" layoutX="130.0" layoutY="429.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="359.0" style="-fx-border-radius: 10;" styleClass="log-buttton" text="Sign up" textFill="WHITE">
+      <Button fx:id="confirmRegisterButton" onMouseClicked="#confirmRegisterAction" layoutX="130.0" layoutY="429.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="359.0" style="-fx-border-radius: 10;" styleClass="log-buttton" text="Sign up" textFill="WHITE">
          <font>
             <Font size="20.0" />
          </font>
@@ -55,13 +54,11 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <stylesheets>
-            <URL value="@style.css" />
             <URL value="@assets/css/style.css" />
          </stylesheets>
       </Button>
-      <PasswordField layoutX="130.0" layoutY="258.0" prefHeight="46.0" prefWidth="359.0" styleClass="payment-text-field">
+      <PasswordField fx:id="passwordTextField" layoutX="130.0" layoutY="258.0" prefHeight="46.0" prefWidth="359.0" styleClass="payment-text-field">
          <stylesheets>
-            <URL value="@style.css" />
             <URL value="@assets/css/style.css" />
          </stylesheets></PasswordField>
       <Label layoutX="130.0" layoutY="313.0" text="Confirm password:" textFill="#02457b">
@@ -69,9 +66,8 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <PasswordField layoutX="130.0" layoutY="349.0" prefHeight="46.0" prefWidth="359.0" styleClass="payment-text-field">
+      <PasswordField fx:id="confirmPasswordTextField" layoutX="130.0" layoutY="349.0" prefHeight="46.0" prefWidth="359.0" styleClass="payment-text-field">
          <stylesheets>
-            <URL value="@style.css" />
             <URL value="@assets/css/style.css" />
          </stylesheets>
       </PasswordField>
