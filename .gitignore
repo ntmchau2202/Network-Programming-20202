@@ -2,3 +2,10 @@
 Programming/out
 Programming/.idea
 Ref/
+build/
+
+
+# IntelliJ project files
+.idea
+*.iml
+out
