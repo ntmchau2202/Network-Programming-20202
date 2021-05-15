@@ -173,10 +173,18 @@ public class Server {
     	return serverResponse.toString();		
 	}
 	
-	private String processRegisterRequest() throws Exception {
-		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;
+	private String processRegisterRequest(String input) throws Exception {
+		ServerMessage serverResponse = new ServerMessage();
+		String username = (String)msgParser.getInfoField(input, "username");
+		String password = (String)msgParser.getInfoField(input, "password");
+		// get logged player
+		RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+		if (loggedPlayer == null) {
+			serverResponse.createRegisterResponse("", "", 0, StatusCode.ERROR, "Username / Password is invalid");
+		} else {
+			serverResponse.createRegisterResponse(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), StatusCode.SUCCESS, "");
+		}
+		return serverResponse.toString();
 	}
 	
 	private String processJoinQueueRequest() throws Exception {

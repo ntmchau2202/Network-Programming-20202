@@ -12,6 +12,14 @@ public class RankPlayer extends Player {
         this.elo = elo;
     }
 
+    public RankPlayer(String username, String sessionId, int elo, int noPlayedMatch, int noWonMatch) {
+        super(username, sessionId);
+        this.elo = elo;
+        this.noPlayedMatch = noPlayedMatch;
+        this.noWonMatch = noWonMatch;
+        this.winningRate = (float)noWonMatch / noPlayedMatch;
+    }
+
     public RankPlayer(String username, String sessionId, int rank, int elo, int noPlayedMatch, int noWonMatch) {
         super(username, sessionId);
         this.rank = rank;
