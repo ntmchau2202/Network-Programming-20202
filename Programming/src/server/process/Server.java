@@ -8,12 +8,17 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 //import java.util.ArrayList;
 
+import entity.Player.Player;
+import entity.Player.RankPlayer;
 import helper.MessageParser;
 import message.login.LoginClientMessage;
 import message.login.LoginServerMessage;
+import message.register.RegisterClientMessage;
+import message.register.RegisterServerMessage;
 import protocol.Attachment;
 import protocol.Command;
 import protocol.StatusCode;
+import server.authentication.T3Authenticator;
 import server.network.ReadCompletionHandler;
 import server.network.WriteCompletionHandler;
 
@@ -105,7 +110,7 @@ public class Server {
 				break;
 			}
 			case REGISTER: {
-				response = this.processRegisterRequest();
+				response = this.processRegisterRequest(recvMsg);
 				break;
 			}
 			case JOIN_QUEUE: {
@@ -158,17 +163,37 @@ public class Server {
 	}
 	
 	private String processLoginRequest(String input) throws Exception {
-		LoginClientMessage clientRequest = new LoginClientMessage(input);
-		System.out.println("Message from client: " + clientRequest.toString());
+
+		LoginServerMessage serverResponse = null;
 		
-		LoginServerMessage serverResponse = new LoginServerMessage(clientRequest.getUsername(), "ABCKASBDFOAWUE", 15000, 10000, (float)0.69, 1000, 10, StatusCode.SUCCESS, "");
-		return serverResponse.toString();	
+		LoginClientMessage clientRequest = new LoginClientMessage(input);
+		String username = clientRequest.getUsername();
+		String password = clientRequest.getPassword();
+		// get logged player
+		RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+		if (loggedPlayer == null) {
+			serverResponse = new LoginServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
+		} else {
+			serverResponse = new LoginServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+		}
+    	return serverResponse.toString();		
 	}
 	
-	private String processRegisterRequest() throws Exception {
-		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;
+	private String processRegisterRequest(String input) throws Exception {
+		RegisterServerMessage serverResponse = null;
+		
+		RegisterClientMessage clientRequest = new RegisterClientMessage(input);
+		String username = clientRequest.getUsername();
+		
+		String password = clientRequest.getPassword();
+		// register new player
+		RankPlayer loggedPlayer = new T3Authenticator().register(username, password);
+		if (loggedPlayer == null) {
+			serverResponse = new RegisterServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
+		} else {
+			serverResponse = new RegisterServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+		}
+		return serverResponse.toString();
 	}
 	
 	private String processJoinQueueRequest() throws Exception {

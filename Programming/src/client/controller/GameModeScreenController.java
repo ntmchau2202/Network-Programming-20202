@@ -1,17 +1,19 @@
 package client.controller;
 
-import client.entity.Player;
 import client.network.ClientSocketChannel;
 import message.joinqueue.JoinQueueServerMessage;
 import protocol.StatusCode;
 
+import entity.Player.RankPlayer;
+
+
 public class GameModeScreenController extends BaseController{
-    private Player curPlayer;
-    public GameModeScreenController(Player curPlayer) {
+    private RankPlayer curPlayer;
+    public GameModeScreenController(RankPlayer curPlayer) {
         this.curPlayer = curPlayer;
     }
 
-    public Player getCurPlayer() {
+    public RankPlayer getCurPlayer() {
         return this.curPlayer;
     }
 

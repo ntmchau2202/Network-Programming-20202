@@ -53,19 +53,20 @@ public class LoginFormHandler extends BaseScreenHandler
             System.out.println("password is null. Insert again");
             return ;
         }
-        System.out.println("User name: " + username);
+        System.out.println("Username: " + username);
         System.out.println("Password: " + password);
         try {
-            boolean isLoginSuccess = this.loginFormController.isLoginSuccessfully(username, password);
-            if (isLoginSuccess) {
-	            BaseScreenHandler gameModeScreenHandler = new GameModeScreenHandler(this.stage,
-	                    Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController(this.loginFormController.getLoggedPlayer()));
-	            gameModeScreenHandler.setScreenTitle("Game Mode");
-	            gameModeScreenHandler.show();
-            } else {
-            	// TODO: show some notification here
+
+            if (!this.loginFormController.isLoginSuccessfully(username, password)) {
+                System.out.println("Login failed");
+                // TODO: show some message box here
+                return ;
             }
 
+            BaseScreenHandler gameModeScreenHandler = new GameModeScreenHandler(this.stage,
+                    Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController(this.loginFormController.getLoggedPlayer()));
+            gameModeScreenHandler.setScreenTitle("Game Mode");
+            gameModeScreenHandler.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

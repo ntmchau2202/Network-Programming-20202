@@ -2,6 +2,7 @@ package client.network;
 
 import client.utils.Configs;
 import message.login.LoginClientMessage;
+import message.register.RegisterClientMessage;
 import protocol.Attachment;
 
 import java.io.IOException;
@@ -71,9 +72,8 @@ public class ClientSocketChannel {
 	}
 	
 	public String register(String username, String password) throws Exception {
-		// TODO: Finish function
-		
-		return sendRequest("");
+		RegisterClientMessage registerRequest = new RegisterClientMessage(username, password);
+		return sendRequest(registerRequest.toString());
 	}
 	
 	public String joinQueue(String mode) throws Exception {
