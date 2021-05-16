@@ -4,34 +4,34 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ResponseBody {
-	private JSONObject body;
 	
+	private JSONObject responseBody;
 	public ResponseBody() {
-		body = new JSONObject();
-	}
-	
-	public ResponseBody(JSONObject obj) {
-		body = obj;
-	}
-	
-	public JSONObject getBody() {
-		return this.body;
+		this.responseBody = new JSONObject();
 	}
 	
 	public void setBody(JSONObject body) {
-		this.body = body;
+		this.responseBody = body;
+	}
+	
+	public Object getKey(String key) {
+		return this.responseBody.get(key);
+	}
+	
+	public JSONObject getBody() {
+		return this.responseBody;
 	}
 	
 	public void createLoginBody(String username, String sessionID, int elo, int rank, float winRate, 
 			int numGamePlayed, int numGameWin) throws JSONException {
-		this.body.clear();
-		this.body.put("username", username);
-		this.body.put("session_id", sessionID);
-		this.body.put("elo", elo);
-		this.body.put("rank", rank);
-		this.body.put("win_rate",winRate);
-		this.body.put("num_game_played", numGamePlayed);
-		this.body.put("num_game_win", numGameWin);
+		this.responseBody.clear();
+		this.responseBody.put("username", username);
+		this.responseBody.put("session_id", sessionID);
+		this.responseBody.put("elo", elo);
+		this.responseBody.put("rank", rank);
+		this.responseBody.put("win_rate",winRate);
+		this.responseBody.put("num_game_played", numGamePlayed);
+		this.responseBody.put("num_game_won", numGameWin);
 		
 	}
 	

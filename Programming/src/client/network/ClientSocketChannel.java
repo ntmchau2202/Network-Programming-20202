@@ -1,9 +1,8 @@
 package client.network;
 
 import client.utils.Configs;
-import message.login.LoginClientRequest;
+import message.login.LoginClientMessage;
 import protocol.Attachment;
-import protocol.ClientMessage;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -67,7 +66,7 @@ public class ClientSocketChannel {
     
     public String login(String username, String password) throws Exception {
 //		clientMsg.createLoginRequest(username, password);
-    	LoginClientRequest loginRequest = new LoginClientRequest(username, password);
+    	LoginClientMessage loginRequest = new LoginClientMessage(username, password);
 		return sendRequest(loginRequest.toString());
 	}
 	

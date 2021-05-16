@@ -5,22 +5,20 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 
+import message.ServerMessage;
 import protocol.Attachment;
-import protocol.ServerMessage;
 
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{
 	private final AsynchronousSocketChannel socketChannel;
 	private final ByteBuffer buffer;
 	private String recvMsg;
-	private ServerMessage serverResponse;
 	
 	// Constructor
 	
 	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, ByteBuffer buf) {
 		this.socketChannel = socketChan;
 		this.buffer = buf;
-		this.serverResponse = new ServerMessage();
 	}
 	
 	@Override
@@ -107,14 +105,6 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	@Override
 	public void failed(Throwable exc, Attachment attachment) {
 		exc.printStackTrace();
-	}
-	
-	public void sendResponse() {
-		String msgToSend = serverResponse.toString();
-		ByteBuffer bufferRequest = ByteBuffer.wrap(msgToSend.getBytes(StandardCharsets.UTF_8));
-		
-		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
-		socketChannel.write(bufferRequest, null, writeCompletionHandler);
 	}
 	
 }

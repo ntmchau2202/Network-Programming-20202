@@ -9,11 +9,10 @@ import java.nio.charset.StandardCharsets;
 //import java.util.ArrayList;
 
 import helper.MessageParser;
-import message.login.LoginClientRequest;
-import message.login.LoginServerResponse;
+import message.login.LoginClientMessage;
+import message.login.LoginServerMessage;
 import protocol.Attachment;
 import protocol.Command;
-import protocol.ServerMessage;
 import protocol.StatusCode;
 import server.network.ReadCompletionHandler;
 import server.network.WriteCompletionHandler;
@@ -159,10 +158,10 @@ public class Server {
 	}
 	
 	private String processLoginRequest(String input) throws Exception {
-		LoginClientRequest clientRequest = new LoginClientRequest(input);
+		LoginClientMessage clientRequest = new LoginClientMessage(input);
 		System.out.println("Message from client: " + clientRequest.toString());
 		
-		LoginServerResponse serverResponse = new LoginServerResponse(clientRequest.getUsername(), "ABCKASBDFOAWUE", 15000, 10000, (float)0.69, 1000, 10, StatusCode.SUCCESS, "");
+		LoginServerMessage serverResponse = new LoginServerMessage(clientRequest.getUsername(), "ABCKASBDFOAWUE", 15000, 10000, (float)0.69, 1000, 10, StatusCode.SUCCESS, "");
 		return serverResponse.toString();	
 	}
 	

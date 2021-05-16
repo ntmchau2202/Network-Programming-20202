@@ -1,32 +1,35 @@
 package message;
 
-import org.json.*;
+import org.json.JSONObject;
 
 import protocol.Command;
-import protocol.RequestBody;
 
-public abstract class Message {	
-	protected Command commandCode;
-	protected JSONObject message;
+public abstract class Message {
+	protected Command command;
+	protected JSONObject finalMessageObject;
 	
-	protected Message() {
-		message = new JSONObject();
+	public Message() {
+		this.finalMessageObject = new JSONObject();
 	}
 	
-	protected Message(String input) {
-		message = new JSONObject(input);
-	}
-
-	protected void addCommandCode(Command commandCode) throws JSONException {
-		this.commandCode = commandCode;
-		message.put("command_code", commandCode.toString());
+	public Message(String input) {
+		this.finalMessageObject = new JSONObject(input);
+		this.command = Command.toCommand(this.finalMessageObject.getString("command_code"));
 	}
 	
-	protected void addInfo(JSONObject obj) {
-		this.message.put("info", obj);
+	protected void setCommand(Command cmd) {
+		this.command = cmd;
+	}
+	// classes must override this
+	protected void finalizeMessageObject() {
+		
+	}
+	
+	public Command getCommand() {
+		return this.command;
 	}
 	
 	public String toString() {
-		return message.toString();
+		return finalMessageObject.toString();
 	}
 }
