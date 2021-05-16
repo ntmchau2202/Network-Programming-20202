@@ -8,9 +8,11 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 //import java.util.ArrayList;
 
+import org.json.JSONObject;
+
 import entity.Player.Player;
 import entity.Player.RankPlayer;
-import helper.MessageParser;
+import message.ClientMessage;
 import message.login.LoginClientMessage;
 import message.login.LoginServerMessage;
 import message.register.RegisterClientMessage;
@@ -24,23 +26,15 @@ import server.network.WriteCompletionHandler;
 
 public class Server {
 	private AsynchronousServerSocketChannel serverSocketChannel;
-//	private Attachment attachment;
-//	private ArrayList<AsynchronousSocketChannel> listSocket;
-	private MessageParser msgParser = new MessageParser();
 	
 	public Server() throws Exception {
 		serverSocketChannel = AsynchronousServerSocketChannel.open();
-//		attachment = new Attachment();
-//		listSocket = new ArrayList<AsynchronousSocketChannel>();
 	}
 
 	public void start(int port) throws Exception {
 		serverSocketChannel.bind(new InetSocketAddress(port));
 		
 		System.out.println("Server started");
-		
-//		AcceptCompletionHandler acceptCompletionHandler = new AcceptCompletionHandler(serverSocketChannel, attachment, listSocket);
-//		serverSocketChannel.accept(attachment, acceptCompletionHandler);
 		
 		while(true) {
 			serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>(){
@@ -103,7 +97,10 @@ public class Server {
 	public String processReturn(String recvMsg) throws Exception {
 		String response = "";
 		
-		Command cmd = msgParser.getCommand(recvMsg);
+		JSONObject clientMsg = new JSONObject(recvMsg);
+		
+		Command cmd = Command.toCommand(clientMsg.getString("command_code"));
+		
 		switch (cmd) {
 		case LOGIN: {
 				response = this.processLoginRequest(recvMsg);

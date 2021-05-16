@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 
 import client.network.WriteCompletionHandler;
 import protocol.Attachment;
-import protocol.ClientMessage;
 
 public class TestAsynchronousClient {	
 	public static void main(String[] args) throws Exception {
@@ -27,20 +26,20 @@ public class TestAsynchronousClient {
 		socketChannel.connect(new InetSocketAddress("localhost", 6666));
 		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 		
-		while ((inputMessage = stdIn.readLine())!=null) {
-			if (inputMessage.compareTo("c") != 0)
-				continue;
-			ClientMessage loginRequest = new ClientMessage();
-			loginRequest.createLoginRequest("hikaru", "abcde");
-			String msgToSend = loginRequest.toString();
-			
-			Attachment attachment = new Attachment(msgToSend, true);
-			buffer = ByteBuffer.wrap(msgToSend.getBytes(StandardCharsets.UTF_8));
-			socketChannel.write(buffer, attachment, writeCompletionHandler);
+//		while ((inputMessage = stdIn.readLine())!=null) {
+//			if (inputMessage.compareTo("c") != 0)
+//				continue;
+//			ClientMessage loginRequest = new ClientMessage();
+//			loginRequest.createLoginRequest("hikaru", "abcde");
+//			String msgToSend = loginRequest.toString();
+//			
+//			Attachment attachment = new Attachment(msgToSend, true);
+//			buffer = ByteBuffer.wrap(msgToSend.getBytes(StandardCharsets.UTF_8));
+//			socketChannel.write(buffer, attachment, writeCompletionHandler);
 //			Attachment attachment = new Attachment(inputMessage, true);
 //			buffer = ByteBuffer.wrap(inputMessage.getBytes(StandardCharsets.UTF_8));
 //			socketChannel.write(buffer, attachment, writeCompletionHandler);
-		}
+//		}
 		
 
 		

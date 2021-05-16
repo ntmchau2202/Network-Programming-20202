@@ -66,7 +66,6 @@ public class ClientSocketChannel {
 	}
     
     public String login(String username, String password) throws Exception {
-//		clientMsg.createLoginRequest(username, password);
     	LoginClientMessage loginRequest = new LoginClientMessage(username, password);
 		return sendRequest(loginRequest.toString());
 	}
