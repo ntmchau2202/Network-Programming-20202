@@ -1,6 +1,7 @@
 package message.leaderboard;
 
 import message.ClientMessage;
+import protocol.Command;
 
 public class LeaderboardClientMessage extends ClientMessage {
 	private String username, sessionID;
@@ -9,7 +10,8 @@ public class LeaderboardClientMessage extends ClientMessage {
 		this.username = username;
 		this.sessionID = sessionID;
 		
-		this.requestBody.createLeaderBoardBody();
+		this.setCommand(Command.LEADERBOARD);
+		this.requestBody.createLeaderBoardBody(sessionID, username);
 		this.finalizeMessageObject();
 	}
 	

@@ -3,7 +3,10 @@ package message.leaderboard;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+
 import message.ServerMessage;
+import protocol.Command;
 import protocol.StatusCode;
 
 public class LeaderboardServerMessage extends ServerMessage {
@@ -16,7 +19,11 @@ public class LeaderboardServerMessage extends ServerMessage {
 		this.listElo = listElo;
 		this.listRank = listRank;
 		
-		this.responseBody.createLeaderBoardBody();
+		JSONArray jsArrayUser = new JSONArray(listUsr);
+		JSONArray jsArrayElo = new JSONArray(listElo);
+		JSONArray jsArrayRank = new JSONArray(listRank);
+		this.setCommand(Command.LEADERBOARD);
+		this.responseBody.createLeaderBoardBody(jsArrayUser, jsArrayElo, jsArrayRank);
 		this.finalizeMessageObject();
 	}
 	

@@ -18,17 +18,17 @@ public class DrawConfirmServerMessage extends ServerMessage {
 		this.acceptance = acceptance;
 		
 		this.setCommand(Command.DRAW_CONFIRM);
-		this.responseBody.createDrawRequestBody();
+		this.responseBody.createDrawConfirmBody(matchID, player, acceptance);
 		this.finalizeMessageObject();
 	}
 	
 	public DrawConfirmServerMessage(String inputMessage) {
 		super(inputMessage);
 		
-		this.matchID = (int)this.responseBody.getKey("match_id");
-		this.movePlayer = (String)this.responseBody.getKey("move_player");
-		this.sessionID = (String)this.responseBody.getKey("session_id");
-		this.acceptance = (boolean)this.responseBody.getKey("acceptance");
+		this.matchID = this.responseBody.getBody().getInt("match_id");
+		this.movePlayer = this.responseBody.getBody().getString("move_player");
+		this.sessionID = this.responseBody.getBody().getString("session_id");
+		this.acceptance = this.responseBody.getBody().getBoolean("acceptance");
 	}	
 	
 	public int getMatchID() {

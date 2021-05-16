@@ -22,8 +22,8 @@ public class LoginClientMessage extends ClientMessage {
 	public LoginClientMessage(String inputMessage) {
 		super(inputMessage);
 
-		this.username = (String)this.requestBody.getKey("username");
-		this.password = (String)this.requestBody.getKey("password");
+		this.username = this.requestBody.getBody().getString("username");
+		this.password = this.requestBody.getBody().getString("password");
 	}	
 	
 	public String getUsername() {

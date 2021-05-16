@@ -1,6 +1,7 @@
 package message.logout;
 
 import message.ClientMessage;
+import protocol.Command;
 
 public class LogoutClientMessage extends ClientMessage {
 	private String username, sessionID;
@@ -10,7 +11,8 @@ public class LogoutClientMessage extends ClientMessage {
 		this.username = username;
 		this.sessionID = sessionID;
 		
-		this.requestBody.createLogoutBody();
+		this.setCommand(Command.LOGOUT);
+		this.requestBody.createLogoutBody(username, sessionID);
 		this.finalizeMessageObject();
 	}
 	

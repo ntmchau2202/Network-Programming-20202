@@ -15,16 +15,16 @@ public class DrawRequestClientMessage extends ClientMessage {
 		this.sessionID = sessionID;
 		
 		this.setCommand(Command.DRAW_REQUEST);
-		this.requestBody.createDrawRequestBody();
+		this.requestBody.createDrawRequestBody(matchID, sessionID, player);
 		this.finalizeMessageObject();
 	}
 	
 	public DrawRequestClientMessage(String inputMessage) {
 		super(inputMessage);
 		
-		this.matchID = (int)this.requestBody.getKey("match_id");
-		this.movePlayer = (String)this.requestBody.getKey("move_player");
-		this.sessionID = (String)this.requestBody.getKey("session_id");
+		this.matchID = this.requestBody.getBody().getInt("match_id");
+		this.movePlayer = this.requestBody.getBody().getString("move_player");
+		this.sessionID = this.requestBody.getBody().getString("session_id");
 	}	
 	
 	public int getMatchID() {

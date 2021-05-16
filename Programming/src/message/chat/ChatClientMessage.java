@@ -14,7 +14,7 @@ public class ChatClientMessage extends ClientMessage {
 		this.messageID = msgID;
 		this.matchID = matchID;
 		
-		this.requestBody.createChatBody();
+		this.requestBody.createChatBody(fromUsr, toUsr, msg, msgID, matchID);
 		this.finalizeMessageObject();
 	}
 	

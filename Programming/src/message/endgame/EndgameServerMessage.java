@@ -22,7 +22,7 @@ public class EndgameServerMessage extends ServerMessage {
 		this.isDraw = isDraw;
 		
 		this.setCommand(Command.ENDGAME);
-		this.responseBody.createEndgameBody();
+		this.responseBody.createEndgameBody(matchID, winner, winnerElo, loser, loserElo, isDraw);
 		this.finalizeMessageObject();
 		
 	}
@@ -30,7 +30,7 @@ public class EndgameServerMessage extends ServerMessage {
 	public EndgameServerMessage(String input) {
 		super(input);
 		
-		this.matchID = (int)this.responseBody.getKey("match_id");
+		this.matchID = this.responseBody.getBody().getInt("match_id");
 		JSONObject winnerInf = this.responseBody.getBody().getJSONObject("winner");
 		JSONObject loserInf = this.responseBody.getBody().getJSONObject("loser");
 		this.winner = winnerInf.getString("username");

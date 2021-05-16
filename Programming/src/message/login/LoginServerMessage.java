@@ -27,15 +27,13 @@ public class LoginServerMessage extends ServerMessage {
 	
 	public LoginServerMessage(String input) {
 		super(input);
-		
-		this.username = (String)this.responseBody.getKey("username");
-		this.sessionID = (String)this.responseBody.getKey("session_id");
-		this.elo = (int)this.responseBody.getKey("elo");
-		this.rank = (int)this.responseBody.getKey("rank");
-		BigDecimal bigWinRate = (BigDecimal)this.responseBody.getKey("win_rate");
-		this.winRate = bigWinRate.floatValue();
-		this.noMatchPlayed = (int)this.responseBody.getKey("num_game_played");
-		this.noMatchWon = (int)this.responseBody.getKey("num_game_won");
+		this.username = this.responseBody.getBody().getString("username");
+		this.sessionID = this.responseBody.getBody().getString("session_id");
+		this.elo = this.responseBody.getBody().getInt("elo");
+		this.rank = this.responseBody.getBody().getInt("rank");
+		this.winRate = this.responseBody.getBody().getFloat("win_rate");
+		this.noMatchPlayed = this.responseBody.getBody().getInt("num_game_played");
+		this.noMatchWon = this.responseBody.getBody().getInt("num_game_won");
 	}
 	
 	public String getUsername() {

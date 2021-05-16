@@ -15,7 +15,7 @@ public class ChatACKServerMessage extends ServerMessage {
 		this.statusCode = statCode;
 		this.matchID = matchID;
 		
-		this.responseBody.createChatACKBody();
+		this.responseBody.createChatACKBody(messageID, matchID);
 		this.finalizeMessageObject();
 	}
 	

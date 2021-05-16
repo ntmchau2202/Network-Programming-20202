@@ -17,16 +17,16 @@ public class MatchFoundServerMessage extends ServerMessage {
 		this.opponent = opponent;
 		
 		this.setCommand(Command.MATCH_FOUND);
-		// this.responseBody.createMatchFoundBody();
+		this.responseBody.createMatchFoundBody(matchID, opponent, elo);
 		this.finalizeMessageObject();
 	}
 	
 	public MatchFoundServerMessage(String input) {
 		super(input);
 		
-		this.matchID = (int)this.responseBody.getKey("match_id");
-		this.elo = (int)this.responseBody.getKey("elo");
-		this.opponent = (String)this.responseBody.getKey("opponent");
+		this.matchID = this.responseBody.getBody().getInt("match_id");
+		this.elo = this.responseBody.getBody().getInt("elo");
+		this.opponent = this.responseBody.getBody().getString("opponent");
 	}
 	
 	public int getMatchID() {

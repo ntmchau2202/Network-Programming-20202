@@ -17,7 +17,7 @@ public class DrawRequestServerMessage extends ServerMessage {
 		this.sessionID = sessionID;
 		
 		this.setCommand(Command.DRAW_REQUEST);
-		this.responseBody.createDrawRequestBody();
+		this.responseBody.createDrawRequestBody(matchID, player);
 		this.finalizeMessageObject();
 
 	}
@@ -25,9 +25,9 @@ public class DrawRequestServerMessage extends ServerMessage {
 	public DrawRequestServerMessage(String inputMessage) {
 		super(inputMessage);
 		
-		this.matchID = (int)this.responseBody.getKey("match_id");
-		this.movePlayer = (String)this.responseBody.getKey("move_player");
-		this.sessionID = (String)this.responseBody.getKey("session_id");
+		this.matchID = this.responseBody.getBody().getInt("match_id");
+		this.movePlayer = this.responseBody.getBody().getString("move_player");
+		this.sessionID = this.responseBody.getBody().getString("session_id");
 
 	}
 

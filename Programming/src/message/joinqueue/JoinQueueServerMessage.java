@@ -14,16 +14,16 @@ public class JoinQueueServerMessage extends ServerMessage {
 		this.gameMode = mode;
 		
 		this.setCommand(Command.JOIN_QUEUE);
-		this.responseBody.createJoinQueueBody();
+		this.responseBody.createJoinQueueBody(usr, sesID);
 		this.finalizeMessageObject();
 	}
 	
 	public JoinQueueServerMessage(String input) {
 		super(input);
 		
-		this.username = (String)this.responseBody.getKey("username");
-		this.sessionID = (String)this.responseBody.getKey("session_id");
-		this.gameMode = (String)this.responseBody.getKey("mode");
+		this.username = this.responseBody.getBody().getString("username");
+		this.sessionID = this.responseBody.getBody().getString("session_id");
+		this.gameMode = this.responseBody.getBody().getString("mode");
 
 	}
 	

@@ -21,21 +21,21 @@ public class MoveClientMessage extends ClientMessage {
 		this.result = res;
 		
 		this.setCommand(Command.MOVE);
-		this.requestBody.createMoveBody();
+		this.requestBody.createMoveBody(matchID, sessionID, player, posX, posY, state, res);
 		this.finalizeMessageObject();
 	}
 	
 	public MoveClientMessage(String inputMessage) {
 		super(inputMessage);
 		
-		this.matchID = (int)this.requestBody.getKey("match_id");
-		this.movePlayer = (String)this.requestBody.getKey("move_player");
-		this.sessionID = (String)this.requestBody.getKey("session_id");
-		JSONObject movePos = (JSONObject)this.requestBody.getKey("move_position");
+		this.matchID = this.requestBody.getBody().getInt("match_id");
+		this.movePlayer = this.requestBody.getBody().getString("move_player");
+		this.sessionID = this.requestBody.getBody().getString("session_id");
+		JSONObject movePos = this.requestBody.getBody().getJSONObject("move_position");
 		this.posX = movePos.getInt("x");
 		this.posY = movePos.getInt("y");
-		this.state = (String)this.requestBody.getKey("state");
-		this.result = (String)this.requestBody.getKey("result");
+		this.state = this.requestBody.getBody().getString("state");
+		this.result = this.requestBody.getBody().getString("result");
 	}	
 	
 	public int getMatchID() {

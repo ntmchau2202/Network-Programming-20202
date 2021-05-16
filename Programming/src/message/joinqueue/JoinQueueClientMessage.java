@@ -14,14 +14,14 @@ public class JoinQueueClientMessage extends ClientMessage {
 		this.sessionID = sesID;
 		
 		this.setCommand(Command.JOIN_QUEUE);
-		this.requestBody.createJoinQueueBody();
+		this.requestBody.createJoinQueueBody(mode, sesID);
 		this.finalizeMessageObject();
 	}
 	
 	public JoinQueueClientMessage(String inputMessage) {
 		super(inputMessage);
-		this.gameMode = (String)this.requestBody.getKey("mode");
-		this.sessionID = (String)this.requestBody.getKey("session_id");
+		this.gameMode = this.requestBody.getBody().getString("mode");
+		this.sessionID = this.requestBody.getBody().getString("session_id");
 	}	
 	
 	public String getGameMode() {
