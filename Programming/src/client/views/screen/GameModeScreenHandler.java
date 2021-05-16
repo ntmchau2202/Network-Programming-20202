@@ -3,6 +3,7 @@ package client.views.screen;
 import client.controller.GameModeScreenController;
 import client.controller.LeaderBoardController;
 import client.controller.LoginFormController;
+import client.controller.MainGameScreenController;
 import client.controller.RegisterFormController;
 import client.utils.Configs;
 import javafx.fxml.FXML;
@@ -66,12 +67,35 @@ public class GameModeScreenHandler extends BaseScreenHandler
 
     @FXML
     private void handleFindGameAction(javafx.event.Event evt) {
-        if (evt.getSource() == practicePlay) {
-            System.out.println("practice play");
-        } else if (evt.getSource() == rankPlay) {
-            System.out.println("rank play");
-
-        }
-
+    	try {
+    		BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage, 
+          			Configs.MAINGAME_SCREEN_PATH, new MainGameScreenController());
+        		mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+    		if (evt.getSource() == practicePlay) {
+	            System.out.println("practice play");
+	            
+	            boolean isFound = gameModeScreenController.findPracticeGame();
+	            if (isFound) {
+	            	// TODO: may need other analyze here	
+	            	mainGameScreenHandler.show();
+	            } else {
+	            	// TODO: make some notification here
+	            }
+	            
+	        } else if (evt.getSource() == rankPlay) {
+	            System.out.println("rank play");
+	            
+	            boolean isFound = gameModeScreenController.findRankGame();
+	            if (isFound) {
+	            	// TODO: may need other analyze here
+	            	mainGameScreenHandler.show();
+	            } else {
+	            	// TODO: make some notification here
+	            }
+	
+	        }
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
     }
 }

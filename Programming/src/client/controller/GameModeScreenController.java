@@ -22,6 +22,7 @@ public class GameModeScreenController extends BaseController{
         	return false;
         }
         return true;
+//    	return true;
     }
 
     public boolean findRankGame() throws Exception {
@@ -31,5 +32,6 @@ public class GameModeScreenController extends BaseController{
         	return false;
         }
         return true;
+//    	return true;
     }
 }

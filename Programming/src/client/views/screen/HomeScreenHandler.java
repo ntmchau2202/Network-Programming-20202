@@ -56,6 +56,7 @@ public class HomeScreenHandler extends BaseScreenHandler
     private void handleHomeAction(javafx.event.Event evt) {
         if (evt.getSource() == guestPlayBtn) {
             System.out.println("guest player");
+            // TODO: log guest player here
         } else if (evt.getSource() == returnPlayerBtn) {
             System.out.println("back to player");
             try {
