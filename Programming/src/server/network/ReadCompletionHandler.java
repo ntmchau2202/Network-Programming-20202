@@ -5,23 +5,26 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 
+import protocol.Attachment;
 import protocol.ServerMessage;
-import protocol.StatusCode;
 
-public class ReadCompletionHandler implements CompletionHandler<Integer, Void>{
+
+public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{
 	private final AsynchronousSocketChannel socketChannel;
 	private final ByteBuffer buffer;
+	private String recvMsg;
+	private ServerMessage serverResponse;
 	
 	// Constructor
 	
 	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, ByteBuffer buf) {
 		this.socketChannel = socketChan;
 		this.buffer = buf;
-		
+		this.serverResponse = new ServerMessage();
 	}
 	
 	@Override
-	public void completed(Integer result, Void attachment) {
+	public void completed(Integer result, Attachment attachment) {
 		// log out what received
 		System.out.println("Bytes received: " + result.toString());
 		
@@ -32,19 +35,68 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Void>{
 			byte[] bytes = new byte[buffer.limit()];
 			buffer.get(bytes);
 			
-			String msg = new String(bytes, StandardCharsets.UTF_8);
-			System.out.println("Message received: " + msg);
+			recvMsg = new String(bytes, StandardCharsets.UTF_8);
+			System.out.println("Message received: " + recvMsg);
+			attachment.setReturnMessage(recvMsg);
+			attachment.getActive().set(false);
 			
-			// do some consuming work here
+			// this is where the magic begin
 			
-			// and prepare the message
-			ServerMessage loginResponse = new ServerMessage();
-			loginResponse.createLoginResponse("hikaru", "AOUJBSGOAW01p39u5P", 15000, StatusCode.SUCCESS, "");
-			String msgToSend = loginResponse.toString();
-			ByteBuffer bufferRespone = ByteBuffer.wrap(msgToSend.getBytes(StandardCharsets.UTF_8));
+//			Command cmd = msgParser.getCommand(recvMsg);
+//			System.out.println("Command is: " + cmd.getCommandString());
+//			
+//			switch (cmd) {
+//				case LOGIN: {
+//					this.processLoginRequest();
+//					break;
+//				}
+//				case REGISTER: {
+//					this.processRegisterRequest();
+//					break;
+//				}
+//				case JOIN_QUEUE: {
+//					this.processJoinQueueRequest();
+//					break;
+//				}
+//				case MATCH_FOUND: {
+//					this.notifyMatchFound();
+//					break;
+//				}
+//				case MOVE: {
+//					this.processMoveRequest();
+//					break;
+//				}
+//				case DRAW_REQUEST: {
+//					this.processRequestDrawRequest();
+//					break;
+//				}
+//				case DRAW_CONFIRM: {
+//					this.processConfirmDrawRequest();
+//					break;
+//				}
+//				case ENDGAME: {
+//					this.notifyEndgame();
+//					break;
+//				}
+//				case LEADERBOARD: {
+//					this.processGetLeaderBoardRequest();
+//					break;
+//				}
+//				case CHAT: {
+//					this.processChatRequest();
+//					break;
+//				}
+//				case CHATACK: {
+//					this.processChatACKRequest();
+//					break;
+//				}
+//				default: {
+//					this.notifyUnknownCommand();
+//					break;
+//				}
+//			}
 			
-			WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
-			socketChannel.write(bufferRespone, null, writeCompletionHandler);
+			
 		} else if (result == 0) {
 			System.out.println("Client send empty message");
 		} else {
@@ -53,9 +105,16 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Void>{
 
 	}
 	@Override
-	public void failed(Throwable exc, Void attachment) {
+	public void failed(Throwable exc, Attachment attachment) {
 		exc.printStackTrace();
 	}
 	
+	public void sendResponse() {
+		String msgToSend = serverResponse.toString();
+		ByteBuffer bufferRequest = ByteBuffer.wrap(msgToSend.getBytes(StandardCharsets.UTF_8));
+		
+		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
+		socketChannel.write(bufferRequest, null, writeCompletionHandler);
+	}
 	
 }

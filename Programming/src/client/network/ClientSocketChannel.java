@@ -2,6 +2,7 @@ package client.network;
 
 import client.utils.Configs;
 import protocol.Attachment;
+import protocol.ClientMessage;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -14,6 +15,13 @@ public class ClientSocketChannel {
     private static ClientSocketChannel socketChannelInstance;
     private static AsynchronousSocketChannel socketChannel;
     private static WriteCompletionHandler writeCompletionHandler;
+    
+    
+    private Attachment attachment;
+    private ClientMessage clientMsg;
+    private ByteBuffer buffer;
+    
+    // ================= INITIALIZER ======================
 
     private ClientSocketChannel() throws IOException {
         socketChannel = AsynchronousSocketChannel.open();
@@ -28,6 +36,11 @@ public class ClientSocketChannel {
 
         // init write completion handler
         writeCompletionHandler = new WriteCompletionHandler(socketChannel);
+        
+        // additional implementation for operations
+        clientMsg = new ClientMessage();
+        buffer = ByteBuffer.allocate(4096);
+        
 
         // how to implement close socket when object is destroyed?
     }
@@ -36,11 +49,70 @@ public class ClientSocketChannel {
         if (socketChannelInstance == null) socketChannelInstance = new ClientSocketChannel();
         return socketChannelInstance;
     }
-
-    public void sendMessageToServer(String msgToSend) {
-        ByteBuffer buffer;
-        Attachment attachment = new Attachment(msgToSend, true);
-        buffer = ByteBuffer.wrap(msgToSend.getBytes(StandardCharsets.UTF_8));
-        socketChannel.write(buffer, attachment, writeCompletionHandler);
-    }
+    
+    // =================== FUNCTIONS =======================
+    
+    private String sendRequest() throws Exception {
+		String strMsgToSend = clientMsg.toString();
+		attachment = new Attachment(strMsgToSend, true);
+		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
+		socketChannel.write(buffer, attachment, writeCompletionHandler);
+		while (attachment.getActive().get()) {
+			
+		}
+		System.out.println("This is printed from client: " + attachment.getReturnMessage());
+		return attachment.getReturnMessage();
+		
+	}
+    
+    public String login(String username, String password) throws Exception {
+		clientMsg.createLoginRequest(username, password);
+		return sendRequest();
+	}
+	
+	public String register(String username, String password) throws Exception {
+		clientMsg.createRegisterRequest(username, password);
+		return sendRequest();
+	}
+	
+	public String joinQueue(String mode) throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+	
+	public String move(int x, int y, String state, String result) throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+	
+	public String requestDraw() throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+	
+	public String confirmDraw() throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+	
+	public String getLeaderBoard() throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+	
+	public String chat(String chatMsg) throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+	
+	public String chatACK() throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+	
+	public String logout() throws Exception {
+		// TODO: Finish function
+		return sendRequest();
+	}
+    
 }

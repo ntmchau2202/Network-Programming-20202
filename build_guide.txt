@@ -1,0 +1,1 @@
+--module-path "D:\K62\Study\ICT\Software Development\Personal\AIMS-Student\lib\win\javafx-sdk-15\lib" --add-modules javafx.controls,javafx.fxml
