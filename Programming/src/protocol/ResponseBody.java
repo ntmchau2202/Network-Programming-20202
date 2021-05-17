@@ -28,7 +28,7 @@ public class ResponseBody {
 		this.responseBody.put("session_id", sessionID);
 		this.responseBody.put("elo", elo);
 		this.responseBody.put("rank", rank);
-		this.responseBody.put("win_rate",winRate);
+		this.responseBody.put("win_rate", String.valueOf(winRate));
 		this.responseBody.put("num_game_played", numGamePlayed);
 		this.responseBody.put("num_game_won", numGameWin);
 	}
