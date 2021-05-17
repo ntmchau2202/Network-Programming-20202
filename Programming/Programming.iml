@@ -12,27 +12,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library name="javafx15">
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/lib/javafx-sdk-15.0.1/lib" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/lib/javafx-sdk-15.0.1/lib" />
-        </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/lib/javafx-sdk-15.0.1/lib" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/lib/javafx-sdk-15.0.1/lib" recursive="false" type="SOURCES" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/json-20210307.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
+    <orderEntry type="library" exported="" name="json-20210307" level="project" />
+    <orderEntry type="library" exported="" name="sqlite-jdbc-3.7.2" level="project" />
+    <orderEntry type="library" exported="" name="javafx" level="project" />
   </component>
 </module>
