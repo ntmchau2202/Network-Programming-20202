@@ -2,27 +2,23 @@ package client.controller;
 
 import client.network.ClientSocketChannel;
 import entity.Player.RankPlayer;
-import helper.MessageParser;
+import message.login.LoginServerMessage;
 import protocol.StatusCode;
 
 public class LoginFormController extends BaseController {
-	
-	private MessageParser msgParser = new MessageParser();
 	private RankPlayer loggedPlayer;
-	
     public boolean isLoginSuccessfully(String username, String password) throws Exception {
         String result = ClientSocketChannel.getSocketInstance().login(username, password);
-        // parsing stuff here
-        if (result.length() != 0) {
-        	StatusCode stat = msgParser.getStatusCode(result);
-	        if (stat.compareTo(StatusCode.SUCCESS) == 0) {
-                String sessionID = String.valueOf(msgParser.getInfoField(result,"session_id"));
-                int elo = (int)msgParser.getInfoField(result, "elo");
-	            loggedPlayer = new RankPlayer(username, sessionID, elo);
-	        	return true;
-	        } 
+        LoginServerMessage serverResponse = new LoginServerMessage(result);
+        if (serverResponse.getStatusCode().compareTo(StatusCode.SUCCESS) == 0) {
+        	String sessionID = serverResponse.getSessionID();
+        	String returnedUsername = serverResponse.getUsername();
+        	int elo = serverResponse.getELO();
+        	loggedPlayer = new RankPlayer(returnedUsername, sessionID, elo);
+        	return true;
         }
-        return false;
+        
+        return false;	
     }
 
     public RankPlayer getLoggedPlayer() {

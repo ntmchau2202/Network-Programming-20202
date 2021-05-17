@@ -1,6 +1,17 @@
 .vscode
+<<<<<<< HEAD
+<<<<<<< HEAD
 Programming/out
 Programming/.idea
+Ref/
+=======
+<<<<<<< HEAD
+build/
+=======
+=======
+Programming/out
+Programming/.idea
+>>>>>>> 48f4e7a33101c2d432293ef89cfc4c171efe8980
 Ref/
 build/
 
@@ -9,3 +20,9 @@ build/
 .idea
 *.iml
 out
+<<<<<<< HEAD
+
+>>>>>>> c80bbbacc5d29925e179e37b46a5590bc59ffbfb
+>>>>>>> update-protocol
+=======
+>>>>>>> 48f4e7a33101c2d432293ef89cfc4c171efe8980

@@ -8,12 +8,17 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 //import java.util.ArrayList;
 
+import org.json.JSONObject;
+
 import entity.Player.Player;
 import entity.Player.RankPlayer;
-import helper.MessageParser;
+import message.ClientMessage;
+import message.login.LoginClientMessage;
+import message.login.LoginServerMessage;
+import message.register.RegisterClientMessage;
+import message.register.RegisterServerMessage;
 import protocol.Attachment;
 import protocol.Command;
-import protocol.ServerMessage;
 import protocol.StatusCode;
 import server.authentication.T3Authenticator;
 import server.network.ReadCompletionHandler;
@@ -21,23 +26,15 @@ import server.network.WriteCompletionHandler;
 
 public class Server {
 	private AsynchronousServerSocketChannel serverSocketChannel;
-//	private Attachment attachment;
-//	private ArrayList<AsynchronousSocketChannel> listSocket;
-	private MessageParser msgParser = new MessageParser();
 	
 	public Server() throws Exception {
 		serverSocketChannel = AsynchronousServerSocketChannel.open();
-//		attachment = new Attachment();
-//		listSocket = new ArrayList<AsynchronousSocketChannel>();
 	}
 
 	public void start(int port) throws Exception {
 		serverSocketChannel.bind(new InetSocketAddress(port));
 		
 		System.out.println("Server started");
-		
-//		AcceptCompletionHandler acceptCompletionHandler = new AcceptCompletionHandler(serverSocketChannel, attachment, listSocket);
-//		serverSocketChannel.accept(attachment, acceptCompletionHandler);
 		
 		while(true) {
 			serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>(){
@@ -100,7 +97,10 @@ public class Server {
 	public String processReturn(String recvMsg) throws Exception {
 		String response = "";
 		
-		Command cmd = msgParser.getCommand(recvMsg);
+		JSONObject clientMsg = new JSONObject(recvMsg);
+		
+		Command cmd = Command.toCommand(clientMsg.getString("command_code"));
+		
 		switch (cmd) {
 		case LOGIN: {
 				response = this.processLoginRequest(recvMsg);
@@ -160,29 +160,35 @@ public class Server {
 	}
 	
 	private String processLoginRequest(String input) throws Exception {
-		ServerMessage serverResponse = new ServerMessage();
-		String username = (String)msgParser.getInfoField(input, "username");
-		String password = (String)msgParser.getInfoField(input, "password");
+
+		LoginServerMessage serverResponse = null;
+		
+		LoginClientMessage clientRequest = new LoginClientMessage(input);
+		String username = clientRequest.getUsername();
+		String password = clientRequest.getPassword();
 		// get logged player
 		RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
 		if (loggedPlayer == null) {
-			serverResponse.createLoginResponse("", "", 0, StatusCode.ERROR, "Username / Password is invalid");
+			serverResponse = new LoginServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
 		} else {
-			serverResponse.createLoginResponse(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), StatusCode.SUCCESS, "");
+			serverResponse = new LoginServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
 		}
     	return serverResponse.toString();		
 	}
 	
 	private String processRegisterRequest(String input) throws Exception {
-		ServerMessage serverResponse = new ServerMessage();
-		String username = (String)msgParser.getInfoField(input, "username");
-		String password = (String)msgParser.getInfoField(input, "password");
+		RegisterServerMessage serverResponse = null;
+		
+		RegisterClientMessage clientRequest = new RegisterClientMessage(input);
+		String username = clientRequest.getUsername();
+		
+		String password = clientRequest.getPassword();
 		// register new player
 		RankPlayer loggedPlayer = new T3Authenticator().register(username, password);
 		if (loggedPlayer == null) {
-			serverResponse.createRegisterResponse("", "", 0, StatusCode.ERROR, "Username exists");
+			serverResponse = new RegisterServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
 		} else {
-			serverResponse.createRegisterResponse(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), StatusCode.SUCCESS, "");
+			serverResponse = new RegisterServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
 		}
 		return serverResponse.toString();
 	}

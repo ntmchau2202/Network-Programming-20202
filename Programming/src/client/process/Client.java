@@ -9,13 +9,13 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
 
 import client.network.WriteCompletionHandler;
+import message.login.LoginClientMessage;
 import protocol.Attachment;
-import protocol.ClientMessage;
 
 public class Client {
 	private BufferedReader stdIn;
 	private ByteBuffer buffer;
-	private ClientMessage clientMsg;
+
 	
 	private AsynchronousSocketChannel clientSocketChannel;
 	WriteCompletionHandler writeCompletionHandler;
@@ -27,8 +27,6 @@ public class Client {
 		clientSocketChannel.setOption(StandardSocketOptions.SO_SNDBUF, 4096);
 		clientSocketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
 		
-		// setting up components of client
-		clientMsg = new ClientMessage();
 		buffer = ByteBuffer.allocate(4086);
 		writeCompletionHandler = new WriteCompletionHandler(clientSocketChannel);
 		
@@ -102,8 +100,7 @@ public class Client {
 	
 	// ================ FUNCTIONS ================
 	
-	private void sendRequest() throws Exception {
-		String strMsgToSend = clientMsg.toString();
+	private void sendRequest(String strMsgToSend) throws Exception {
 		Attachment attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
 		clientSocketChannel.write(buffer, attachment, writeCompletionHandler);
@@ -111,8 +108,8 @@ public class Client {
 	}
 	
 	public void login(String username, String password) throws Exception {
-		clientMsg.createLoginRequest(username, password);
-		sendRequest();
+		LoginClientMessage clientMsg = new LoginClientMessage(username, password);
+		sendRequest(clientMsg.toString());
 	}
 	
 	public void register(String username, String password) throws Exception {
