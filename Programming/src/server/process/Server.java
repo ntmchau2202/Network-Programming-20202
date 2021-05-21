@@ -6,13 +6,20 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 //import java.util.ArrayList;
+import java.util.Queue;
 
 import org.json.JSONObject;
 
 import entity.Player.Player;
 import entity.Player.RankPlayer;
 import message.ClientMessage;
+import message.joinqueue.JoinQueueClientMessage;
+import message.joinqueue.JoinQueueServerMessage;
 import message.login.LoginClientMessage;
 import message.login.LoginServerMessage;
 import message.register.RegisterClientMessage;
@@ -26,9 +33,15 @@ import server.network.WriteCompletionHandler;
 
 public class Server {
 	private AsynchronousServerSocketChannel serverSocketChannel;
+	private ArrayList<RankPlayer> hall;
+	private Queue<Player> normalQueue;
+	private Queue<RankPlayer> rankedQueue;
 	
 	public Server() throws Exception {
 		serverSocketChannel = AsynchronousServerSocketChannel.open();
+		hall = new ArrayList<RankPlayer>();
+		normalQueue = new LinkedList<Player>();
+		rankedQueue = new LinkedList<RankPlayer>();
 	}
 
 	public void start(int port) throws Exception {
@@ -59,8 +72,8 @@ public class Server {
 			    		String recvMsg = socketAttachment.getReturnMessage();
 			    		
 			    		try {
-			    			String msgToSend = processReturn(recvMsg);
-			    			sendResponse(msgToSend, result);
+			    			Map<AsynchronousSocketChannel, String> msgToSend = processReturn(recvMsg, result);
+			    			sendResponse(msgToSend);
 			    		} catch (Exception e) {
 			    			e.printStackTrace();
 			    		}		    		
@@ -81,21 +94,28 @@ public class Server {
 		}
 	}
 	
-	private void sendResponse(String msg, AsynchronousSocketChannel toSocket) {
+	private void sendResponse(Map<AsynchronousSocketChannel, String> listMsg) {
 
-    	Attachment newAttachment = new Attachment(msg, true);
-    	ByteBuffer bufferRequest = ByteBuffer.wrap(msg.getBytes(StandardCharsets.UTF_8));
-    	
-    	WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(toSocket);
-		toSocket.write(bufferRequest, newAttachment, writeCompletionHandler);
-		while(newAttachment.getActive().get()) {
-			
+		// rehandle this
+		for (Map.Entry<AsynchronousSocketChannel, String> item : listMsg.entrySet()) {
+			String msg = item.getValue();
+			AsynchronousSocketChannel toSocket = item.getKey();
+			Attachment newAttachment = new Attachment(msg, true);
+	    	ByteBuffer bufferRequest = ByteBuffer.wrap(msg.getBytes(StandardCharsets.UTF_8));
+	    	
+	    	WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(toSocket);
+			toSocket.write(bufferRequest, newAttachment, writeCompletionHandler);
+			while(newAttachment.getActive().get()) {
+				
+			}
+			System.out.println("Done sending msg: " + msg);	
 		}
-		System.out.println("Done sending");	
+    	
 	}
 	
-	public String processReturn(String recvMsg) throws Exception {
-		String response = "";
+	public Map<AsynchronousSocketChannel, String> processReturn(String recvMsg, AsynchronousSocketChannel sock) throws Exception {
+		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 		
 		JSONObject clientMsg = new JSONObject(recvMsg);
 		
@@ -103,47 +123,44 @@ public class Server {
 		
 		switch (cmd) {
 		case LOGIN: {
-				response = this.processLoginRequest(recvMsg);
+				listResponse = this.processLoginRequest(recvMsg, sock);
 				break;
 			}
 			case REGISTER: {
-				response = this.processRegisterRequest(recvMsg);
+				listResponse = this.processRegisterRequest(recvMsg, sock);
 				break;
 			}
 			case JOIN_QUEUE: {
-				response = this.processJoinQueueRequest();
-				break;
-			}
-			case MATCH_FOUND: {
-				response = this.notifyMatchFound();
+				listResponse = this.processJoinQueueRequest(recvMsg, sock);
+				
 				break;
 			}
 			case MOVE: {
-				response = this.processMoveRequest();
+				listResponse = this.processMoveRequest();
 				break;
 			}
 			case DRAW_REQUEST: {
-				response = this.processRequestDrawRequest();
+				listResponse = this.processRequestDrawRequest();
 				break;
 			}
 			case DRAW_CONFIRM: {
-				response = this.processConfirmDrawRequest();
+				listResponse = this.processConfirmDrawRequest();
 				break;
 			}
 			case ENDGAME: {
-				response = this.notifyEndgame();
+				listResponse = this.notifyEndgame();
 				break;
 			}
 			case LEADERBOARD: {
-				response = this.processGetLeaderBoardRequest();
+				listResponse = this.processGetLeaderBoardRequest();
 				break;
 			}
 			case CHAT: {
-				response = this.processChatRequest();
+				listResponse = this.processChatRequest();
 				break;
 			}
 			case CHATACK: {
-				response = this.processChatACKRequest();
+				listResponse = this.processChatACKRequest();
 				break;
 			}
 			case LOGOUT: {
@@ -151,16 +168,16 @@ public class Server {
 				break;
 			}
 			default: {
-				response = this.notifyUnknownCommand();
+				listResponse = this.notifyUnknownCommand();
 				break;
 			}
 		}
 		
-		return response;
+		return listResponse;
 	}
 	
-	private String processLoginRequest(String input) throws Exception {
-
+	private Map<AsynchronousSocketChannel, String> processLoginRequest(String input, AsynchronousSocketChannel sock) throws Exception {
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 		LoginServerMessage serverResponse = null;
 		
 		LoginClientMessage clientRequest = new LoginClientMessage(input);
@@ -171,12 +188,16 @@ public class Server {
 		if (loggedPlayer == null) {
 			serverResponse = new LoginServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
 		} else {
+			loggedPlayer.setUserSocket(sock);
+			hall.add(loggedPlayer);
 			serverResponse = new LoginServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
 		}
-    	return serverResponse.toString();		
+		listResponse.put(sock, serverResponse.toString());
+    	return listResponse;		
 	}
 	
-	private String processRegisterRequest(String input) throws Exception {
+	private Map<AsynchronousSocketChannel, String> processRegisterRequest(String input, AsynchronousSocketChannel sock) throws Exception {
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 		RegisterServerMessage serverResponse = null;
 		
 		RegisterClientMessage clientRequest = new RegisterClientMessage(input);
@@ -188,72 +209,120 @@ public class Server {
 		if (loggedPlayer == null) {
 			serverResponse = new RegisterServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
 		} else {
+			loggedPlayer.setUserSocket(sock);
+			hall.add(loggedPlayer);
 			serverResponse = new RegisterServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
 		}
-		return serverResponse.toString();
+		listResponse.put(sock, serverResponse.toString());
+    	return listResponse;	
 	}
 	
-	private String processJoinQueueRequest() throws Exception {
-		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;
+	private Map<AsynchronousSocketChannel, String> processJoinQueueRequest(String input, AsynchronousSocketChannel sock) throws Exception {
+		System.out.println("======== Start processing join queue request");
+		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		JoinQueueClientMessage clientRequest = new JoinQueueClientMessage(input);
+		String sessionID = clientRequest.getSessionID();
+		String mode = clientRequest.getGameMode();
+		if (mode.compareToIgnoreCase("normal") == 0) {
+			// check if this is ranked user
+			System.out.println("Normal request!");
+			RankPlayer loggedPlayer = null;
+			for (RankPlayer player : hall) {
+				if (sessionID.compareTo(player.getSessionId())==0) {
+					loggedPlayer = player;
+					break;
+				}
+			}
+			
+			if (loggedPlayer != null) {
+				hall.remove(loggedPlayer);
+				normalQueue.add(loggedPlayer);
+				System.out.println("normal queue: " + normalQueue.toString());
+				while(normalQueue.size() < 2) {
+					
+				}
+				
+				Player player1 = normalQueue.poll();
+				Player player2 = normalQueue.poll();
+				
+				// prepare message according to each player
+				
+				JoinQueueServerMessage player1Message = new JoinQueueServerMessage(player1.getUsername(), player1.getSessionId(), player2.getUsername(), 1234, 1234, player1.getUsername(), StatusCode.SUCCESS, "");
+				JoinQueueServerMessage player2Message = new JoinQueueServerMessage(player2.getUsername(), player2.getSessionId(), player1.getUsername(), 1234, 1234, player1.getUsername(), StatusCode.SUCCESS, "");
+				
+				listResponse.put(player1.getUserSocket(), player1Message.toString());
+				listResponse.put(player2.getUserSocket(), player2Message.toString());
+			} else {
+				// if it is not ranked user, call to create a new guest player account
+				
+			}
+			
+			
+			
+		} else if (mode.compareToIgnoreCase("ranked") == 0) {
+
+		} else {
+			// error
+		}
+		return listResponse;
 	}
 	
-	private String notifyMatchFound() throws Exception {
+	private Map<AsynchronousSocketChannel, String> notifyMatchFound() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;
 	}
 	
-	private String processMoveRequest() throws Exception {
+	private Map<AsynchronousSocketChannel, String> processMoveRequest() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;		
 	}
 	
-	private String processRequestDrawRequest() throws Exception {
+	private Map<AsynchronousSocketChannel, String> processRequestDrawRequest() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;		
 	}
 	
-	private String processConfirmDrawRequest() throws Exception {
+	private Map<AsynchronousSocketChannel, String> processConfirmDrawRequest() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;		
 	}
 	
-	private String notifyEndgame() throws Exception {
+	private Map<AsynchronousSocketChannel, String> notifyEndgame() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;	
 	}
 	
-	private String processGetLeaderBoardRequest() throws Exception {
+	private Map<AsynchronousSocketChannel, String> processGetLeaderBoardRequest() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;	
 	}
 	
-	private String processChatRequest() throws Exception {
+	private Map<AsynchronousSocketChannel, String> processChatRequest() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;	
 	}
 	
-	private String processChatACKRequest() throws Exception {
+	private Map<AsynchronousSocketChannel, String> processChatACKRequest() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;	
 	}
 	
 	private void processLogoutRequest() throws Exception {
 		
 	}
 	
-	private String notifyUnknownCommand() throws Exception {
+	private Map<AsynchronousSocketChannel, String> notifyUnknownCommand() throws Exception {
 		// TODO: Finish the function here
-		String returnMsg = "";
-		return returnMsg;		
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		return listResponse;		
 	}
 }

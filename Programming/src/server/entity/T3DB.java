@@ -10,7 +10,7 @@ public class T3DB {
         if (connect != null) return connect;
         try {
             Class.forName("org.sqlite.JDBC");
-            String url = "jdbc:sqlite:src/server/assets/db/t3db.db";
+            String url = "jdbc:sqlite:server/assets/db/t3db.db";
             connect = DriverManager.getConnection(url);
             System.out.println("Connect database successfully");
         } catch (Exception e) {

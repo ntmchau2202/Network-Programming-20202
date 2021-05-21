@@ -1,5 +1,6 @@
 package server.authentication;
 
+import entity.Player.Player;
 import entity.Player.RankPlayer;
 import server.entity.T3DB;
 
@@ -16,10 +17,15 @@ public class T3Authenticator {
         stm.setString(1, username);
         stm.setString(2, password);
         ResultSet res = stm.executeQuery();
+        String sessionID = genSessionID();
         // TODO: throw exception if multiple results
         while (res.next()) {
             // TODO: get rank
-            loggedPlayer = new RankPlayer(res.getString("username"), genSessionID(), res.getInt("elo"),res.getInt("no_match_played"), res.getInt("no_match_won"));
+            loggedPlayer = new RankPlayer(res.getString("username"), sessionID , res.getInt("elo"),res.getInt("no_match_played"), res.getInt("no_match_won"));
+//            PreparedStatement stmInsertSessionID = T3DB.getConnection().prepareStatement(
+//            		"insert into SessionID (username, session_id) values (?, ?)");
+//            stmInsertSessionID.setString(1, username);
+//            stmInsertSessionID.setString(2, sessionID);
         }
         return loggedPlayer;
     }
@@ -68,4 +74,13 @@ public class T3Authenticator {
         }
         return loggedPlayer;
     }
+    
+//    public Player getOnlinePlayer(String sessionID) throws Exception {
+//    	Player player = null;
+//    	PreparedStatement stm = T3DB.getConnection().prepareStatement(
+//    			"select username from SessionID where session_id = ?");
+//    	stm.setString(1, sessionID);
+//    	ResultSet res = stm.executeQuery();
+//    	
+//    }
 }

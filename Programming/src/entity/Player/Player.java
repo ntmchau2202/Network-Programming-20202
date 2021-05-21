@@ -1,8 +1,11 @@
 package entity.Player;
 
+import java.nio.channels.AsynchronousSocketChannel;
+
 public abstract class Player {
     private final String username;
     private final String sessionId;
+    private AsynchronousSocketChannel userSocket;
 
     public Player(String username, String sessionId) {
         this.username = username;
@@ -15,6 +18,14 @@ public abstract class Player {
 
     public String getSessionId() {
         return sessionId;
+    }
+    
+    public void setUserSocket(AsynchronousSocketChannel sock) {
+    	this.userSocket = sock;	
+    }
+    
+    public AsynchronousSocketChannel getUserSocket() {
+    	return this.userSocket;
     }
 
 }

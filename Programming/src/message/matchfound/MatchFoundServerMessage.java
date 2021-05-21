@@ -17,7 +17,7 @@ public class MatchFoundServerMessage extends ServerMessage {
 		this.opponent = opponent;
 		
 		this.setCommand(Command.MATCH_FOUND);
-		this.responseBody.createMatchFoundBody(matchID, opponent, elo);
+		// this.responseBody.createMatchFoundBody(matchID, opponent, elo);
 		this.finalizeMessageObject();
 	}
 	
