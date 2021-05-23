@@ -1,6 +1,7 @@
 package client.network;
 
 import client.utils.Configs;
+import message.joinqueue.JoinQueueClientMessage;
 import message.login.LoginClientMessage;
 import message.register.RegisterClientMessage;
 import protocol.Attachment;
@@ -75,9 +76,9 @@ public class ClientSocketChannel {
 		return sendRequest(registerRequest.toString());
 	}
 	
-	public String joinQueue(String mode) throws Exception {
-		// TODO: Finish function
-		return sendRequest("");
+	public String joinQueue(String sesID, String mode) throws Exception {
+		JoinQueueClientMessage joinQueueRequest = new JoinQueueClientMessage(mode, sesID);
+		return sendRequest(joinQueueRequest.toString());
 	}
 	
 	public String move(int x, int y, String state, String result) throws Exception {
