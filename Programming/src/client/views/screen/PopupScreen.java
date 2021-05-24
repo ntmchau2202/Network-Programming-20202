@@ -5,6 +5,7 @@ import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -26,6 +27,7 @@ public class PopupScreen extends BaseScreenHandler{
 
     public PopupScreen(Stage stage) throws IOException{
         super(stage, Configs.POPUP_PATH);
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     private static PopupScreen popup(String message, String imagePath, Boolean undecorated) throws IOException{
@@ -37,7 +39,7 @@ public class PopupScreen extends BaseScreenHandler{
     }
 
     public static void success(String message) throws IOException{
-        popup(message, Configs.IMAGE_PATH + "/" + "checked.png", false).show(false);
+        popup(message, Configs.IMAGE_PATH + "/" + "checked.png", false).show(true);
     }
 
     public static void error(String message) throws IOException{
@@ -54,7 +56,7 @@ public class PopupScreen extends BaseScreenHandler{
 
     public void show(Boolean autoClose) {
         super.show();
-        if (autoClose) close(0.8);
+        if (autoClose) close(3.2);
     }
 
     public void show(double time) {
