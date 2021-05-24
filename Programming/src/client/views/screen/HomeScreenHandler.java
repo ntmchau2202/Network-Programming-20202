@@ -63,6 +63,7 @@ public class HomeScreenHandler extends BaseScreenHandler
                 BaseScreenHandler loginFormHandler = new LoginFormHandler(this.stage,
                         Configs.LOGIN_FORM_PATH, new LoginFormController());
                 loginFormHandler.setScreenTitle("Login");
+                loginFormHandler.setPreviousScreen(this);
                 loginFormHandler.show();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -73,6 +74,7 @@ public class HomeScreenHandler extends BaseScreenHandler
                 BaseScreenHandler registerFormHandler = new RegisterFormHandler(this.stage,
                         Configs.REGISTER_FORM_PATH, new RegisterFormController());
                 registerFormHandler.setScreenTitle("Register");
+                registerFormHandler.setPreviousScreen(this);
                 registerFormHandler.show();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -83,6 +85,7 @@ public class HomeScreenHandler extends BaseScreenHandler
                 BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
                         Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
                 leaderboardHandler.setScreenTitle("Leaderboard");
+                leaderboardHandler.setPreviousScreen(this);
                 leaderboardHandler.show();
             } catch (IOException e) {
                 e.printStackTrace();

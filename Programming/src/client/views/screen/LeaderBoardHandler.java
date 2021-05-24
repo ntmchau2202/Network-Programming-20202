@@ -1,7 +1,9 @@
 package client.views.screen;
 
 import client.controller.LeaderBoardController;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -12,6 +14,8 @@ public class LeaderBoardHandler extends BaseScreenHandler implements Initializab
 
     private final LeaderBoardController leaderBoardController;
 
+    @FXML
+    private ImageView prevScreenImageView;
     /**
      * @param stage stage of screen.
      * @param screenPath path to screen fxml
@@ -20,7 +24,10 @@ public class LeaderBoardHandler extends BaseScreenHandler implements Initializab
     public LeaderBoardHandler(Stage stage, String screenPath, LeaderBoardController leaderBoardController) throws IOException {
         super(stage, screenPath);
         this.leaderBoardController = leaderBoardController;
-
+        prevScreenImageView.setOnMouseClicked(e -> {
+            this.getPreviousScreen().show();
+            this.getPreviousScreen().setScreenTitle("Home Screen");
+        });
     }
 
     @Override

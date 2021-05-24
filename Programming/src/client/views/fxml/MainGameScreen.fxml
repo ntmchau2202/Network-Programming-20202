@@ -8,9 +8,8 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1239.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
@@ -30,109 +29,6 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <GridPane gridLinesVisible="true" prefHeight="591.0" prefWidth="604.0" style="-fx-background-color: white;" styleClass="mygridStyle" stylesheets="@assets/css/style.css">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="5" GridPane.rowIndex="5">
-               <image>
-                  <Image url="@assets/img/circle.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="6" GridPane.rowIndex="6">
-               <image>
-                  <Image url="@assets/img/cross.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="6">
-               <image>
-                  <Image url="@assets/img/circle.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="6" GridPane.rowIndex="4">
-               <image>
-                  <Image url="@assets/img/circle.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="7" GridPane.rowIndex="3">
-               <image>
-                  <Image url="@assets/img/circle.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="7">
-               <image>
-                  <Image url="@assets/img/circle.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="4">
-               <image>
-                  <Image url="@assets/img/circle.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="7" GridPane.rowIndex="4">
-               <image>
-                  <Image url="@assets/img/cross.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="8" GridPane.rowIndex="2">
-               <image>
-                  <Image url="@assets/img/cross.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="3">
-               <image>
-                  <Image url="@assets/img/cross.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="5" GridPane.rowIndex="2">
-               <image>
-                  <Image url="@assets/img/cross.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="7" GridPane.rowIndex="7">
-               <image>
-                  <Image url="@assets/img/cross.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="8" GridPane.rowIndex="8">
-               <image>
-                  <Image url="@assets/img/cross.png" />
-               </image>
-            </ImageView>
-         </children>
-      </GridPane>
       <Label layoutX="701.0" layoutY="94.0" text="1236">
          <font>
             <Font name="System Bold" size="24.0" />
@@ -175,21 +71,30 @@
             <Image url="@assets/img/circle.png" />
          </image>
       </ImageView>
-      <Button layoutX="1164.0" layoutY="548.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" styleClass="send-buttton" stylesheets="@assets/css/style.css" text="Send" />
-      <ScrollPane layoutX="604.0" layoutY="258.0" prefHeight="290.0" prefWidth="638.0">
+      <Button layoutX="1164.0" layoutY="548.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" styleClass="send-buttton" stylesheets="@assets/css/style.css" text="Send">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <ScrollPane layoutX="605.0" layoutY="257.0" prefHeight="290.0" prefWidth="634.0">
          <content>
-            <AnchorPane prefHeight="350.0" prefWidth="635.0" style="-fx-background-color: white; -fx-border-color: transparent;" />
+            <AnchorPane prefHeight="289.0" prefWidth="630.0" style="-fx-background-color: white; -fx-border-color: transparent;" />
          </content>
       </ScrollPane>
-      <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="607.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="prevScreenImageView" fitHeight="35.0" fitWidth="35.0" layoutX="607.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/back.png" />
          </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </ImageView>
-      <ImageView fitHeight="35.0" fitWidth="40.0" layoutX="1202.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="homeScreenImageView" fitHeight="35.0" fitWidth="40.0" layoutX="1202.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/home.png" />
          </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </ImageView>
       <Label layoutX="744.0" layoutY="140.0" text="1">
          <font>
@@ -205,6 +110,9 @@
          <image>
             <Image url="@assets/img/flag.png" />
          </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </ImageView>
       <Label layoutX="805.0" layoutY="218.0" text="Ask for draw">
          <font>
@@ -215,6 +123,9 @@
          <image>
             <Image url="@assets/img/quit.png" />
          </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </ImageView>
       <Label layoutX="993.0" layoutY="218.0" text="Quit">
          <font>
@@ -226,5 +137,15 @@
             <Image url="@assets/img/bg2%20-%20Copy.jpg" />
          </image>
       </ImageView>
+      <Pane fx:id="boardPane" layoutX="-1.0" prefHeight="591.0" prefWidth="604.0">
+         <children>
+             <GridPane fx:id="gameBoardGridPane" gridLinesVisible="true" layoutX="2.0" prefHeight="591.0" prefWidth="604.0" style="-fx-background-color: white;" styleClass="mygridStyle" stylesheets="@assets/css/style.css">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></GridPane>
+         </children>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Pane>
    </children>
 </AnchorPane>

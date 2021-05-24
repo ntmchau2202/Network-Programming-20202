@@ -1,15 +1,12 @@
 package client.views.screen;
 
-import client.controller.GameModeScreenController;
-import client.controller.LeaderBoardController;
-import client.controller.LoginFormController;
-import client.controller.MainGameScreenController;
-import client.controller.RegisterFormController;
+import client.controller.*;
 import client.utils.Configs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -42,7 +39,10 @@ public class GameModeScreenHandler extends BaseScreenHandler
 
     @FXML
     private Button rankPlay;
-
+    @FXML
+    private ImageView prevScreenImageView;
+    @FXML
+    private ImageView homeScreenImageView;
     private final GameModeScreenController gameModeScreenController;
 
     /**
@@ -59,10 +59,20 @@ public class GameModeScreenHandler extends BaseScreenHandler
         this.noPlayedMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoPlayedMatch()));
         this.noWonMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoWonMatch()));
         this.winningRate.setText(Float.toString(this.gameModeScreenController.getCurPlayer().getWinningRate()));
+        HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
+        prevScreenImageView.setOnMouseClicked(e -> {
+            homeHandler.show();
+            homeHandler.setScreenTitle("Home Screen");
+        });
+        homeScreenImageView.setOnMouseClicked(e -> {
+            homeHandler.show();
+            homeHandler.setScreenTitle("Home Screen");
+        });
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
     }
 
     @FXML
@@ -71,15 +81,17 @@ public class GameModeScreenHandler extends BaseScreenHandler
     		BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage, 
           			Configs.MAINGAME_SCREEN_PATH, new MainGameScreenController());
         		mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+        		mainGameScreenHandler.setPreviousScreen(this);
     		if (evt.getSource() == practicePlay) {
 	            System.out.println("practice play");
 	            
 	            boolean isFound = gameModeScreenController.findPracticeGame();
 	            if (isFound) {
-	            	// TODO: may need other analyze here	
+	            	// TODO: may need other analyze here
+                    notifySuccess("Yeah! Found a match! Let's practice");
 	            	mainGameScreenHandler.show();
 	            } else {
-	            	// TODO: make some notification here
+                    notifyError("Can not find practice play match");
 	            }
 	            
 	        } else if (evt.getSource() == rankPlay) {
@@ -88,9 +100,10 @@ public class GameModeScreenHandler extends BaseScreenHandler
 	            boolean isFound = gameModeScreenController.findRankGame();
 	            if (isFound) {
 	            	// TODO: may need other analyze here
+                    notifySuccess("Yeah! Found a rank match! Hope you win");
 	            	mainGameScreenHandler.show();
 	            } else {
-	            	// TODO: make some notification here
+                    notifyError("Can not find rank play match");
 	            }
 	
 	        }

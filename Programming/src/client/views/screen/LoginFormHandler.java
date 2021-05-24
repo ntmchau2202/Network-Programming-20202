@@ -9,7 +9,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,6 +26,9 @@ public class LoginFormHandler extends BaseScreenHandler
     @FXML
     private PasswordField passwordTextField;
 
+    @FXML
+    private ImageView prevScreenImageView;
+
     private final LoginFormController loginFormController;
 
     /**
@@ -34,7 +39,10 @@ public class LoginFormHandler extends BaseScreenHandler
     public LoginFormHandler(Stage stage, String screenPath, LoginFormController loginFormController) throws IOException {
         super(stage, screenPath);
         this.loginFormController = loginFormController;
-
+        prevScreenImageView.setOnMouseClicked(e -> {
+            this.getPreviousScreen().show();
+            this.getPreviousScreen().setScreenTitle("Home Screen");
+        });
     }
 
     @Override
@@ -42,15 +50,17 @@ public class LoginFormHandler extends BaseScreenHandler
     }
 
     @FXML
-    private void confirmLoginAction(javafx.event.Event evt) {
+    private void confirmLoginAction(javafx.event.Event evt) throws IOException {
         String username = usernameTextField.getText();
         String password = passwordTextField.getText();
         if (username.isEmpty()) {
             System.out.println("username is null. Insert again");
+            notifyError("Username is empty. Insert again");
             return ;
         }
         if (password.isEmpty()) {
             System.out.println("password is null. Insert again");
+            notifyError("Password is null. Insert again");
             return ;
         }
         System.out.println("Username: " + username);
@@ -59,10 +69,10 @@ public class LoginFormHandler extends BaseScreenHandler
 
             if (!this.loginFormController.isLoginSuccessfully(username, password)) {
                 System.out.println("Login failed");
-                // TODO: show some message box here
+                notifyError("Login failed");
                 return ;
             }
-
+            notifySuccess("Login successfully");
             BaseScreenHandler gameModeScreenHandler = new GameModeScreenHandler(this.stage,
                     Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController(this.loginFormController.getLoggedPlayer()));
             gameModeScreenHandler.setScreenTitle("Game Mode");

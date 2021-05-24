@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -35,5 +36,13 @@
             <TableColumn prefWidth="59.199920654296875" text="Elo" />
         </columns>
       </TableView>
+      <ImageView fx:id="prevScreenImageView" fitHeight="35.0" fitWidth="35.0" layoutX="13.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@assets/img/back.png" />
+         </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ImageView>
    </children>
 </AnchorPane>

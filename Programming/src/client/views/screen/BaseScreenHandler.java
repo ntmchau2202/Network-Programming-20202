@@ -57,4 +57,23 @@ public class BaseScreenHandler extends FXMLScreenHandler {
         this.stage.setScene(this.scene);
         this.stage.show();
     }
+    /**
+     * notifying error
+     * @param error error message
+     * @throws IOException io exception
+     */
+    void notifyError(String error) throws IOException {
+        System.out.println(error);
+        PopupScreen.error(error);
+    }
+
+    /**
+     * notifying success
+     * @param success success message
+     * @throws IOException io exception
+     */
+    void notifySuccess(String success) throws IOException {
+        System.out.println(success);
+        PopupScreen.success(success);
+    }
 }
