@@ -96,7 +96,6 @@ public class Server {
 	
 	private void sendResponse(Map<AsynchronousSocketChannel, String> listMsg) {
 
-		// rehandle this
 		for (Map.Entry<AsynchronousSocketChannel, String> item : listMsg.entrySet()) {
 			String msg = item.getValue();
 			AsynchronousSocketChannel toSocket = item.getKey();
@@ -136,7 +135,7 @@ public class Server {
 				break;
 			}
 			case MOVE: {
-				listResponse = this.processMoveRequest();
+				listResponse = this.processMoveRequest(recvMsg, sock);
 				break;
 			}
 			case DRAW_REQUEST: {
@@ -274,9 +273,10 @@ public class Server {
 		return listResponse;
 	}
 	
-	private Map<AsynchronousSocketChannel, String> processMoveRequest() throws Exception {
+	private Map<AsynchronousSocketChannel, String> processMoveRequest(String input) throws Exception {
 		// TODO: Finish the function here
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		
 		return listResponse;		
 	}
 	

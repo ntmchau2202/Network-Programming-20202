@@ -78,10 +78,9 @@ public class GameModeScreenHandler extends BaseScreenHandler
     @FXML
     private void handleFindGameAction(javafx.event.Event evt) {
     	try {
-    		BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage, 
-          			Configs.MAINGAME_SCREEN_PATH, new MainGameScreenController());
-        		mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
-        		mainGameScreenHandler.setPreviousScreen(this);
+    		MainGameScreenController mainGameScreenController = new MainGameScreenController(this.gameModeScreenController.getCurPlayer().getUsername());
+
+
     		if (evt.getSource() == practicePlay) {
 	            System.out.println("practice play");
 	            
@@ -89,11 +88,10 @@ public class GameModeScreenHandler extends BaseScreenHandler
 	            if (isFound) {
 	            	// TODO: may need other analyze here
                     notifySuccess("Yeah! Found a match! Let's practice");
-	            	mainGameScreenHandler.show();
+                    mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
 	            } else {
                     notifyError("Can not find practice play match");
 	            }
-	            
 	        } else if (evt.getSource() == rankPlay) {
 	            System.out.println("rank play");
 	            
@@ -101,12 +99,18 @@ public class GameModeScreenHandler extends BaseScreenHandler
 	            if (isFound) {
 	            	// TODO: may need other analyze here
                     notifySuccess("Yeah! Found a rank match! Hope you win");
-	            	mainGameScreenHandler.show();
+                    mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+	            	
 	            } else {
                     notifyError("Can not find rank play match");
 	            }
 	
 	        }
+    		BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage, 
+          			Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
+    		mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+    		mainGameScreenHandler.setPreviousScreen(this);
+    		mainGameScreenHandler.show();
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }

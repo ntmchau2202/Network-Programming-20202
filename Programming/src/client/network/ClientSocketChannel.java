@@ -54,6 +54,21 @@ public class ClientSocketChannel {
     
     // =================== FUNCTIONS =======================
     
+    public Attachment sendRequestAsync(String strMsgToSend) throws Exception {
+    	attachment = new Attachment(strMsgToSend, true);
+		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
+		socketChannel.write(buffer, attachment, writeCompletionHandler);
+		return attachment;
+    }
+    
+    public String receiveResponseAsync(Attachment att) throws Exception {
+    	while (attachment.getActive().get()) {
+			
+		}
+		System.out.println("This is printed from client: " + attachment.getReturnMessage());
+		return attachment.getReturnMessage();
+    }
+    
     private String sendRequest(String strMsgToSend) throws Exception {
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
@@ -68,8 +83,10 @@ public class ClientSocketChannel {
     
     public String login(String username, String password) throws Exception {
     	LoginClientMessage loginRequest = new LoginClientMessage(username, password);
-		return sendRequest(loginRequest.toString());
-	}
+		// return sendRequest(loginRequest.toString());
+    	Attachment att = sendRequestAsync(loginRequest.toString());
+    	return receiveResponseAsync(att);   	
+    }
 	
 	public String register(String username, String password) throws Exception {
 		RegisterClientMessage registerRequest = new RegisterClientMessage(username, password);
@@ -116,4 +133,16 @@ public class ClientSocketChannel {
 		return sendRequest("");
 	}
     
+	public String listenIngameMessage() {
+		attachment = new Attachment("", true);
+		buffer = ByteBuffer.wrap("".getBytes(StandardCharsets.UTF_8));
+		ByteBuffer inputBuffer = ByteBuffer.allocate(4096);
+		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(inputBuffer);
+		socketChannel.read(buffer, attachment, readCompletionHandler);
+		while (attachment.getActive().get()) {
+			
+		}
+		System.out.println("This is printed from client: " + attachment.getReturnMessage());
+		return attachment.getReturnMessage();
+	}
 }
