@@ -273,7 +273,7 @@ public class Server {
 		return listResponse;
 	}
 	
-	private Map<AsynchronousSocketChannel, String> processMoveRequest(String input) throws Exception {
+	private Map<AsynchronousSocketChannel, String> processMoveRequest(String input, AsynchronousSocketChannel sock) throws Exception {
 		// TODO: Finish the function here
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 		
