@@ -78,7 +78,7 @@ public class GameModeScreenHandler extends BaseScreenHandler
     @FXML
     private void handleFindGameAction(javafx.event.Event evt) {
     	try {
-    		MainGameScreenController mainGameScreenController = new MainGameScreenController(this.gameModeScreenController.getCurPlayer().getUsername());
+    		MainGameScreenController mainGameScreenController = new MainGameScreenController(this.gameModeScreenController.getCurPlayer());
 
 
     		if (evt.getSource() == practicePlay) {
@@ -87,7 +87,9 @@ public class GameModeScreenHandler extends BaseScreenHandler
 	            boolean isFound = gameModeScreenController.findPracticeGame();
 	            if (isFound) {
 	            	// TODO: may need other analyze here
-                    notifySuccess("Yeah! Found a match! Let's practice");
+	            	mainGameScreenController.setOpponent(this.gameModeScreenController.getOpponent(), this.gameModeScreenController.getOpponentElo());
+                    mainGameScreenController.setMatchID(this.gameModeScreenController.getMatchID());
+	            	notifySuccess("Yeah! Found a match! Let's practice");
                     System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
                     mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
 	            } else {

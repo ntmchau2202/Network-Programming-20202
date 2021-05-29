@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.json.JSONObject;
 
 import client.network.ClientSocketChannel;
+import entity.Player.Player;
 import javafx.application.Platform;
 import message.chat.ChatServerMessage;
 import message.chatack.ChatACKServerMessage;
@@ -18,11 +19,13 @@ import protocol.StatusCode;
 public class MainGameScreenController extends BaseController {
 	
 	private int moveX, moveY;
-	private String currentPlayer, movePlayer;
+	private Player currentPlayer;
+	private String movePlayer, opponentPlayer;
 	private String moveResult, moveState;
 	private boolean isMyTurn;
+	private int matchID, opponentElo;
 	
-	public MainGameScreenController(String currentPlayer) {
+	public MainGameScreenController(Player currentPlayer) {
 		this.currentPlayer = currentPlayer;
 	}
 	
@@ -30,12 +33,21 @@ public class MainGameScreenController extends BaseController {
 		this.isMyTurn = turn;
 	}
 	
+	public void setOpponent(String opponent, int elo) {
+		this.opponentPlayer = opponent;
+		this.opponentElo = elo;
+	}
+	
+	public void setMatchID(int matchID) {
+		this.matchID = matchID;
+	}
+	
 	public boolean isMyTurn() {
 		return this.isMyTurn;
 	}
 	
 	public boolean sendMove(int x, int y) throws Exception {
-		String result = ClientSocketChannel.getSocketInstance().move(x, y, "valid", "");
+		String result = ClientSocketChannel.getSocketInstance().move(currentPlayer.getUsername(), currentPlayer.getSessionId(), this.matchID, x, y, "valid", "");
 		MoveServerMessage move = new MoveServerMessage(result);
 		
 		if(move.getStatusCode().compareTo(StatusCode.SUCCESS)==0) {

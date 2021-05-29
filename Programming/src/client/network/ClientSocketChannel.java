@@ -3,6 +3,7 @@ package client.network;
 import client.utils.Configs;
 import message.joinqueue.JoinQueueClientMessage;
 import message.login.LoginClientMessage;
+import message.move.MoveClientMessage;
 import message.register.RegisterClientMessage;
 import protocol.Attachment;
 
@@ -100,9 +101,9 @@ public class ClientSocketChannel {
 		return sendRequest(joinQueueRequest.toString());
 	}
 	
-	public String move(int x, int y, String state, String result) throws Exception {
-		// TODO: Finish function
-		return sendRequest("");
+	public String move(String player, String sesID, int matchID, int x, int y, String state, String result) throws Exception {
+		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
+		return sendRequest(msg.toString());
 	}
 	
 	public String requestDraw() throws Exception {
