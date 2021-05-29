@@ -88,6 +88,9 @@ public class GameModeScreenHandler extends BaseScreenHandler
 	            if (isFound) {
 	            	// TODO: may need other analyze here
                     notifySuccess("Yeah! Found a match! Let's practice");
+                    if (gameModeScreenController.amIFirstPlayer()) {
+                        System.out.println("i play first mother fucker");
+                    }
                     mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
 	            } else {
                     notifyError("Can not find practice play match");

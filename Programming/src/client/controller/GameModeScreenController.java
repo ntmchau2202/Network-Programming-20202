@@ -28,7 +28,6 @@ public class GameModeScreenController extends BaseController{
         	return false;
         }
         return true;
-//    	return true;
     }
     
     public boolean amIFirstPlayer() {

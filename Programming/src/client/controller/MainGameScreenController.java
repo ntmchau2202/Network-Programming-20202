@@ -25,9 +25,14 @@ public class MainGameScreenController extends BaseController {
 	public boolean isMyTurn() {
 		return this.isMyTurn;
 	}
+
+	public String getCurrentPlayer() {
+		return currentPlayer;
+	}
 	
 	public boolean sendMove(int x, int y) throws Exception {
-		String result = ClientSocketChannel.getSocketInstance().move(x, y, "valid", "");
+		String result = ClientSocketChannel.getSocketInstance().move(currentPlayer, x, y, "valid", "");
+
 		MoveServerMessage move = new MoveServerMessage(result);
 		
 		if(move.getStatusCode().compareTo(StatusCode.SUCCESS)==0) {

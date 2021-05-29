@@ -14,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -31,6 +32,8 @@ public class MainGameScreenHandler extends BaseScreenHandler
     private Pane boardPane;
     @FXML
     private GridPane gameBoardGridPane;
+    @FXML
+    private Text playerTurnText;
 
     private final MainGameScreenController mainGameScreenController;
     private static final File X_IMAGE_FILE
@@ -61,6 +64,13 @@ public class MainGameScreenHandler extends BaseScreenHandler
 //        this.gameBoardGridPane.setPrefHeight(591);
 //        this.gameBoardGridPane.setPrefWidth(604);
 //        this.gameBoardGridPane.setStyle("-fx-background-color: white");
+
+        // display player turn
+        if (mainGameScreenController.isMyTurn()) {
+            playerTurnText.setText(mainGameScreenController.getCurrentPlayer());
+        } else {
+            playerTurnText.setText("Opponent");
+        }
     }
 
     @Override
@@ -92,16 +102,18 @@ public class MainGameScreenHandler extends BaseScreenHandler
                 addPane(i, j, MOVE_IMAGE);
             }
         }
+
 //        this.boardPane.getChildren().add(gameBoardGridPane);
 //        Node source = (Node)e.getSource() ;
 //        Integer colIndex = GridPane.getColumnIndex(source);
 //        Integer rowIndex = GridPane.getRowIndex(source);
 //        System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
         
-        Thread alwaysListener = new Thread(new InGameListener(this));
-        alwaysListener.setDaemon(true);
-        alwaysListener.start();
+//        Thread alwaysListener = new Thread(new InGameListener(this));
+//        alwaysListener.setDaemon(true);
+//        alwaysListener.start();
     }
+
     private void addPane(int colIndex, int rowIndex, Image move) {
         Pane pane = new Pane();
         ImageView x = new ImageView();
@@ -112,32 +124,33 @@ public class MainGameScreenHandler extends BaseScreenHandler
         x.setImage(move);
 
         pane.setOnMousePressed(e -> {
-            if(mainGameScreenController.isMyTurn()) {
+//            if(mainGameScreenController.isMyTurn()) {
             	System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
             	 pane.getChildren().add(x);
+
             	 
-            	 // send information here
-            	 try {
-					if(mainGameScreenController.sendMove(colIndex, rowIndex)) {
-						int recvX = mainGameScreenController.getX();
-						int recvY = mainGameScreenController.getY();
-						System.out.printf("Recv coordinate [%d, %d]%n", recvX, recvY);
-						// TODO: display X or O here
-					} else {
-						// TODO: handle send failed here
-					}
-					
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-            	 
-            	 
-            	 // then switch it to false
-            	 mainGameScreenController.setTurn(false);
-            }         	       
+//            	 // send information here
+//            	 try {
+//					if(mainGameScreenController.sendMove(colIndex, rowIndex)) {
+//						int recvX = mainGameScreenController.getX();
+//						int recvY = mainGameScreenController.getY();
+//						System.out.printf("Recv coordinate [%d, %d]%n", recvX, recvY);
+//						// TODO: display X or O here
+//					} else {
+//						// TODO: handle send failed here
+//					}
+//
+//				} catch (Exception e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//
+//
+//            	 // then switch it to false
+//            	 mainGameScreenController.setTurn(false);
+//            }
         });
-     
+        this.gameBoardGridPane.add(pane, colIndex, rowIndex);
     }
 
 //    public void removeNodeByRowColumnIndex(final int row,final int column,GridPane gridPane) {
