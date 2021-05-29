@@ -56,7 +56,7 @@ public class PopupScreen extends BaseScreenHandler{
 
     public void show(Boolean autoClose) {
         super.show();
-        if (autoClose) close(3.2);
+        if (autoClose) close(2.5);
     }
 
     public void show(double time) {
