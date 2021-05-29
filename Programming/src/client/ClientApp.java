@@ -24,7 +24,7 @@ public class ClientApp extends Application {
             AnchorPane root = FXMLLoader.load(getClass().getResource(Configs.SPLASH_SCREEN_PATH));
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
-            primaryStage.setTitle("Tic Tac Toe");
+            primaryStage.setTitle("Caro Game");
             primaryStage.getIcons().add(new Image(new File(Configs.APP_ICON_PATH).toURI().toString()));
             primaryStage.show();
 

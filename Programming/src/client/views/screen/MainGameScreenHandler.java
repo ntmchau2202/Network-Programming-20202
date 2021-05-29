@@ -95,7 +95,7 @@ public class MainGameScreenHandler extends BaseScreenHandler
             this.gameBoardGridPane.getRowConstraints().add(rowConstraints);
         }
         // if 1st player enter then x
-        MOVE_IMAGE = new Image(O_IMAGE_FILE.toURI().toString());
+        MOVE_IMAGE = new Image(X_IMAGE_FILE.toURI().toString());
         // else o MOVE_IMAGE = new Image(O_IMAGE_FILE.toURI().toString());
         for (int i = 0 ; i < numCols ; i++) {
             for (int j = 0; j < numRows; j++) {
