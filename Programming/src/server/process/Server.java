@@ -22,6 +22,8 @@ import message.joinqueue.JoinQueueClientMessage;
 import message.joinqueue.JoinQueueServerMessage;
 import message.login.LoginClientMessage;
 import message.login.LoginServerMessage;
+import message.move.MoveClientMessage;
+import message.move.MoveServerMessage;
 import message.register.RegisterClientMessage;
 import message.register.RegisterServerMessage;
 import protocol.Attachment;
@@ -36,12 +38,15 @@ public class Server {
 	private ArrayList<RankPlayer> hall;
 	private Queue<Player> normalQueue;
 	private Queue<RankPlayer> rankedQueue;
+	// temp only
+	private ArrayList<Player> ingameList;
 	
 	public Server() throws Exception {
 		serverSocketChannel = AsynchronousServerSocketChannel.open();
 		hall = new ArrayList<RankPlayer>();
 		normalQueue = new LinkedList<Player>();
 		rankedQueue = new LinkedList<RankPlayer>();
+		ingameList = new ArrayList<Player>();
 	}
 
 	public void start(int port) throws Exception {
@@ -245,6 +250,9 @@ public class Server {
 				Player player1 = normalQueue.poll();
 				Player player2 = normalQueue.poll();
 				
+				ingameList.add(player1);
+				ingameList.add(player2);
+				
 				// prepare message according to each player
 				
 				JoinQueueServerMessage player1Message = new JoinQueueServerMessage(player1.getUsername(), player1.getSessionId(), player2.getUsername(), 1234, 1234, player1.getUsername(), StatusCode.SUCCESS, "");
@@ -276,6 +284,31 @@ public class Server {
 	private Map<AsynchronousSocketChannel, String> processMoveRequest(String input, AsynchronousSocketChannel sock) throws Exception {
 		// TODO: Finish the function here
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		MoveClientMessage moveMsg = new MoveClientMessage(input);
+		
+		int matchID = moveMsg.getMatchID();
+		int x = moveMsg.getX();
+		int y = moveMsg.getY();
+		String movePlayer = moveMsg.getMovePlayer();
+		String state = moveMsg.getState();
+		String result = moveMsg.getResult();
+		
+		// find user with match id. Should add a field of match ID for player?
+		// Nah, maybe query in database
+		// only do a prototype here 
+		Player partner = null;
+		for(Player p : ingameList) {
+			if (p.getUsername().compareToIgnoreCase(movePlayer) != 0) {
+				partner = p;
+				break;
+			}
+		}
+		
+		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, StatusCode.SUCCESS, "");
+		
+		listResponse.put(sock, fwdMsg.toString());
+		listResponse.put(partner.getUserSocket(), fwdMsg.toString());
+		
 		
 		return listResponse;		
 	}

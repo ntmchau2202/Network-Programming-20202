@@ -7,6 +7,7 @@ import client.network.ClientSocketChannel;
 import client.network.InGameListener;
 import client.utils.Configs;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -38,6 +39,8 @@ public class MainGameScreenHandler extends BaseScreenHandler
     private static final File O_IMAGE_FILE
             = new File(Configs.O_ICON_PATH);
     private Image MOVE_IMAGE;
+
+    private Thread alwaysListener;
 
 
     /**
@@ -98,10 +101,26 @@ public class MainGameScreenHandler extends BaseScreenHandler
 //        Integer rowIndex = GridPane.getRowIndex(source);
 //        System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
         
-        Thread alwaysListener = new Thread(new InGameListener(this));
-        alwaysListener.setDaemon(true);
-        alwaysListener.start();
+        Task task = new Task<Void>() {
+        	@Override
+        	public Void call() {
+        		try {
+        			mainGameScreenController.listening();
+        		} catch (Exception e) {
+        			e.printStackTrace();
+        		}
+        		return null;
+        	}
+        };
+        alwaysListener = new Thread(task);
+        task.setOnSucceeded(taskFinishEvent -> System.out.println("task done"));
+        // alwaysListener.start();
     }
+    
+    public void switchTurn(boolean turn) {
+    	mainGameScreenController.setTurn(turn);
+    }
+    
     private void addPane(int colIndex, int rowIndex, Image move) {
         Pane pane = new Pane();
         ImageView x = new ImageView();
@@ -113,6 +132,7 @@ public class MainGameScreenHandler extends BaseScreenHandler
 
         pane.setOnMousePressed(e -> {
             if(mainGameScreenController.isMyTurn()) {
+            	alwaysListener.suspend();
             	System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
             	 pane.getChildren().add(x);
             	 
@@ -135,7 +155,10 @@ public class MainGameScreenHandler extends BaseScreenHandler
             	 
             	 // then switch it to false
             	 mainGameScreenController.setTurn(false);
-            }         	       
+            	 alwaysListener.resume();
+            } else {
+            	System.out.println("Sed, not my turn");
+            }
         });
      
     }

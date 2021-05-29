@@ -18,15 +18,16 @@ private final ByteBuffer inputBuffer;
 	@Override
 	public void completed(Integer result, Attachment attachment) {
 		// logging
-		System.out.println("Bytes read: " + result.toString());
+		// System.out.println("Bytes read: " + result.toString());
 		
 		// read message
 		try {
-			inputBuffer.flip();
-			String tmp = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
-			attachment.setReturnMessage(tmp);
-			attachment.getActive().set(false);
-			 
+			if (result > 0) {
+				inputBuffer.flip();
+				String tmp = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
+				attachment.setReturnMessage(tmp);
+				attachment.getActive().set(false);
+			}			 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

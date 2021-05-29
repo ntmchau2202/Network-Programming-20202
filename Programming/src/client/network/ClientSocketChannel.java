@@ -12,6 +12,8 @@ import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ClientSocketChannel {
     private static ClientSocketChannel socketChannelInstance;
@@ -134,15 +136,21 @@ public class ClientSocketChannel {
 	}
     
 	public String listenIngameMessage() {
-		attachment = new Attachment("", true);
-		buffer = ByteBuffer.wrap("".getBytes(StandardCharsets.UTF_8));
+		
 		ByteBuffer inputBuffer = ByteBuffer.allocate(4096);
-		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(inputBuffer);
-		socketChannel.read(buffer, attachment, readCompletionHandler);
-		while (attachment.getActive().get()) {
+		String returnMsg = "";
+		
+		Future<Integer> result = this.socketChannel.read(inputBuffer);
+		try {
+			result.get();
+			inputBuffer.flip();
+			returnMsg = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
+		} catch (Exception e) {
 			
+			e.printStackTrace();
 		}
-		System.out.println("This is printed from client: " + attachment.getReturnMessage());
-		return attachment.getReturnMessage();
+		
+		System.out.println("This is printed from client: " + returnMsg);
+		return returnMsg;
 	}
 }
