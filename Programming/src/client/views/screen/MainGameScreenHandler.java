@@ -3,6 +3,8 @@ package client.views.screen;
 import client.controller.GameModeScreenController;
 import client.controller.HomeScreenController;
 import client.controller.MainGameScreenController;
+import client.network.ClientSocketChannel;
+import client.network.InGameListener;
 import client.utils.Configs;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -95,7 +97,10 @@ public class MainGameScreenHandler extends BaseScreenHandler
 //        Integer colIndex = GridPane.getColumnIndex(source);
 //        Integer rowIndex = GridPane.getRowIndex(source);
 //        System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
-
+        
+        Thread alwaysListener = new Thread(new InGameListener(this));
+        alwaysListener.setDaemon(true);
+        alwaysListener.start();
     }
     private void addPane(int colIndex, int rowIndex, Image move) {
         Pane pane = new Pane();
@@ -107,11 +112,34 @@ public class MainGameScreenHandler extends BaseScreenHandler
         x.setImage(move);
 
         pane.setOnMousePressed(e -> {
-            System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
-            pane.getChildren().add(x);
+            if(mainGameScreenController.isMyTurn()) {
+            	System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
+            	 pane.getChildren().add(x);
+            	 
+            	 // send information here
+            	 try {
+					if(mainGameScreenController.sendMove(colIndex, rowIndex)) {
+						int recvX = mainGameScreenController.getX();
+						int recvY = mainGameScreenController.getY();
+						System.out.printf("Recv coordinate [%d, %d]%n", recvX, recvY);
+						// TODO: display X or O here
+					} else {
+						// TODO: handle send failed here
+					}
+					
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            	 
+            	 
+            	 // then switch it to false
+            	 mainGameScreenController.setTurn(false);
+            }         	       
         });
-        this.gameBoardGridPane.add(pane, colIndex, rowIndex);
+     
     }
+
 //    public void removeNodeByRowColumnIndex(final int row,final int column,GridPane gridPane) {
 //
 //        ObservableList<Node> childrens = gridPane.getChildren();
