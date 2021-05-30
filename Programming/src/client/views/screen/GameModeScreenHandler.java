@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -43,6 +44,8 @@ public class GameModeScreenHandler extends BaseScreenHandler
     private ImageView prevScreenImageView;
     @FXML
     private ImageView homeScreenImageView;
+    @FXML
+    private ImageView leaderboardImageView;
     private final GameModeScreenController gameModeScreenController;
 
     /**
@@ -68,13 +71,24 @@ public class GameModeScreenHandler extends BaseScreenHandler
             homeHandler.show();
             homeHandler.setScreenTitle("Home Screen");
         });
+        leaderboardImageView.setOnMouseClicked(ev -> {
+            System.out.println("leaderboard");
+            try {
+                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+                leaderboardHandler.setScreenTitle("Leaderboard");
+                leaderboardHandler.setPreviousScreen(this);
+                leaderboardHandler.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
     }
-
     @FXML
     private void handleFindGameAction(javafx.event.Event evt) {
     	try {

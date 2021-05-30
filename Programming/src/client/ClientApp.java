@@ -4,6 +4,7 @@ import client.controller.HomeScreenController;
 import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import client.views.screen.HomeScreenHandler;
+import entity.Player.LeaderboardPlayerList;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class ClientApp extends Application {
     @Override
@@ -46,9 +48,10 @@ public class ClientApp extends Application {
                 fadeOut.play();
                 // connect client
                 try {
-                	
                 	ClientSocketChannel.getSocketInstance();
-                } catch (IOException ioException) {
+                    LeaderboardPlayerList.getLeaderboardPlayerListInstance().synchronizeLeaderboardPlayerWithDb();
+                    System.out.println("synchronize done");
+                } catch (IOException | SQLException ioException) {
                     ioException.printStackTrace();
                 }
             });

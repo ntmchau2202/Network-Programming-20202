@@ -23,7 +23,7 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <ImageView fitHeight="74.0" fitWidth="78.0" layoutX="586.0" layoutY="491.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="leaderboardImageView" fitHeight="74.0" fitWidth="78.0" layoutX="586.0" layoutY="471.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/podium2.png" />
          </image>
@@ -99,7 +99,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label fx:id="winningRate" layoutX="1086.0" layoutY="125.0" text="83%">
+      <Label fx:id="winningRate" layoutX="1090.0" layoutY="125.0" prefHeight="35.0" prefWidth="42.0" text="83">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -120,5 +120,15 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
+      <Label layoutX="1131.0" layoutY="125.0" prefHeight="35.0" prefWidth="22.0" text="\%">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="552.0" layoutY="551.0" text="Leaderboard" textFill="#fcff32">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
