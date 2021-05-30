@@ -73,7 +73,7 @@ public class TestClientB extends Application {
                         }
                         mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
                         BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(primaryStage,
-                                Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
+                                Configs.MAINGAME_SCREEN_PATH, mainGameScreenController, gameModeScreenController.amIFirstPlayer());
                         mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
                         mainGameScreenHandler.show();
                     } else {

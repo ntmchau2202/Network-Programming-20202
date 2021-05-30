@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -34,7 +35,9 @@ public class MainGameScreenHandler extends BaseScreenHandler
     private GridPane gameBoardGridPane;
     @FXML
     private Text playerTurnText;
-
+    @FXML
+    private Label yourMove;
+    private boolean amIFirstPlayer;
     private final MainGameScreenController mainGameScreenController;
     private static final File X_IMAGE_FILE
             = new File(Configs.X_ICON_PATH);
@@ -48,7 +51,7 @@ public class MainGameScreenHandler extends BaseScreenHandler
      * @param screenPath path to screen fxml
      * @throws IOException exception for IO operations
      */
-    public MainGameScreenHandler(Stage stage, String screenPath, MainGameScreenController mainGameScreenController) throws IOException {
+    public MainGameScreenHandler(Stage stage, String screenPath, MainGameScreenController mainGameScreenController, boolean amIFirstPlayer) throws IOException {
         super(stage, screenPath);
         this.mainGameScreenController = mainGameScreenController;
         HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
@@ -60,6 +63,7 @@ public class MainGameScreenHandler extends BaseScreenHandler
             homeHandler.show();
             homeHandler.setScreenTitle("Home Screen");
         });
+        this.amIFirstPlayer = amIFirstPlayer;
 //
 //        this.gameBoardGridPane.setPrefHeight(591);
 //        this.gameBoardGridPane.setPrefWidth(604);
@@ -71,13 +75,14 @@ public class MainGameScreenHandler extends BaseScreenHandler
         } else {
             playerTurnText.setText("Opponent");
         }
-    }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // initialize player move to be X if first player or O second player
+        yourMove.setText( this.amIFirstPlayer ? "X" : "O");
+        this.MOVE_IMAGE = new Image(this.amIFirstPlayer ?  X_IMAGE_FILE.toURI().toString() : O_IMAGE_FILE.toURI().toString());
+
+        // initialize game board grid pane
         int numCols = 15 ;
         int numRows = 15;
-//        this.gameBoardGridPane = new GridPane();
 
         for (int i = 0 ; i < numCols ; i++) {
             ColumnConstraints colConstraints = new ColumnConstraints();
@@ -94,24 +99,17 @@ public class MainGameScreenHandler extends BaseScreenHandler
             rowConstraints.setPrefHeight(30);
             this.gameBoardGridPane.getRowConstraints().add(rowConstraints);
         }
-        // if 1st player enter then x
-        MOVE_IMAGE = new Image(X_IMAGE_FILE.toURI().toString());
-        // else o MOVE_IMAGE = new Image(O_IMAGE_FILE.toURI().toString());
+
         for (int i = 0 ; i < numCols ; i++) {
             for (int j = 0; j < numRows; j++) {
-                addPane(i, j, MOVE_IMAGE);
+                addPane(i, j, this.MOVE_IMAGE);
             }
         }
+    }
 
-//        this.boardPane.getChildren().add(gameBoardGridPane);
-//        Node source = (Node)e.getSource() ;
-//        Integer colIndex = GridPane.getColumnIndex(source);
-//        Integer rowIndex = GridPane.getRowIndex(source);
-//        System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
-        
-//        Thread alwaysListener = new Thread(new InGameListener(this));
-//        alwaysListener.setDaemon(true);
-//        alwaysListener.start();
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
     }
 
     private void addPane(int colIndex, int rowIndex, Image move) {

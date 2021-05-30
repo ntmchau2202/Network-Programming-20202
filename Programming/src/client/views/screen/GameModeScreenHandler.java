@@ -110,7 +110,7 @@ public class GameModeScreenHandler extends BaseScreenHandler
 	
 	        }
     		BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage, 
-          			Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
+          			Configs.MAINGAME_SCREEN_PATH, mainGameScreenController, gameModeScreenController.amIFirstPlayer());
     		mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
     		mainGameScreenHandler.setPreviousScreen(this);
     		mainGameScreenHandler.show();
