@@ -37,6 +37,11 @@ public class MainGameScreenHandler extends BaseScreenHandler
     private Text playerTurnText;
     @FXML
     private Label yourMove;
+
+    private int[][] status = new int[15][15];
+
+    //private int[][] player = new String[15][15];
+
     private boolean amIFirstPlayer;
     private final MainGameScreenController mainGameScreenController;
     private static final File X_IMAGE_FILE
@@ -100,19 +105,18 @@ public class MainGameScreenHandler extends BaseScreenHandler
             this.gameBoardGridPane.getRowConstraints().add(rowConstraints);
         }
 
-        for (int i = 0 ; i < numCols ; i++) {
-            for (int j = 0; j < numRows; j++) {
+        for (int i = 0 ; i < numRows ; i++) {
+            for (int j = 0; j < numCols; j++) {
                 addPane(i, j, this.MOVE_IMAGE);
             }
         }
-    }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
 
     }
 
-    private void addPane(int colIndex, int rowIndex, Image move) {
+
+
+    private void addPane(int rowIndex, int colIndex, Image move) {
         Pane pane = new Pane();
         ImageView x = new ImageView();
         pane.setPrefHeight(39);
@@ -122,15 +126,17 @@ public class MainGameScreenHandler extends BaseScreenHandler
         x.setImage(move);
 
         pane.setOnMousePressed(e -> {
+            this.status[rowIndex][colIndex] = (this.amIFirstPlayer ? 1 : 2);
+
 //            if(mainGameScreenController.isMyTurn()) {
             if (pane.getChildren().isEmpty()) {
-                System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
+                System.out.printf("Mouse clicked cell [%d, %d]%n", rowIndex, colIndex);
                 pane.getChildren().add(x);
             } else {
                 pane.setDisable(true);
-                System.out.printf("Already clicked [%d, %d]%n", colIndex, rowIndex);
+                System.out.printf("Already clicked [%d, %d]%n", rowIndex, colIndex);
             }
-            	 
+            System.out.println(hasWinner(rowIndex, colIndex));
 //            	 // send information here
 //            	 try {
 //					if(mainGameScreenController.sendMove(colIndex, rowIndex)) {
@@ -155,29 +161,35 @@ public class MainGameScreenHandler extends BaseScreenHandler
         this.gameBoardGridPane.add(pane, colIndex, rowIndex);
     }
 
-//    public void removeNodeByRowColumnIndex(final int row,final int column,GridPane gridPane) {
-//
-//        ObservableList<Node> childrens = gridPane.getChildren();
-//        for(Node node : childrens) {
-//            if(node instanceof ImageView && gridPane.getRowIndex(node) == row && gridPane.getColumnIndex(node) == column) {
-//                ImageView imageView= new ImageView(String.valueOf(node)); // use what you want to remove
-//                gridPane.getChildren().remove(imageView);
-//                break;
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+    }
+
+    /*
+     *
+     * Kiểm tra người chơi  hiện tại có chiến thắng hay không?
+     */
+    public boolean hasWinner(int row, int col) {
+
+        Check myCheck = new Check(15, 15);
+        int prePlayer = (this.amIFirstPlayer ? 1 : 2 );
+        System.out.println("Player " + prePlayer + "Win?" + myCheck.checkIt(row, col, this.status, prePlayer));
+        return myCheck.checkIt(row, col, this.status, prePlayer);
+
+        /*
+         * Kiểm tra bảng có còn ô trống nào không ?
+         */
+//        public boolean boardFilledUp() {
+//            for (int row = 0; row < 16; row++) {
+//                for (int col = 0; col < 16; col++) {
+//                    if (board[row][col] == null) {
+//                        return false;
+//                    }
+//                }
 //            }
-//        }
-//    }
-//    @FXML
-//    private void mousePressed(MouseEvent e) {
+//            return true;
 //
-//        Image x = new Image(Configs.X_ICON_PATH);
-//        Image o = new Image(Configs.O_ICON_PATH);
-//        Image empty = new Image();
-
-//        Node source = (Node)event.getSource() ;
-//        Integer colIndex = GridPane.getColumnIndex(source);
-//        Integer rowIndex = GridPane.getRowIndex(source);
-//        System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
-
-//        gameBoardGridPane.add(new ImageView(x), colIndex, rowIndex);
-//    }
+//        }
+    }
 }
