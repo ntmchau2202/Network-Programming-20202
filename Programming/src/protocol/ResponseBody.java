@@ -47,6 +47,7 @@ public class ResponseBody {
 		this.responseBody.put("username", username);
 		this.responseBody.put("match_id", matchID);
 		this.responseBody.put("opponent", opponent);
+		this.responseBody.put("opponent_elo", elo);
 		this.responseBody.put("elo", elo);
 		this.responseBody.put("player_1", player1);
 	}

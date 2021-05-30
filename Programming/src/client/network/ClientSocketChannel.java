@@ -73,6 +73,7 @@ public class ClientSocketChannel {
     }
     
     private String sendRequest(String strMsgToSend) throws Exception {
+    	System.out.println(this.getSocketInstance().socketChannel.toString());
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
@@ -103,6 +104,7 @@ public class ClientSocketChannel {
 	
 	public String move(String player, String sesID, int matchID, int x, int y, String state, String result) throws Exception {
 		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
+		System.out.println(msg.toString());
 		return sendRequest(msg.toString());
 	}
 	

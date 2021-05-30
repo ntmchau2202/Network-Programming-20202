@@ -70,10 +70,11 @@ public class Server {
 			    		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer);
 			    		Attachment socketAttachment = new Attachment();
 			    		clientChannel.read(buffer, socketAttachment, readCompletionHandler);
+			    		System.out.println("Listening...");
 			    		while(socketAttachment.getActive().get()){
 
 			    		}
-			    		
+			    		System.out.println("Got msg");
 			    		String recvMsg = socketAttachment.getReturnMessage();
 			    		
 			    		try {

@@ -101,19 +101,19 @@ public class MainGameScreenHandler extends BaseScreenHandler
 //        Integer rowIndex = GridPane.getRowIndex(source);
 //        System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(), rowIndex.intValue());
         
-        Task task = new Task<Void>() {
-        	@Override
-        	public Void call() {
-        		try {
-        			mainGameScreenController.listening();
-        		} catch (Exception e) {
-        			e.printStackTrace();
-        		}
-        		return null;
-        	}
-        };
-        alwaysListener = new Thread(task);
-        task.setOnSucceeded(taskFinishEvent -> System.out.println("task done"));
+//        Task task = new Task<Void>() {
+//        	@Override
+//        	public Void call() {
+//        		try {
+//        			mainGameScreenController.listening();
+//        		} catch (Exception e) {
+//        			e.printStackTrace();
+//        		}
+//        		return null;
+//        	}
+//        };
+//        alwaysListener = new Thread(task);
+//        task.setOnSucceeded(taskFinishEvent -> System.out.println("task done"));
         // alwaysListener.start();
     }
     
@@ -132,7 +132,7 @@ public class MainGameScreenHandler extends BaseScreenHandler
 
         pane.setOnMousePressed(e -> {
             if(mainGameScreenController.isMyTurn()) {
-            	alwaysListener.suspend();
+//            	alwaysListener.suspend();
             	System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
             	 pane.getChildren().add(x);
             	 
@@ -155,12 +155,12 @@ public class MainGameScreenHandler extends BaseScreenHandler
             	 
             	 // then switch it to false
             	 mainGameScreenController.setTurn(false);
-            	 alwaysListener.resume();
+//            	 alwaysListener.resume();
             } else {
             	System.out.println("Sed, not my turn");
             }
         });
-     
+        this.gameBoardGridPane.add(pane, colIndex, rowIndex);
     }
 
 //    public void removeNodeByRowColumnIndex(final int row,final int column,GridPane gridPane) {

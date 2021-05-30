@@ -2,6 +2,9 @@ package client.views.screen;
 
 import client.controller.*;
 import client.utils.Configs;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -79,22 +82,62 @@ public class GameModeScreenHandler extends BaseScreenHandler
     private void handleFindGameAction(javafx.event.Event evt) {
     	try {
     		MainGameScreenController mainGameScreenController = new MainGameScreenController(this.gameModeScreenController.getCurPlayer());
-
+    		BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage, 
+          			Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
+    		mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+    		mainGameScreenHandler.setPreviousScreen(this);
 
     		if (evt.getSource() == practicePlay) {
+    			practicePlay.setDisable(true);
+    			rankPlay.setDisable(true);
 	            System.out.println("practice play");
+//	            Boolean isFound = false;
+	            Task<Boolean> findGameTask = new Task<Boolean>() {
+	            	protected Boolean call() {
+	            		Boolean isFound = false;
+	            	try {
+						isFound = gameModeScreenController.findPracticeGame();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		            return isFound;
+	            	}
+	            };
 	            
-	            boolean isFound = gameModeScreenController.findPracticeGame();
-	            if (isFound) {
-	            	// TODO: may need other analyze here
-	            	mainGameScreenController.setOpponent(this.gameModeScreenController.getOpponent(), this.gameModeScreenController.getOpponentElo());
-                    mainGameScreenController.setMatchID(this.gameModeScreenController.getMatchID());
-	            	notifySuccess("Yeah! Found a match! Let's practice");
-                    System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
-                    mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
-	            } else {
-                    notifyError("Can not find practice play match");
-	            }
+	            findGameTask.setOnSucceeded((EventHandler) new EventHandler<WorkerStateEvent>() {
+
+	                public void handle(WorkerStateEvent t) {
+	                	Boolean isFound = (Boolean) t.getSource().getValue();
+	                    System.out.println("done:" + isFound);
+	                    if (isFound) {
+	    	            	// TODO: may need other analyze here
+	    	            	mainGameScreenController.setOpponent(gameModeScreenController.getOpponent(), gameModeScreenController.getOpponentElo());
+	                        mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
+	                        mainGameScreenHandler.show();
+	    	            	try {
+								notifySuccess("Yeah! Found a match! Let's practice");
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	                        System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
+	                        mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+	    	            } else {
+	                        try {
+								notifyError("Can not find practice play match");
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	    	            }
+	                }
+	            });
+	            
+	            Thread thread = new Thread(findGameTask);
+	            thread.start();
+	           // thread.join();
+	            
 	        } else if (evt.getSource() == rankPlay) {
 	            System.out.println("rank play");
 	            
@@ -109,11 +152,8 @@ public class GameModeScreenHandler extends BaseScreenHandler
 	            }
 	
 	        }
-    		BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage, 
-          			Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
-    		mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
-    		mainGameScreenHandler.setPreviousScreen(this);
-    		mainGameScreenHandler.show();
+    		
+    		
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }
