@@ -269,11 +269,12 @@ public class Server {
 					for(Match m : queueController.getIngameList()) {
 						if(m.isPlayerOfMatch(loggedPlayer)) {
 							match = m;
+							isFound = true;
 							break;
 						}
 					}
 					
-					if(!isFound) {
+					if(isFound) {
 						break;
 					} else {
 						Thread.sleep(500);
@@ -287,7 +288,7 @@ public class Server {
 					// user is player 2
 					opponent = match.getPlayer1();
 				}
-				JoinQueueServerMessage serverResponse = new JoinQueueServerMessage(loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.ERROR, ""); 
+				JoinQueueServerMessage serverResponse = new JoinQueueServerMessage(loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.SUCCESS, ""); 
 				listResponse.put(sock, serverResponse.toString());
 			} else {
 				// if it is not ranked user, call to create a new guest player account
@@ -325,12 +326,9 @@ public class Server {
 		// Nah, maybe query in database
 		// only do a prototype here
 		Player partner = null;
-//		for (Player p : queueController.getIngameList()) {
-//			if (p.getUsername().compareToIgnoreCase(movePlayer) != 0) {
-//				partner = p;
-//				break;
-//			}
-//		}
+		for (Match m : queueController.getIngameList()) {
+			
+		}
 
 		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, StatusCode.SUCCESS,
 				"");

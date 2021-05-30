@@ -10,6 +10,8 @@ import entity.Match.Match;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.util.Pair;
 import message.matchfound.MatchFoundServerMessage;
 
@@ -19,40 +21,47 @@ public class QueueController {
 	private  Queue<RankPlayer> rankedQueue;
 	private  ArrayList<Match> ingameList;
 	
-	private Task<Void> queueTask;
-	
 	public QueueController() {
 		hall = new ArrayList<RankPlayer>();
 		normalQueue = new LinkedList<Player>();
 		rankedQueue = new LinkedList<RankPlayer>();
 		ingameList = new ArrayList<Match>();
-		queueTask = new Task<Void>() {
-			protected Void call() {
-//				transferToIngameList();
-//				Random random = new Random();
-				while(true) {
-					try {
-						Thread.sleep(1000);
-						if(normalQueue.size() > 1) {
-							Player player1 = normalQueue.poll();
-							Player player2 = normalQueue.poll();
-							
-							ingameList.add(new Match(player1, player2));
-							// ingameList.add(new Pair<Integer, Player>(matchID, player2));
-							
-							// ingameList.
-						}
-						// other queues here
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-//				return null;
-			}
-		};
+//		queueTask = new Task<Void>() {
+//			protected Void call() {
+////				transferToIngameList();
+////				Random random = new Random();
+//				while(true) {
+//					try {
+//						Thread.sleep(1000);
+//						if(normalQueue.size() > 1) {
+//							Player player1 = normalQueue.poll();
+//							Player player2 = normalQueue.poll();
+//							
+//							ingameList.add(new Match(player1, player2));
+//							// ingameList.add(new Pair<Integer, Player>(matchID, player2));
+//							
+//							// ingameList.
+//						}
+//						// other queues here
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+////				return null;
+//			}
+//		};
+//		queueTask.setOnSucceeded((EventHandler) new EventHandler<WorkerStateEvent>() {
+//
+//			@Override
+//			public void handle(WorkerStateEvent arg0) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			
+//		});
 	}
 	public void startQueueController() {
-		Thread queueThread = new Thread(queueTask);
+		Thread queueThread = new Thread(new QueueThread());
 		queueThread.start();
 	}
 	
@@ -112,5 +121,30 @@ public class QueueController {
 //			}
 //		}
 		System.out.println("Hello world its middnite now");
+	}
+	
+	private class QueueThread implements Runnable {
+
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					Thread.sleep(1000);
+					if(normalQueue.size() > 1) {
+						Player player1 = normalQueue.poll();
+						Player player2 = normalQueue.poll();
+						
+						ingameList.add(new Match(player1, player2));
+						// ingameList.add(new Pair<Integer, Player>(matchID, player2));
+						
+						// ingameList.
+					}
+					// other queues here
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 	}
 }
