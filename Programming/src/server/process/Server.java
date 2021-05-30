@@ -54,26 +54,27 @@ public class Server {
 
 		System.out.println("Server started");
 
-		while(true) {
-			serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>(){
+		while (true) {
+			serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
 
 				@Override
 				public void completed(AsynchronousSocketChannel result, Object attachment) {
 					// TODO Auto-generated method stub
-					if ( serverSocketChannel.isOpen() ) {
+					if (serverSocketChannel.isOpen()) {
 						serverSocketChannel.accept(null, this);
-						System.out.println("Connection accepted: " + result.toString() );
+						System.out.println("Connection accepted: " + result.toString());
 					}
 					AsynchronousSocketChannel clientChannel = result;
-					while(clientChannel != null && clientChannel.isOpen()) {
+					while (clientChannel != null && clientChannel.isOpen()) {
 						ByteBuffer buffer = ByteBuffer.allocate(4096);
 						ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer);
 						Attachment socketAttachment = new Attachment();
 						clientChannel.read(buffer, socketAttachment, readCompletionHandler);
-						while(socketAttachment.getActive().get()){
+						System.out.println("Listening...");
+						while (socketAttachment.getActive().get()) {
 
 						}
-
+						System.out.println("Got msg");
 						String recvMsg = socketAttachment.getReturnMessage();
 
 						try {
@@ -109,7 +110,7 @@ public class Server {
 
 			WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(toSocket);
 			toSocket.write(bufferRequest, newAttachment, writeCompletionHandler);
-			while(newAttachment.getActive().get()) {
+			while (newAttachment.getActive().get()) {
 
 			}
 			System.out.println("Done sending msg: " + msg);
@@ -117,7 +118,8 @@ public class Server {
 
 	}
 
-	public Map<AsynchronousSocketChannel, String> processReturn(String recvMsg, AsynchronousSocketChannel sock) throws Exception {
+	public Map<AsynchronousSocketChannel, String> processReturn(String recvMsg, AsynchronousSocketChannel sock)
+			throws Exception {
 
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 
@@ -180,7 +182,8 @@ public class Server {
 		return listResponse;
 	}
 
-	private Map<AsynchronousSocketChannel, String> processLoginRequest(String input, AsynchronousSocketChannel sock) throws Exception {
+	private Map<AsynchronousSocketChannel, String> processLoginRequest(String input, AsynchronousSocketChannel sock)
+			throws Exception {
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 		LoginServerMessage serverResponse = null;
 
@@ -190,17 +193,21 @@ public class Server {
 		// get logged player
 		RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
 		if (loggedPlayer == null) {
-			serverResponse = new LoginServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
+			serverResponse = new LoginServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
+					"Username / Password is not valid");
 		} else {
 			loggedPlayer.setUserSocket(sock);
 			hall.add(loggedPlayer);
-			serverResponse = new LoginServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+			serverResponse = new LoginServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
+					loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
+					loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
 		}
 		listResponse.put(sock, serverResponse.toString());
 		return listResponse;
 	}
 
-	private Map<AsynchronousSocketChannel, String> processRegisterRequest(String input, AsynchronousSocketChannel sock) throws Exception {
+	private Map<AsynchronousSocketChannel, String> processRegisterRequest(String input, AsynchronousSocketChannel sock)
+			throws Exception {
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 		RegisterServerMessage serverResponse = null;
 
@@ -211,17 +218,21 @@ public class Server {
 		// register new player
 		RankPlayer loggedPlayer = new T3Authenticator().register(username, password);
 		if (loggedPlayer == null) {
-			serverResponse = new RegisterServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR, "Username / Password is not valid");
+			serverResponse = new RegisterServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
+					"Username / Password is not valid");
 		} else {
 			loggedPlayer.setUserSocket(sock);
 			hall.add(loggedPlayer);
-			serverResponse = new RegisterServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+			serverResponse = new RegisterServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
+					loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
+					loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
 		}
 		listResponse.put(sock, serverResponse.toString());
 		return listResponse;
 	}
 
-	private Map<AsynchronousSocketChannel, String> processJoinQueueRequest(String input, AsynchronousSocketChannel sock) throws Exception {
+	private Map<AsynchronousSocketChannel, String> processJoinQueueRequest(String input, AsynchronousSocketChannel sock)
+			throws Exception {
 		System.out.println("======== Start processing join queue request");
 
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
@@ -233,7 +244,7 @@ public class Server {
 			System.out.println("Normal request!");
 			RankPlayer loggedPlayer = null;
 			for (RankPlayer player : hall) {
-				if (sessionID.compareTo(player.getSessionId())==0) {
+				if (sessionID.compareTo(player.getSessionId()) == 0) {
 					loggedPlayer = player;
 					break;
 				}
@@ -243,7 +254,7 @@ public class Server {
 				hall.remove(loggedPlayer);
 				normalQueue.add(loggedPlayer);
 				System.out.println("normal queue: " + normalQueue.toString());
-				while(normalQueue.size() < 2) {
+				while (normalQueue.size() < 2) {
 
 				}
 
@@ -255,8 +266,12 @@ public class Server {
 
 				// prepare message according to each player
 
-				JoinQueueServerMessage player1Message = new JoinQueueServerMessage(player1.getUsername(), player1.getSessionId(), player2.getUsername(), 1234, 1234, player1.getUsername(), StatusCode.SUCCESS, "");
-				JoinQueueServerMessage player2Message = new JoinQueueServerMessage(player2.getUsername(), player2.getSessionId(), player1.getUsername(), 1234, 1234, player1.getUsername(), StatusCode.SUCCESS, "");
+				JoinQueueServerMessage player1Message = new JoinQueueServerMessage(player1.getUsername(),
+						player1.getSessionId(), player2.getUsername(), 1234, 1234, player1.getUsername(),
+						StatusCode.SUCCESS, "");
+				JoinQueueServerMessage player2Message = new JoinQueueServerMessage(player2.getUsername(),
+						player2.getSessionId(), player1.getUsername(), 1234, 1234, player1.getUsername(),
+						StatusCode.SUCCESS, "");
 
 				listResponse.put(player1.getUserSocket(), player1Message.toString());
 				listResponse.put(player2.getUserSocket(), player2Message.toString());
@@ -264,8 +279,6 @@ public class Server {
 				// if it is not ranked user, call to create a new guest player account
 
 			}
-
-
 
 		} else if (mode.compareToIgnoreCase("ranked") == 0) {
 
@@ -281,7 +294,8 @@ public class Server {
 		return listResponse;
 	}
 
-	private Map<AsynchronousSocketChannel, String> processMoveRequest(String input, AsynchronousSocketChannel sock) throws Exception {
+	private Map<AsynchronousSocketChannel, String> processMoveRequest(String input, AsynchronousSocketChannel sock)
+			throws Exception {
 		// TODO: Finish the function here
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
 		MoveClientMessage moveMsg = new MoveClientMessage(input);
@@ -297,18 +311,18 @@ public class Server {
 		// Nah, maybe query in database
 		// only do a prototype here
 		Player partner = null;
-		for(Player p : ingameList) {
+		for (Player p : ingameList) {
 			if (p.getUsername().compareToIgnoreCase(movePlayer) != 0) {
 				partner = p;
 				break;
 			}
 		}
 
-		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, StatusCode.SUCCESS, "");
+		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, StatusCode.SUCCESS,
+				"");
 
 		listResponse.put(sock, fwdMsg.toString());
 		listResponse.put(partner.getUserSocket(), fwdMsg.toString());
-
 
 		return listResponse;
 	}

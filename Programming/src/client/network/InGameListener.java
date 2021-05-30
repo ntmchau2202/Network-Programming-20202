@@ -46,6 +46,7 @@ public class InGameListener implements Runnable {
 						public void run() {
 							// update GUI here
 							System.out.printf("Coordinate received: %d;%d\n", x, y);
+							mainGameScreenHandler.switchTurn(true);
 						}
 						
 					});
