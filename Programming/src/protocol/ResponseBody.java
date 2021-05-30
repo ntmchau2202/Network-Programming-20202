@@ -52,6 +52,12 @@ public class ResponseBody {
 		this.responseBody.put("player_1", player1);
 	}
 
+	public void createMatchFoundBody(int matchID, String opponent, int elo, String firstPlayer) {
+		this.responseBody.put("match_id", matchID);
+		this.responseBody.put("opponent", opponent);
+		this.responseBody.put("elo", elo);
+		this.responseBody.put("player_1", firstPlayer);
+	}
 
 	public void createMoveBody(int match_id, String move_player, int x, int y, String state, String result) throws JSONException {
 		this.responseBody.clear();

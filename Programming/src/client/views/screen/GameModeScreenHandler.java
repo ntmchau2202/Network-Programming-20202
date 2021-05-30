@@ -1,6 +1,7 @@
 package client.views.screen;
 
 import client.controller.*;
+import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -11,6 +12,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import message.matchfound.MatchFoundServerMessage;
+import protocol.StatusCode;
 
 import java.io.IOException;
 import java.net.URL;
@@ -90,10 +93,11 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			mainGameScreenHandler.setPreviousScreen(this);
 
 			if (evt.getSource() == practicePlay) {
-				practicePlay.setDisable(true);
-				rankPlay.setDisable(true);
+				
 				System.out.println("practice play");
 				// Boolean isFound = false;
+				practicePlay.setDisable(true);
+				rankPlay.setDisable(true);
 				Task<Boolean> findGameTask = new Task<Boolean>() {
 					protected Boolean call() {
 						Boolean isFound = false;

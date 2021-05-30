@@ -15,8 +15,10 @@ import java.util.Queue;
 
 import org.json.JSONObject;
 
+import entity.Match.Match;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
+import javafx.util.Pair;
 import message.ClientMessage;
 import message.joinqueue.JoinQueueClientMessage;
 import message.joinqueue.JoinQueueServerMessage;
@@ -35,24 +37,20 @@ import server.network.WriteCompletionHandler;
 
 public class Server {
 	private AsynchronousServerSocketChannel serverSocketChannel;
-	private ArrayList<RankPlayer> hall;
-	private Queue<Player> normalQueue;
-	private Queue<RankPlayer> rankedQueue;
-	// temp only
-	private ArrayList<Player> ingameList;
+	private QueueController queueController;
 
 	public Server() throws Exception {
 		serverSocketChannel = AsynchronousServerSocketChannel.open();
-		hall = new ArrayList<RankPlayer>();
-		normalQueue = new LinkedList<Player>();
-		rankedQueue = new LinkedList<RankPlayer>();
-		ingameList = new ArrayList<Player>();
 	}
 
 	public void start(int port) throws Exception {
 		serverSocketChannel.bind(new InetSocketAddress(port));
 
 		System.out.println("Server started");
+		
+		queueController = new QueueController();
+		queueController.startQueueController();
+		
 
 		while (true) {
 			serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
@@ -198,7 +196,7 @@ public class Server {
 					"Username / Password is not valid");
 		} else {
 			loggedPlayer.setUserSocket(sock);
-			hall.add(loggedPlayer);
+			queueController.pushToHall(loggedPlayer);
 			serverResponse = new LoginServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
 					loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
 					loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
@@ -223,7 +221,7 @@ public class Server {
 					"Username / Password is not valid");
 		} else {
 			loggedPlayer.setUserSocket(sock);
-			hall.add(loggedPlayer);
+			queueController.pushToHall(loggedPlayer);
 			serverResponse = new RegisterServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
 					loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
 					loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
@@ -244,7 +242,7 @@ public class Server {
 			// check if this is ranked user
 			System.out.println("Normal request!");
 			RankPlayer loggedPlayer = null;
-			for (RankPlayer player : hall) {
+			for (RankPlayer player : queueController.getHall()) {
 				if (sessionID.compareTo(player.getSessionId()) == 0) {
 					loggedPlayer = player;
 					break;
@@ -252,30 +250,45 @@ public class Server {
 			}
 
 			if (loggedPlayer != null) {
-				hall.remove(loggedPlayer);
-				normalQueue.add(loggedPlayer);
-				System.out.println("normal queue: " + normalQueue.toString());
-				while (normalQueue.size() < 2) {
-
-				}
-
-				Player player1 = normalQueue.poll();
-				Player player2 = normalQueue.poll();
-
-				ingameList.add(player1);
-				ingameList.add(player2);
+				queueController.removeFromHall(loggedPlayer);
+				queueController.pushToQueue(loggedPlayer, mode);
+//				while (normalQueue.size() < 2) {
+//
+//				}
+//
+//				Player player1 = normalQueue.poll();
+//				Player player2 = normalQueue.poll();
+//
+//				ingameList.add(player1);
+//				ingameList.add(player2);
 
 				// prepare message according to each player
-
-				JoinQueueServerMessage player1Message = new JoinQueueServerMessage(player1.getUsername(),
-						player1.getSessionId(), player2.getUsername(), 1234, 1234, player1.getUsername(),
-						StatusCode.SUCCESS, "");
-				JoinQueueServerMessage player2Message = new JoinQueueServerMessage(player2.getUsername(),
-						player2.getSessionId(), player1.getUsername(), 1234, 1234, player1.getUsername(),
-						StatusCode.SUCCESS, "");
-
-				listResponse.put(player1.getUserSocket(), player1Message.toString());
-				listResponse.put(player2.getUserSocket(), player2Message.toString());
+				Match match = null;
+				while(true) {
+					boolean isFound = false;
+					for(Match m : queueController.getIngameList()) {
+						if(m.isPlayerOfMatch(loggedPlayer)) {
+							match = m;
+							break;
+						}
+					}
+					
+					if(!isFound) {
+						break;
+					} else {
+						Thread.sleep(500);
+					}
+				}
+				Player opponent = null;
+				if(loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())){
+					// user is player 1
+					opponent = match.getPlayer2();
+				} else {
+					// user is player 2
+					opponent = match.getPlayer1();
+				}
+				JoinQueueServerMessage serverResponse = new JoinQueueServerMessage(loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.ERROR, ""); 
+				listResponse.put(sock, serverResponse.toString());
 			} else {
 				// if it is not ranked user, call to create a new guest player account
 
@@ -312,12 +325,12 @@ public class Server {
 		// Nah, maybe query in database
 		// only do a prototype here
 		Player partner = null;
-		for (Player p : ingameList) {
-			if (p.getUsername().compareToIgnoreCase(movePlayer) != 0) {
-				partner = p;
-				break;
-			}
-		}
+//		for (Player p : queueController.getIngameList()) {
+//			if (p.getUsername().compareToIgnoreCase(movePlayer) != 0) {
+//				partner = p;
+//				break;
+//			}
+//		}
 
 		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, StatusCode.SUCCESS,
 				"");

@@ -67,7 +67,7 @@ public class TestClientA extends Application {
                         System.exit(-1);
                     }
                     GameModeScreenController gameModeScreenController = new GameModeScreenController(loginFormController.getLoggedPlayer());
-                    MainGameScreenController mainGameScreenController = new MainGameScreenController(gameModeScreenController.getCurPlayer().getUsername());
+                    MainGameScreenController mainGameScreenController = new MainGameScreenController(gameModeScreenController.getCurPlayer());
                     boolean isFound = gameModeScreenController.findPracticeGame();
                     if (isFound) {
                         if (gameModeScreenController.amIFirstPlayer()) {

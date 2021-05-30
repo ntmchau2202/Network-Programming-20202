@@ -22,7 +22,7 @@ public class GameModeScreenController extends BaseController{
     }
 
     public boolean findPracticeGame() throws Exception {
-    	System.out.println("Waiting for a game...");
+System.out.println("Waiting for a game...");
     	
     	// TODO: make an interactive pop up here for waiting for server response
         String result = ClientSocketChannel.getSocketInstance().joinQueue(curPlayer.getSessionId(), "normal");

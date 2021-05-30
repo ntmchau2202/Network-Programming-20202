@@ -1,11 +1,20 @@
 package client.network;
 
 import client.utils.Configs;
+import javafx.application.Platform;
+import message.ServerMessage;
+import message.chat.ChatServerMessage;
+import message.chatack.ChatACKServerMessage;
+import message.drawconfirm.DrawConfirmServerMessage;
+import message.drawrequest.DrawRequestServerMessage;
 import message.joinqueue.JoinQueueClientMessage;
 import message.login.LoginClientMessage;
+import message.matchfound.MatchFoundServerMessage;
 import message.move.MoveClientMessage;
+import message.move.MoveServerMessage;
 import message.register.RegisterClientMessage;
 import protocol.Attachment;
+import protocol.Command;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,6 +24,8 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import org.json.JSONObject;
 
 public class ClientSocketChannel {
 	private static ClientSocketChannel socketChannelInstance;
@@ -138,7 +149,7 @@ public class ClientSocketChannel {
 		return sendRequest("");
 	}
 
-	public String listenIngameMessage() {
+	public ServerMessage listenIngameMessage() {
 
 		ByteBuffer inputBuffer = ByteBuffer.allocate(4096);
 		String returnMsg = "";
@@ -148,12 +159,47 @@ public class ClientSocketChannel {
 			result.get();
 			inputBuffer.flip();
 			returnMsg = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
+			System.out.println("This is printed from client: " + returnMsg);
 		} catch (Exception e) {
 
 			e.printStackTrace();
 		}
-
-		System.out.println("This is printed from client: " + returnMsg);
-		return returnMsg;
+		
+		// analyze things here?
+		
+		JSONObject jsMsg = new JSONObject(returnMsg);
+		Command cmd = Command.toCommand(jsMsg.getString("command_code"));
+		
+		switch(cmd) {
+		case MATCH_FOUND:{
+			MatchFoundServerMessage matchFoundMsg = new MatchFoundServerMessage(returnMsg);
+			return matchFoundMsg;
+		}
+		case MOVE:{
+			MoveServerMessage moveMsg = new MoveServerMessage(returnMsg);
+			return moveMsg;			
+		}
+		case CHAT:{
+			ChatServerMessage chatMsg = new ChatServerMessage(returnMsg);
+			return chatMsg;
+			
+		}
+		case CHATACK:{
+			ChatACKServerMessage ack = new ChatACKServerMessage(returnMsg);
+			return ack;		
+		}
+		
+		case DRAW_REQUEST: {
+			DrawRequestServerMessage drawRequest = new DrawRequestServerMessage(returnMsg);
+			return drawRequest;
+		}
+		case DRAW_CONFIRM:{
+			DrawConfirmServerMessage drawConfirm = new DrawConfirmServerMessage(returnMsg);
+			return drawConfirm;
+			
+		}
+		}
+		
+		return null;
 	}
 }

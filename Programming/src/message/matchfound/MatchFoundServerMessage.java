@@ -7,17 +7,18 @@ import protocol.StatusCode;
 public class MatchFoundServerMessage extends ServerMessage {
 	
 	private int matchID, elo;
-	private String opponent; 
+	private String opponent, firstPlayer; 
 	
-	public MatchFoundServerMessage(int matchID, String opponent, int elo, StatusCode statCode, String errMsg) {
+	public MatchFoundServerMessage(int matchID, String opponent, int elo, String firstPlayer, StatusCode statCode, String errMsg) {
 		super(statCode, errMsg);
 		
 		this.matchID = matchID;
 		this.elo = elo;
 		this.opponent = opponent;
+		this.firstPlayer = firstPlayer;
 		
 		this.setCommand(Command.MATCH_FOUND);
-		// this.responseBody.createMatchFoundBody(matchID, opponent, elo);
+		this.responseBody.createMatchFoundBody(matchID, opponent, elo, firstPlayer);
 		this.finalizeMessageObject();
 	}
 	
@@ -27,6 +28,7 @@ public class MatchFoundServerMessage extends ServerMessage {
 		this.matchID = this.responseBody.getBody().getInt("match_id");
 		this.elo = this.responseBody.getBody().getInt("elo");
 		this.opponent = this.responseBody.getBody().getString("opponent");
+		this.firstPlayer = this.responseBody.getBody().getString("player_1");
 	}
 	
 	public int getMatchID() {
@@ -39,5 +41,9 @@ public class MatchFoundServerMessage extends ServerMessage {
 	
 	public int getOpponentELO() {
 		return this.elo;
+	}
+	
+	public String getFirstPlayer() {
+		return this.firstPlayer;
 	}
 }
