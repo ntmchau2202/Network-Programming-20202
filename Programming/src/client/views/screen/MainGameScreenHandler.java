@@ -68,7 +68,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // display player turn
         if (mainGameScreenController.isMyTurn()) {
-            playerTurnText.setText(mainGameScreenController.getCurrentPlayer());
+            playerTurnText.setText(mainGameScreenController.getCurrentPlayer().getUsername());
         } else {
             playerTurnText.setText("Opponent");
         }
@@ -141,13 +141,16 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         x.setImage(move);
 
         pane.setOnMousePressed(e -> {
-            if (mainGameScreenController.isMyTurn()) {
+       //     if (mainGameScreenController.isMyTurn()) {
                 // alwaysListener.suspend();
                 System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
-                pane.getChildren().add(x);
+                
 
                 // send information here
                 try {
+                	if (mainGameScreenController.isMyTurn()) {
+                		pane.getChildren().add(x);
+                	
                     if (mainGameScreenController.sendMove(colIndex, rowIndex)) {
                         int recvX = mainGameScreenController.getX();
                         int recvY = mainGameScreenController.getY();
@@ -156,6 +159,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                     } else {
                         // TODO: handle send failed here
                     }
+                  } else {
+                  System.out.println("Sed, not my turn");
+              }
 
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
@@ -165,9 +171,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                 // then switch it to false
                 mainGameScreenController.setTurn(false);
                 // alwaysListener.resume();
-            } else {
-                System.out.println("Sed, not my turn");
-            }
+
         });
         this.gameBoardGridPane.add(pane, colIndex, rowIndex);
     }

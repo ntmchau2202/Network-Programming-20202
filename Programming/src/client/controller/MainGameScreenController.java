@@ -46,7 +46,7 @@ public class MainGameScreenController extends BaseController {
 		return this.isMyTurn;
 	}
 
-	public String getCurrentPlayer() {
+	public Player getCurrentPlayer() {
 		return currentPlayer;
 	}
 

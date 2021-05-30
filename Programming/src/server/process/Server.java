@@ -67,22 +67,23 @@ public class Server {
 					AsynchronousSocketChannel clientChannel = result;
 					while (clientChannel != null && clientChannel.isOpen()) {
 						ByteBuffer buffer = ByteBuffer.allocate(4096);
-						ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer);
-						Attachment socketAttachment = new Attachment();
-						clientChannel.read(buffer, socketAttachment, readCompletionHandler);
-						System.out.println("Listening...");
-						while (socketAttachment.getActive().get()) {
+						buffer.clear();
+			    		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer);
+			    		Attachment socketAttachment = new Attachment();
+			    		clientChannel.read(buffer, socketAttachment, readCompletionHandler);
+			    		System.out.println("Listening...");
+			    		while(socketAttachment.getActive().get()){
 
-						}
-						System.out.println("Got msg");
-						String recvMsg = socketAttachment.getReturnMessage();
-
-						try {
-							Map<AsynchronousSocketChannel, String> msgToSend = processReturn(recvMsg, result);
-							sendResponse(msgToSend);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+			    		}
+			    		System.out.println("Got msg");
+			    		String recvMsg = socketAttachment.getReturnMessage();
+			    		
+			    		try {
+			    			Map<AsynchronousSocketChannel, String> msgToSend = processReturn(recvMsg, result);
+			    			sendResponse(msgToSend);
+			    		} catch (Exception e) {
+			    			e.printStackTrace();
+			    		}		    		
 					}
 
 				}
@@ -97,7 +98,7 @@ public class Server {
 			System.in.read();
 			serverSocketChannel.close();
 			System.out.println("Server done");
-		}
+		}		
 	}
 
 	private void sendResponse(Map<AsynchronousSocketChannel, String> listMsg) {
@@ -114,8 +115,8 @@ public class Server {
 
 			}
 			System.out.println("Done sending msg: " + msg);
+			System.out.println("Is socket still open?: " + toSocket.isOpen());
 		}
-
 	}
 
 	public Map<AsynchronousSocketChannel, String> processReturn(String recvMsg, AsynchronousSocketChannel sock)
