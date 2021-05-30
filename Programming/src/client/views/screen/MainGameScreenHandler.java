@@ -123,9 +123,13 @@ public class MainGameScreenHandler extends BaseScreenHandler
 
         pane.setOnMousePressed(e -> {
 //            if(mainGameScreenController.isMyTurn()) {
-            	System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
-            	 pane.getChildren().add(x);
-
+            if (pane.getChildren().isEmpty()) {
+                System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
+                pane.getChildren().add(x);
+            } else {
+                pane.setDisable(true);
+                System.out.printf("Already clicked [%d, %d]%n", colIndex, rowIndex);
+            }
             	 
 //            	 // send information here
 //            	 try {
