@@ -164,13 +164,12 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             thread.start();
         }
 
+        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
+
     }
 
-    private void displayMove(int rowIndex, int colIndex, String movePlayerName) {
-        Pane pane = new Pane();
+    private void addImageToPane(Pane pane, String movePlayerName) {
         ImageView x = new ImageView();
-        pane.setPrefHeight(39);
-        pane.setPrefWidth(39);
         x.setFitHeight(39);
         x.setFitWidth(39);
 
@@ -182,16 +181,15 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         }
 
         // add to pane
+        if (pane.getChildren().isEmpty()) {
+            pane.getChildren().add(x);
+        }
     }
 
     private void addPane(int rowIndex, int colIndex, Image move) {
         Pane pane = new Pane();
-        ImageView x = new ImageView();
         pane.setPrefHeight(39);
         pane.setPrefWidth(39);
-        x.setFitHeight(39);
-        x.setFitWidth(39);
-        x.setImage(move);
 
         pane.setOnMousePressed(e -> {
             this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
@@ -200,7 +198,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             if (this.mainGameScreenController.isMyTurn() && !isLockMove) {
                 if (pane.getChildren().isEmpty()) {
                     System.out.printf("Mouse clicked cell [%d, %d]%n", rowIndex, colIndex);
-                    pane.getChildren().add(x);
+                    addImageToPane(pane, this.mainGameScreenController.getCurrentPlayer().getUsername());
 
                     // send move
                     try {
@@ -223,6 +221,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                             int recvX1 = mainGameScreenController.getX();
                                             int recvY1 = mainGameScreenController.getY();
                                             System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+                                            // display move on pane ??
+//                                            gameBoardGridPane.get
+
                                             isSuccessfull = true;
                                         } else {
                                             // TODO: handle send failed here
@@ -248,7 +249,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                 System.out.println("done:" + isFound);
                                 if (isFound) {
                                     System.out.println("listen move successfully");
-                                    // display move on pane ??
                                 } else {
                                     try {
                                         notifyError("Can not place move");
@@ -275,6 +275,20 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             }
         });
         this.gameBoardGridPane.add(pane, colIndex, rowIndex);
+    }
+
+    public Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {
+        Node result = null;
+        ObservableList<Node> childrens = gridPane.getChildren();
+
+        for (Node node : childrens) {
+            if(gridPane.getRowIndex(node) == row && gridPane.getColumnIndex(node) == column) {
+                result = node;
+                break;
+            }
+        }
+
+        return result;
     }
 
     @Override
