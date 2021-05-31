@@ -6,6 +6,7 @@ import client.controller.MainGameScreenController;
 import client.network.ClientSocketChannel;
 import client.network.InGameListener;
 import client.utils.Configs;
+import entity.Player.RankPlayer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -299,14 +300,13 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
 							@Override
 							public void handle(WorkerStateEvent arg0) {
-								// TODO Auto-generated method stub
 								try {
 									notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
-                                    HomeScreenHandler homeHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
-                                    homeHandler.setScreenTitle("Home Screen");
-                                    homeHandler.show();
+//									RankPlayer curPlayer = (RankPlayer)mainGameScreenController.getCurrentPlayer();
+                                    GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+			                        gameModeHandler.setScreenTitle("Game mode");
+			                        gameModeHandler.show();
 								} catch (IOException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
