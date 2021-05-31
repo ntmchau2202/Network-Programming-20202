@@ -6,6 +6,7 @@ import client.controller.MainGameScreenController;
 import client.network.ClientSocketChannel;
 import client.network.InGameListener;
 import client.utils.Configs;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -133,6 +134,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                         int recvY1 = mainGameScreenController.getY();
                         System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
 
+                        // display move on pane ??
+                        addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+
+                        mainGameScreenController.setTurn(true);
 
                     } catch (Exception e1) {
                         // TODO Auto-generated catch block
@@ -193,7 +198,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         pane.setPrefWidth(39);
 
         pane.setOnMousePressed(e -> {
-            this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
 
             // clickable only when it's player turn
             if (this.mainGameScreenController.isMyTurn() && !isLockMove) {
@@ -201,6 +205,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                     System.out.printf("Mouse clicked cell [%d, %d]%n", rowIndex, colIndex);
                     addImageToPane(pane, this.mainGameScreenController.getCurrentPlayer().getUsername());
 
+                    // set move status array for checking winning state
+                    this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
                     // send move
                     try {
                         // lock move
@@ -214,8 +220,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                         int recvX = mainGameScreenController.getX();
                                         int recvY = mainGameScreenController.getY();
                                         System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
-                                        // release lock move
-                                        isLockMove = false;
+
+                                        mainGameScreenController.setTurn(false);
 
                                         // start listening for opponent move
                                         if (mainGameScreenController.listenMove()) {
@@ -225,6 +231,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                             // display move on pane ??
                                             addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
 
+                                            mainGameScreenController.setTurn(true);
+
+                                            // release lock move
+                                            isLockMove = false;
                                             isSuccessfull = true;
                                         } else {
                                             // TODO: handle send failed here
@@ -296,7 +306,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
     }
 
     /*
