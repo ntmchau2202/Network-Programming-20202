@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import message.ServerMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +55,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
      * @param screenPath path to screen fxml
      * @throws IOException exception for IO operations
      */
-    public MainGameScreenHandler(Stage stage, String screenPath, MainGameScreenController mainGameScreenController) throws IOException {
+    public MainGameScreenHandler(Stage stage, String screenPath, MainGameScreenController mainGameScreenController)
+            throws IOException {
         super(stage, screenPath);
         this.mainGameScreenController = mainGameScreenController;
         HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
@@ -81,8 +83,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // initialize player move to be X if first player or O second player
         yourMove.setText(this.mainGameScreenController.amIFirstPlayer() ? "X" : "O");
-        this.MOVE_IMAGE = new Image(
-                this.mainGameScreenController.amIFirstPlayer() ? X_IMAGE_FILE.toURI().toString() : O_IMAGE_FILE.toURI().toString());
+        this.MOVE_IMAGE = new Image(this.mainGameScreenController.amIFirstPlayer() ? X_IMAGE_FILE.toURI().toString()
+                : O_IMAGE_FILE.toURI().toString());
 
         // initialize game board grid pane
         int numCols = 15;

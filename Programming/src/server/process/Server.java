@@ -144,6 +144,10 @@ public class Server {
 				listResponse = this.processMoveRequest(recvMsg, sock);
 				break;
 			}
+			case LISTENMOVE:{
+				listResponse = this.processListenMove(recvMsg, sock);
+				break;
+			}
 			case DRAW_REQUEST: {
 				listResponse = this.processRequestDrawRequest();
 				break;
@@ -325,20 +329,32 @@ public class Server {
 		// find user with match id. Should add a field of match ID for player?
 		// Nah, maybe query in database
 		// only do a prototype here
-		Player partner = null;
+		Match match = null;
 		for (Match m : queueController.getIngameList()) {
-			
+			if (m.getMatchID() == matchID) {
+				match = m;
+				break;
+			}
 		}
+		
+		// should have a check here
+		// but first, let's try to successfully send data to both clients
 
 		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, StatusCode.SUCCESS,
 				"");
 
-		listResponse.put(sock, fwdMsg.toString());
-		listResponse.put(partner.getUserSocket(), fwdMsg.toString());
+		listResponse.put(match.getPlayer1().getUserSocket(), fwdMsg.toString());
+		listResponse.put(match.getPlayer2().getUserSocket(), fwdMsg.toString());
 
 		return listResponse;
 	}
 
+	private Map<AsynchronousSocketChannel, String> processListenMove(String input, AsynchronousSocketChannel sock){
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		
+		return listResponse;
+	}
+	
 	private Map<AsynchronousSocketChannel, String> processRequestDrawRequest() throws Exception {
 		// TODO: Finish the function here
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();

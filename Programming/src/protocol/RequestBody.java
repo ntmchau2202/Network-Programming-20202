@@ -50,6 +50,12 @@ public class RequestBody {
 		this.requestBody.put("result", result);
 	}
 	
+	public void createListenMoveBody(String username, int matchID) {
+		this.requestBody.clear();
+		this.requestBody.put("username", username);
+		this.requestBody.put("match_id", matchID);
+	}
+	
 	public void createDrawRequestBody(int match_id, String session_id, String move_player) throws JSONException {
 		this.requestBody.clear();
 		this.requestBody.put("match_id", match_id);

@@ -12,7 +12,8 @@ public enum Command {
 	LEADERBOARD("LEADERBOARD"),
 	CHAT("CHAT"),
 	CHATACK("CHATACK"),
-	LOGOUT("LOGOUT");
+	LOGOUT("LOGOUT"),
+	LISTENMOVE("LISTEN_MOVE");
 
     private String command;
 
