@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 
 public class MainGameScreenHandler extends BaseScreenHandler implements Initializable {
     @FXML
@@ -121,44 +122,48 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         isLockMove = false;
 
         // if not first player to play, listen move from opponent
-//        Task<Boolean> listenMoveTask = new Task<Boolean>() {
-//            protected Boolean call() {
-//                Boolean isSuccessfull = false;
-//                try {
-//                    // send move to server
-//                    isSuccessfull = mainGameScreenController.listenMove();
-//                    int recvX1 = mainGameScreenController.getX();
-//                    int recvY1 = mainGameScreenController.getY();
-//                    System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
-//
-//                    // display move on pane ??
-//                } catch (Exception e1) {
-//                    // TODO Auto-generated catch block
-//                    e1.printStackTrace();
-//                }
-//                return isSuccessfull;
-//            }
-//        };
-//
-//        listenMoveTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-//
-//            public void handle(WorkerStateEvent t) {
-//                Boolean isFound = (Boolean) t.getSource().getValue();
-//                System.out.println("done:" + isFound);
-//                if (isFound) {
-//                    System.out.println("listen move successfully");
-//                } else {
-//                    try {
-//                        notifyError("Can not listen move");
-//                    } catch (IOException e3) {
-//                        // TODO Auto-generated catch block
-//                        e3.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-//        Thread thread = new Thread(listenMoveTask);
-//        thread.start();
+        if (!this.mainGameScreenController.amIFirstPlayer()) {
+            Task<Boolean> listenMoveTask = new Task<Boolean>() {
+                protected Boolean call() {
+                    Boolean isSuccessfull = false;
+                    try {
+                        // send move to server
+                        isSuccessfull = mainGameScreenController.listenMove();
+                        int recvX1 = mainGameScreenController.getX();
+                        int recvY1 = mainGameScreenController.getY();
+                        System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+
+
+                    } catch (Exception e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    return isSuccessfull;
+                }
+            };
+
+            listenMoveTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+                public void handle(WorkerStateEvent t) {
+                    Boolean isFound = (Boolean) t.getSource().getValue();
+                    System.out.println("done:" + isFound);
+                    if (isFound) {
+                        System.out.println("listen move successfully");
+                        // display move on pane ??
+                    } else {
+                        try {
+                            notifyError("Can not listen move");
+                        } catch (IOException e3) {
+                            // TODO Auto-generated catch block
+                            e3.printStackTrace();
+                        }
+                    }
+                }
+            });
+            Thread thread = new Thread(listenMoveTask);
+            thread.start();
+        }
+
     }
 
     private void addPane(int rowIndex, int colIndex, Image move) {
@@ -188,12 +193,28 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                 Boolean isSuccessfull = false;
                                 try {
                                     // send move to server
-                                    isSuccessfull = mainGameScreenController.sendMove(rowIndex, colIndex);
-                                    int recvX = mainGameScreenController.getX();
-                                    int recvY = mainGameScreenController.getY();
-                                    System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
-                                    // release lock move
-                                    isLockMove = false;
+                                    if (mainGameScreenController.sendMove(rowIndex, colIndex)) {
+                                        int recvX = mainGameScreenController.getX();
+                                        int recvY = mainGameScreenController.getY();
+                                        System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
+                                        // release lock move
+                                        isLockMove = false;
+
+                                        // start listening for opponent move
+                                        if (mainGameScreenController.listenMove()) {
+                                            int recvX1 = mainGameScreenController.getX();
+                                            int recvY1 = mainGameScreenController.getY();
+                                            System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+                                            isSuccessfull = true;
+                                        } else {
+                                            // TODO: handle send failed here
+                                            isSuccessfull = false;
+                                        }
+                                    } else {
+                                        isSuccessfull = false;
+                                    }
+
+
                                 } catch (Exception e1) {
                                     // TODO Auto-generated catch block
                                     e1.printStackTrace();
@@ -208,23 +229,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                 Boolean isFound = (Boolean) t.getSource().getValue();
                                 System.out.println("done:" + isFound);
                                 if (isFound) {
-                                    // start listening for opponent move
-                                    try {
-                                        if (mainGameScreenController.listenMove()) {
-                                            int recvX1 = mainGameScreenController.getX();
-                                            int recvY1 = mainGameScreenController.getY();
-                                            System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
-
-                                            // display move on pane ??
-
-                                        } else {
-                                            // TODO: handle send failed here
-                                        }
-
-                                    } catch (Exception e2) {
-                                        // TODO Auto-generated catch block
-                                        e2.printStackTrace();
-                                    }
+                                    System.out.println("listen move successfully");
+                                    // display move on pane ??
                                 } else {
                                     try {
                                         notifyError("Can not place move");
