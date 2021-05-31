@@ -16,6 +16,7 @@ import java.util.Queue;
 import org.json.JSONObject;
 
 import entity.Match.Match;
+import entity.Move.Move;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
 import javafx.util.Pair;
@@ -24,6 +25,7 @@ import message.joinqueue.JoinQueueClientMessage;
 import message.joinqueue.JoinQueueServerMessage;
 import message.login.LoginClientMessage;
 import message.login.LoginServerMessage;
+import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
 import message.register.RegisterClientMessage;
@@ -337,21 +339,82 @@ public class Server {
 			}
 		}
 		
+		
+		
 		// should have a check here
 		// but first, let's try to successfully send data to both clients
+		
+		String errMsg = "";
+		StatusCode statCode = null;
+		
+		if(movePlayer.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+			if((match.getNumberOfMoves() % 2) == 0) {
+				match.addNewMoveRecord(x, y, movePlayer, state, result);
+				statCode = StatusCode.SUCCESS;
+			} else {
+				errMsg = "Invalid turn";
+				statCode = StatusCode.ERROR;
+			}
+		} else {
+			if((match.getNumberOfMoves() % 2) == 1) {
+				match.addNewMoveRecord(x, y, movePlayer, state, result);
+				statCode = StatusCode.SUCCESS;
+			} else {
+				errMsg = "Invalid turn";
+				statCode = StatusCode.ERROR;
+			}
+		}
 
-		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, StatusCode.SUCCESS,
-				"");
+		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, statCode, errMsg);
 
-		listResponse.put(match.getPlayer1().getUserSocket(), fwdMsg.toString());
-		listResponse.put(match.getPlayer2().getUserSocket(), fwdMsg.toString());
+		listResponse.put(sock, fwdMsg.toString());
 
 		return listResponse;
 	}
 
 	private Map<AsynchronousSocketChannel, String> processListenMove(String input, AsynchronousSocketChannel sock){
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		// strategy: polling until there is a new move
 		
+		ListenMoveClientMessage listenMsg = new ListenMoveClientMessage(input);
+		
+		String username = listenMsg.getUsername();
+		int matchID = listenMsg.getMatchID();
+		Match match = null;
+		
+		for(Match m : queueController.getIngameList()) {
+			if (m.getMatchID() == matchID) {
+				match = m;
+				break;
+			}
+		}
+		
+		Move latestMove;
+		String movePlayer = "";
+		while(true) {
+			try {
+				Thread.sleep(500);
+				if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+					if((match.getNumberOfMoves() % 2) == 1) {
+						latestMove = match.getLatestMove();
+						movePlayer = match.getPlayer2().getUsername();
+						break;
+					}
+				} else {
+					if((match.getNumberOfMoves() % 2 == 0)) {
+						latestMove = match.getLatestMove();
+						movePlayer = match.getPlayer1().getUsername();
+						break;
+					}
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, latestMove.getX(), latestMove.getY(), latestMove.getState(), latestMove.getResult(), StatusCode.SUCCESS, "");
+		listResponse.put(sock, fwdMsg.toString());
 		return listResponse;
 	}
 	
