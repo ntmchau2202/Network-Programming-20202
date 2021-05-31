@@ -71,7 +71,7 @@ public class TestClientB extends Application {
                         if (gameModeScreenController.amIFirstPlayer()) {
                             System.out.println("i play first mother fucker");
                         }
-                        mainGameScreenController.setOpponent(gameModeScreenController.getOpponent(),
+                        mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
                                 gameModeScreenController.getOpponentElo());
                         mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
                         System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());

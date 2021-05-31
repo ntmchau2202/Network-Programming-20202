@@ -1,7 +1,6 @@
 package client.views.screen;
 
 import client.controller.*;
-import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -12,10 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import message.matchfound.MatchFoundServerMessage;
-import protocol.StatusCode;
 
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -132,7 +128,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 						Boolean isFound = (Boolean) t.getSource().getValue();
 						System.out.println("done:" + isFound);
 						if (isFound) {
-							mainGameScreenController.setOpponent(gameModeScreenController.getOpponent(),
+							mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
 									gameModeScreenController.getOpponentElo());
 							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
 							System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());

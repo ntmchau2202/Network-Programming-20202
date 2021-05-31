@@ -1,13 +1,11 @@
 package test;
 
 import client.controller.GameModeScreenController;
-import client.controller.HomeScreenController;
 import client.controller.LoginFormController;
 import client.controller.MainGameScreenController;
 import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import client.views.screen.BaseScreenHandler;
-import client.views.screen.HomeScreenHandler;
 import client.views.screen.MainGameScreenHandler;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
@@ -73,7 +71,7 @@ public class TestClientA extends Application {
                         if (gameModeScreenController.amIFirstPlayer()) {
                             System.out.println("i play first mother fucker");
                         }
-                        mainGameScreenController.setOpponent(gameModeScreenController.getOpponent(),
+                        mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
                                 gameModeScreenController.getOpponentElo());
                         mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
                         System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());

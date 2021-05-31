@@ -20,13 +20,22 @@ import protocol.StatusCode;
 
 public class MainGameScreenController extends BaseController {
 
+	// current player info
 	private int moveX, moveY;
 	private Player currentPlayer;
-	private String movePlayer, opponentPlayer;
-	private String moveResult, moveState;
-	private boolean isMyTurn;
-	private int matchID, opponentElo;
 	private boolean isFirstPlayer;
+	private boolean isMyTurn;
+
+	// match info
+	private int matchID;
+	private String firstPlayerName;
+
+	// opponent info
+	private String opponentPlayerName;
+	private int opponentElo;
+
+	private String movePlayer;
+	private String moveResult, moveState;
 
 	public MainGameScreenController(Player currentPlayer) {
 		this.currentPlayer = currentPlayer;
@@ -34,6 +43,11 @@ public class MainGameScreenController extends BaseController {
 
 	public void setIsFirstPlayer(boolean isFirstPlayer) {
 		this.isFirstPlayer = isFirstPlayer;
+		if (isFirstPlayer) {
+			firstPlayerName = currentPlayer.getUsername();
+		} else {
+			firstPlayerName = opponentPlayerName;
+		}
 	}
 
 	public void setTurn(boolean turn) {
@@ -41,7 +55,7 @@ public class MainGameScreenController extends BaseController {
 	}
 
 	public void setOpponent(String opponent, int elo) {
-		this.opponentPlayer = opponent;
+		this.opponentPlayerName = opponent;
 		this.opponentElo = elo;
 	}
 
@@ -59,6 +73,10 @@ public class MainGameScreenController extends BaseController {
 
 	public boolean amIFirstPlayer() {
 		return isFirstPlayer;
+	}
+
+	public boolean checkFirstPlayerByName(String playerName) {
+		return playerName.equals(firstPlayerName);
 	}
 
 	public boolean sendMove(int x, int y) throws Exception {

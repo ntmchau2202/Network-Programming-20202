@@ -173,7 +173,15 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         pane.setPrefWidth(39);
         x.setFitHeight(39);
         x.setFitWidth(39);
-//        x.setImage(move);
+
+        // initialize player move to be X if first player or O second player
+        if (this.mainGameScreenController.checkFirstPlayerByName(movePlayerName)) {
+            x.setImage(new Image(X_IMAGE_FILE.toURI().toString()));
+        } else {
+            x.setImage(new Image(O_IMAGE_FILE.toURI().toString()));
+        }
+
+        // add to pane
     }
 
     private void addPane(int rowIndex, int colIndex, Image move) {
