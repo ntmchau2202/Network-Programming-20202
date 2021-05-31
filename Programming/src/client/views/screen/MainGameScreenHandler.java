@@ -302,6 +302,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 								// TODO Auto-generated method stub
 								try {
 									notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
+                                    HomeScreenHandler homeHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
+                                    homeHandler.setScreenTitle("Home Screen");
+                                    homeHandler.show();
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
