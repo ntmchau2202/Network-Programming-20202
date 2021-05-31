@@ -175,21 +175,25 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     }
 
     private void addImageToPane(Pane pane, String movePlayerName) {
-        ImageView x = new ImageView();
-        x.setFitHeight(39);
-        x.setFitWidth(39);
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                ImageView x = new ImageView();
+                x.setFitHeight(39);
+                x.setFitWidth(39);
 
-        // initialize player move to be X if first player or O second player
-        if (this.mainGameScreenController.checkFirstPlayerByName(movePlayerName)) {
-            x.setImage(new Image(X_IMAGE_FILE.toURI().toString()));
-        } else {
-            x.setImage(new Image(O_IMAGE_FILE.toURI().toString()));
-        }
+                // initialize player move to be X if first player or O second player
+                if (mainGameScreenController.checkFirstPlayerByName(movePlayerName)) {
+                    x.setImage(new Image(X_IMAGE_FILE.toURI().toString()));
+                } else {
+                    x.setImage(new Image(O_IMAGE_FILE.toURI().toString()));
+                }
 
-        // add to pane
-        if (pane.getChildren().isEmpty()) {
-            pane.getChildren().add(x);
-        }
+                // add to pane
+                if (pane.getChildren().isEmpty()) {
+                    pane.getChildren().add(x);
+                }
+            }
+        });
     }
 
     private void addPane(int rowIndex, int colIndex, Image move) {
@@ -207,6 +211,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
                     // set move status array for checking winning state
                     this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
+
+                    // check victory
+                    System.out.println(hasWinner(rowIndex, colIndex));
+
                     // send move
                     try {
                         // lock move
@@ -277,8 +285,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                         // TODO Auto-generated catch block
                         e4.printStackTrace();
                     }
-
-                    System.out.println(hasWinner(rowIndex, colIndex));
                 } else {
                     pane.setDisable(true);
                     System.out.printf("Already clicked [%d, %d]%n", rowIndex, colIndex);
@@ -316,7 +322,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         Check myCheck = new Check(15, 15);
         int prePlayer = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
-        System.out.println("Player " + prePlayer + "Win?" + myCheck.checkIt(row, col, this.status, prePlayer));
+        System.out.println("Player " + prePlayer + "Win? " + myCheck.checkIt(row, col, this.status, prePlayer));
         return myCheck.checkIt(row, col, this.status, prePlayer);
 
         /*
