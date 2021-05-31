@@ -26,14 +26,14 @@
             <Image url="@assets/img/podium2.png" />
          </image>
       </ImageView>
-      <TableView layoutX="38.0" layoutY="140.0" prefHeight="463.0" prefWidth="544.0" stylesheets="@assets/css/style.css">
+      <TableView fx:id="leaderboardTableView" layoutX="38.0" layoutY="140.0" prefHeight="463.0" prefWidth="544.0" stylesheets="@assets/css/style.css">
         <columns>
-          <TableColumn prefWidth="75.0" text="Rank" />
-          <TableColumn prefWidth="120.79993438720703" text="Username" />
-            <TableColumn prefWidth="76.79998779296875" text="#Match" />
-            <TableColumn prefWidth="85.5999755859375" text="#Win" />
-            <TableColumn prefWidth="108.0" text="Rate" />
-            <TableColumn prefWidth="59.199920654296875" text="Elo" />
+          <TableColumn fx:id="rankTableColumn" prefWidth="75.0" text="Rank" />
+          <TableColumn fx:id="usernameTableColumn" prefWidth="120.79993438720703" text="Username" />
+            <TableColumn fx:id="matchTableColumn" prefWidth="76.79998779296875" text="#Match" />
+            <TableColumn fx:id="winTableColumn" prefWidth="85.5999755859375" text="#Win" />
+            <TableColumn fx:id="rateTableColumn" prefWidth="108.0" text="Rate (%)" />
+            <TableColumn fx:id="eloTableColumn" prefWidth="59.199920654296875" text="Elo" />
         </columns>
       </TableView>
       <ImageView fx:id="prevScreenImageView" fitHeight="35.0" fitWidth="35.0" layoutX="13.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true">

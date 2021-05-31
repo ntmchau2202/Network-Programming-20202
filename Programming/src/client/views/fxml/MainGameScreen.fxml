@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1239.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1239.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView fitHeight="591.0" fitWidth="1241.0" layoutY="1.0" pickOnBounds="true">
          <image>
@@ -150,5 +150,7 @@
          </cursor></Pane>
       <Text fx:id="playerTurnText" layoutX="738.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player" />
       <Label layoutX="701.0" layoutY="28.0" text="Turn:" />
+      <Label layoutX="851.0" layoutY="29.0" text="You are:" />
+      <Label fx:id="yourMove" layoutX="911.0" layoutY="29.0" text="Label" />
    </children>
 </AnchorPane>

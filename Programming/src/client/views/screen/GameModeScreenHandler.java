@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import message.matchfound.MatchFoundServerMessage;
 import protocol.StatusCode;
 
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -48,6 +49,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	private ImageView prevScreenImageView;
 	@FXML
 	private ImageView homeScreenImageView;
+	@FXML
+	private ImageView leaderboardImageView;
 	private final GameModeScreenController gameModeScreenController;
 
 	/**
@@ -75,6 +78,18 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			homeHandler.show();
 			homeHandler.setScreenTitle("Home Screen");
 		});
+		leaderboardImageView.setOnMouseClicked(ev -> {
+			System.out.println("leaderboard");
+			try {
+				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+				leaderboardHandler.setScreenTitle("Leaderboard");
+				leaderboardHandler.setPreviousScreen(this);
+				leaderboardHandler.show();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	@Override
@@ -86,65 +101,22 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	private void handleFindGameAction(javafx.event.Event evt) {
 		try {
 			MainGameScreenController mainGameScreenController = new MainGameScreenController(
-					this.gameModeScreenController.getCurPlayer());
-			BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage,
-					Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
-			mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
-			mainGameScreenHandler.setPreviousScreen(this);
+					this.gameModeScreenController.getCurPlayer().getUsername());
 
 			if (evt.getSource() == practicePlay) {
-				
 				System.out.println("practice play");
-				// Boolean isFound = false;
-				practicePlay.setDisable(true);
-				rankPlay.setDisable(true);
-				Task<Boolean> findGameTask = new Task<Boolean>() {
-					protected Boolean call() {
-						Boolean isFound = false;
-						try {
-							isFound = gameModeScreenController.findPracticeGame();
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						return isFound;
+
+				boolean isFound = gameModeScreenController.findPracticeGame();
+				if (isFound) {
+					// TODO: may need other analyze here
+					notifySuccess("Yeah! Found a match! Let's practice");
+					if (gameModeScreenController.amIFirstPlayer()) {
+						System.out.println("i play first mother fucker");
 					}
-				};
-
-				findGameTask.setOnSucceeded((EventHandler) new EventHandler<WorkerStateEvent>() {
-
-					public void handle(WorkerStateEvent t) {
-						Boolean isFound = (Boolean) t.getSource().getValue();
-						System.out.println("done:" + isFound);
-						if (isFound) {
-							// TODO: may need other analyze here
-							mainGameScreenController.setOpponent(gameModeScreenController.getOpponent(),
-									gameModeScreenController.getOpponentElo());
-							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
-							mainGameScreenHandler.show();
-							try {
-								notifySuccess("Yeah! Found a match! Let's practice");
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
-							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
-						} else {
-							try {
-								notifyError("Can not find practice play match");
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					}
-				});
-
-				Thread thread = new Thread(findGameTask);
-				thread.start();
-				// thread.join();
-
+					mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+				} else {
+					notifyError("Can not find practice play match");
+				}
 			} else if (evt.getSource() == rankPlay) {
 				System.out.println("rank play");
 
@@ -159,7 +131,11 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				}
 
 			}
-
+			BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage,
+					Configs.MAINGAME_SCREEN_PATH, mainGameScreenController, gameModeScreenController.amIFirstPlayer());
+			mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+			mainGameScreenHandler.setPreviousScreen(this);
+			mainGameScreenHandler.show();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
