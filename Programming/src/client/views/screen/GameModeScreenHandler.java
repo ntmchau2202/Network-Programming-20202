@@ -111,6 +111,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 					}
 				};
 
+				
+				
 				findGameTask.setOnSucceeded((EventHandler) new EventHandler<WorkerStateEvent>() {
 
 					public void handle(WorkerStateEvent t) {

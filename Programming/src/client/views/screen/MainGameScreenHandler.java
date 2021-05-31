@@ -17,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import message.ServerMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,21 +111,29 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // Integer rowIndex = GridPane.getRowIndex(source);
         // System.out.printf("Mouse entered cell [%d, %d]%n", colIndex.intValue(),
         // rowIndex.intValue());
-
-        // Task task = new Task<Void>() {
-        // @Override
-        // public Void call() {
-        // try {
-        // mainGameScreenController.listening();
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // }
-        // return null;
-        // }
-        // };
-        // alwaysListener = new Thread(task);
-        // task.setOnSucceeded(taskFinishEvent -> System.out.println("task done"));
-        // alwaysListener.start();
+//        MainGameScreenHandler screenHandler = this;
+//         Task task = new Task<Void>() {
+//	         @Override
+//		         public Void call() {
+//			        while(true) {
+//			        	try {
+//			        	 	ServerMessage svMsg = mainGameScreenController.listening(screenHandler);
+//			        	 	// check instanceof. This might be a bad practice but we still use it now
+////			        	 	if (svMsg instanceof MoveServerMessage) {
+////			        	 		/// 
+////			        	 	} else if (sgMsg instanceof ChatServerMessage) {
+////			        	 		///
+////			        	 	} else if
+////			        	 	
+//				         } catch (Exception e) {
+//				        	 e.printStackTrace();
+//				         }
+//			        }
+//	         }
+//         };
+//         alwaysListener = new Thread(task);
+//         task.setOnSucceeded(taskFinishEvent -> System.out.println("task done"));
+//         alwaysListener.start();
     }
 
     public void switchTurn(boolean turn) {
@@ -149,9 +158,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                 // send information here
                 try {
                     if (mainGameScreenController.sendMove(colIndex, rowIndex)) {
-                        int recvX = mainGameScreenController.getX();
-                        int recvY = mainGameScreenController.getY();
-                        System.out.printf("Recv coordinate [%d, %d]%n", recvX, recvY);
+//                        int recvX = mainGameScreenController.getX();
+//                        int recvY = mainGameScreenController.getY();
+//                        System.out.printf("Recv coordinate [%d, %d]%n", recvX, recvY);
                         // TODO: display X or O here
                     } else {
                         // TODO: handle send failed here

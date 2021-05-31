@@ -5,8 +5,10 @@ import java.io.IOException;
 import org.json.JSONObject;
 
 import client.network.ClientSocketChannel;
+import client.views.screen.MainGameScreenHandler;
 import entity.Player.Player;
 import javafx.application.Platform;
+import message.ServerMessage;
 import message.chat.ChatServerMessage;
 import message.chatack.ChatACKServerMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
@@ -81,79 +83,31 @@ public class MainGameScreenController extends BaseController {
 	}
 
 	// may change the return type here, to send information to GUI for modification
-//	public void listening() {
-//		try {
-//			String unconditionalMessage = ClientSocketChannel.getSocketInstance().listenIngameMessage();
-//			JSONObject jsMsg = new JSONObject(unconditionalMessage);
-//			Command cmd = Command.toCommand(jsMsg.getString("command_code"));
-//
-//			switch (cmd) {
-//				case MOVE: {
-//					MoveServerMessage moveMsg = new MoveServerMessage(unconditionalMessage);
-//					int x = moveMsg.getX();
-//					int y = moveMsg.getY();
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//
-//				}
-//				case CHAT: {
-//					ChatServerMessage chatMsg = new ChatServerMessage(unconditionalMessage);
-//					String incommingMsg = chatMsg.getMessage();
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//
-//					// TODO: do analysis here
-//
-//				}
-//				case CHATACK: {
-//					ChatACKServerMessage ack = new ChatACKServerMessage(unconditionalMessage);
-//					String msgID = ack.getMessageID();
-//					int matchID = ack.getMatchID();
-//
-//					// TODO: do analysis here
-//
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//
-//				case DRAW_REQUEST: {
-//					DrawRequestServerMessage drawRequest = new DrawRequestServerMessage(unconditionalMessage);
-//					int matchID = drawRequest.getMatchID();
-//					// TODO: do analysis here
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//
-//				}
-//				case DRAW_CONFIRM: {
-//					DrawConfirmServerMessage drawConfirm = new DrawConfirmServerMessage(unconditionalMessage);
-//					int matchID = drawConfirm.getMatchID();
-//					boolean acceptance = drawConfirm.getAcceptance();
-//
-//					// TODO: do analysis here
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//
-//			}
-//
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+	public ServerMessage listening(MainGameScreenHandler screenHandler) {
+		// screen handler is for displaying stuff on the screen
+		ServerMessage svMsg = null;
+		try {
+			svMsg = ClientSocketChannel.getSocketInstance().listenIngameMessage();
+			// analysis here
+			if (svMsg instanceof MoveServerMessage) {
+				MoveServerMessage moveMsg = (MoveServerMessage)svMsg;
+				int x = moveMsg.getX();
+				int y = moveMsg.getY();
+				System.out.println("Recv (X,Y): "+ x + ":" +y);				
+			} else if (svMsg instanceof ChatServerMessage) {
+				
+			} else if (svMsg instanceof ChatACKServerMessage) {
+				
+			} else if (svMsg instanceof DrawRequestServerMessage) {
+				
+			} else if (svMsg instanceof DrawConfirmServerMessage){
+				// do st here
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	return svMsg;
+	}
 }
