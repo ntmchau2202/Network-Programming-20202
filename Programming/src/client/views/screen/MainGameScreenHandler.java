@@ -166,6 +166,16 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
     }
 
+    private void displayMove(int rowIndex, int colIndex, String movePlayerName) {
+        Pane pane = new Pane();
+        ImageView x = new ImageView();
+        pane.setPrefHeight(39);
+        pane.setPrefWidth(39);
+        x.setFitHeight(39);
+        x.setFitWidth(39);
+//        x.setImage(move);
+    }
+
     private void addPane(int rowIndex, int colIndex, Image move) {
         Pane pane = new Pane();
         ImageView x = new ImageView();
