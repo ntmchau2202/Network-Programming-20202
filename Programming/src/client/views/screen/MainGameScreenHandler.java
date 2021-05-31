@@ -164,7 +164,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             thread.start();
         }
 
-        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
+        // test display in (0, 0)
+//        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
 
     }
 
@@ -222,7 +223,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                             int recvY1 = mainGameScreenController.getY();
                                             System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
                                             // display move on pane ??
-//                                            gameBoardGridPane.get
+                                            addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
 
                                             isSuccessfull = true;
                                         } else {
@@ -277,12 +278,14 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         this.gameBoardGridPane.add(pane, colIndex, rowIndex);
     }
 
-    public Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {
+    public Node getNodeByRowColumnIndex(final int row, final int column, GridPane gridPane) {
         Node result = null;
         ObservableList<Node> childrens = gridPane.getChildren();
 
         for (Node node : childrens) {
-            if(gridPane.getRowIndex(node) == row && gridPane.getColumnIndex(node) == column) {
+            Integer columnIndex = GridPane.getColumnIndex(node);
+            Integer rowIndex = GridPane.getRowIndex(node);
+            if (rowIndex != null && rowIndex == row && columnIndex != null && columnIndex == column) {
                 result = node;
                 break;
             }

@@ -79,6 +79,14 @@ public class MainGameScreenController extends BaseController {
 		return playerName.equals(firstPlayerName);
 	}
 
+	public String getOpponentPlayerName() {
+		return opponentPlayerName;
+	}
+
+	public int getOpponentElo() {
+		return opponentElo;
+	}
+
 	public boolean sendMove(int x, int y) throws Exception {
 		System.out.println("Match id: " + this.matchID);
 		System.out.println("=====================Sending move: " + x + " - " + y);
