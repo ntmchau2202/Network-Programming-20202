@@ -13,7 +13,7 @@ public class ListenMoveClientMessage extends ClientMessage {
 		this.username = username;
 		this.matchID = matchID;
 		
-		this.setCommand(Command.LISTENMOVE);
+		this.setCommand(Command.LISTEN_MOVE);
 		this.requestBody.createListenMoveBody(username, matchID);
 		this.finalizeMessageObject();
 		
