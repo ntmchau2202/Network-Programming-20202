@@ -382,28 +382,35 @@ public class Server {
 		int matchID = listenMsg.getMatchID();
 		Match match = null;
 		
-		for(Match m : queueController.getIngameList()) {
-			if (m.getMatchID() == matchID) {
-				match = m;
-				break;
-			}
-		}
+//		for(Match m : queueController.getIngameList()) {
+//			if (m.getMatchID() == matchID) {
+//				match = m;
+//				break;
+//			}
+//		}
 		
 		Move latestMove;
 		String movePlayer = "";
 		while(true) {
 			try {
 				Thread.sleep(500);
+				for(Match m : queueController.getIngameList()) {
+					if (m.getMatchID() == matchID) {
+						match = m;
+						break;
+					}
+				}
+				
 				if(match.getNumberOfMoves() > 0) {				
 					if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
 				
-					if((match.getNumberOfMoves() % 2) == 1) {
+					if((match.getNumberOfMoves() % 2) == 0) {
 						latestMove = match.getLatestMove();
 						movePlayer = match.getPlayer2().getUsername();
 						break;
 					}
 				} else {
-					if((match.getNumberOfMoves() % 2 == 0)) {
+					if((match.getNumberOfMoves() % 2 == 1)) {
 						latestMove = match.getLatestMove();
 						movePlayer = match.getPlayer1().getUsername();
 						break;
