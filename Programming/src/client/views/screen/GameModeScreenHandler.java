@@ -98,11 +98,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		try {
 			MainGameScreenController mainGameScreenController = new MainGameScreenController(
 					this.gameModeScreenController.getCurPlayer());
+			GameModeScreenHandler currentHandler = this;
 
-			BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(this.stage,
-					Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
-			mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
-			mainGameScreenHandler.setPreviousScreen(this);
 
 			if (evt.getSource() == practicePlay) {
 				System.out.println("practice play");
@@ -140,7 +137,18 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-							mainGameScreenHandler.show();
+							BaseScreenHandler mainGameScreenHandler = null;
+							try {
+								mainGameScreenHandler = new MainGameScreenHandler(currentHandler.stage,
+										Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
+								mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+								mainGameScreenHandler.setPreviousScreen(currentHandler);
+								mainGameScreenHandler.show();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
 						} else {
 							try {
 								notifyError("Can not find practice play match");

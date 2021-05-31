@@ -9,10 +9,10 @@ public class Configs {
     // i.e: "/client" is different from "client"
     // if no slash at the head, location will be the place we load the screen
     public static final String SPLASH_SCREEN_PATH = "/client/views/fxml/SplashScreen.fxml";
-    public static final String IMAGE_PATH = "icon/";
-    public static final String APP_ICON_PATH = "icon/open.png";
-    public static final String X_ICON_PATH = "icon/cross.png";
-    public static final String O_ICON_PATH = "icon/circle.png";
+    public static final String IMAGE_PATH = "../icon/";
+    public static final String APP_ICON_PATH = "../icon/open.png";
+    public static final String X_ICON_PATH = "../icon/cross.png";
+    public static final String O_ICON_PATH = "../icon/circle.png";
     public static final String HOME_SCREEN_PATH  = "/client/views/fxml/HomeScreen.fxml";
     public static final String LOGIN_FORM_PATH  = "/client/views/fxml/LoginForm.fxml";
     public static final String REGISTER_FORM_PATH  = "/client/views/fxml/RegisterForm.fxml";
