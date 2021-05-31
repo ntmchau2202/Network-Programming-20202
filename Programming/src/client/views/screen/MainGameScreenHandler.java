@@ -8,6 +8,8 @@ import client.network.InGameListener;
 import client.utils.Configs;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -38,6 +40,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private Text playerTurnText;
     @FXML
     private Label yourMove;
+
+    // locking clicking other moves when a move is chosen
+    private boolean isLockMove;
 
     private int[][] status = new int[15][15];
 
@@ -112,6 +117,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             }
         }
 
+        // unlock move
+        isLockMove = false;
     }
 
     private void addPane(int rowIndex, int colIndex, Image move) {
@@ -126,35 +133,80 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         pane.setOnMousePressed(e -> {
             this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
 
-            // if(mainGameScreenController.isMyTurn()) {
-            if (pane.getChildren().isEmpty()) {
-                System.out.printf("Mouse clicked cell [%d, %d]%n", rowIndex, colIndex);
-                pane.getChildren().add(x);
-            } else {
-                pane.setDisable(true);
-                System.out.printf("Already clicked [%d, %d]%n", rowIndex, colIndex);
+            // clickable only when it's player turn
+            if (this.mainGameScreenController.isMyTurn() && !isLockMove) {
+                if (pane.getChildren().isEmpty()) {
+                    System.out.printf("Mouse clicked cell [%d, %d]%n", rowIndex, colIndex);
+                    pane.getChildren().add(x);
+
+                    // send move
+                    try {
+                        // lock move
+                        isLockMove = true;
+                        Task<Boolean> sendMoveTask = new Task<Boolean>() {
+                            protected Boolean call() {
+                                Boolean isSuccessfull = false;
+                                try {
+                                    // send move to server
+                                    isSuccessfull = mainGameScreenController.sendMove(rowIndex, colIndex);
+                                    int recvX = mainGameScreenController.getX();
+                                    int recvY = mainGameScreenController.getY();
+                                    System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
+                                    // release lock move
+                                    isLockMove = false;
+                                } catch (Exception e1) {
+                                    // TODO Auto-generated catch block
+                                    e1.printStackTrace();
+                                }
+                                return isSuccessfull;
+                            }
+                        };
+
+                        sendMoveTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+                            public void handle(WorkerStateEvent t) {
+                                Boolean isFound = (Boolean) t.getSource().getValue();
+                                System.out.println("done:" + isFound);
+                                if (isFound) {
+                                    // start listening for opponent move
+                                    try {
+                                        if (mainGameScreenController.listenMove()) {
+                                            int recvX1 = mainGameScreenController.getX();
+                                            int recvY1 = mainGameScreenController.getY();
+                                            System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+
+                                            // display move on pane ??
+
+                                        } else {
+                                            // TODO: handle send failed here
+                                        }
+
+                                    } catch (Exception e2) {
+                                        // TODO Auto-generated catch block
+                                        e2.printStackTrace();
+                                    }
+                                } else {
+                                    try {
+                                        notifyError("Can not place move");
+                                    } catch (IOException e3) {
+                                        // TODO Auto-generated catch block
+                                        e3.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
+
+                    } catch (Exception e4) {
+                        // TODO Auto-generated catch block
+                        e4.printStackTrace();
+                    }
+
+                    System.out.println(hasWinner(rowIndex, colIndex));
+                } else {
+                    pane.setDisable(true);
+                    System.out.printf("Already clicked [%d, %d]%n", rowIndex, colIndex);
+                }
             }
-            System.out.println(hasWinner(rowIndex, colIndex));
-            // // send information here
-            // try {
-            // if(mainGameScreenController.sendMove(colIndex, rowIndex)) {
-            // int recvX = mainGameScreenController.getX();
-            // int recvY = mainGameScreenController.getY();
-            // System.out.printf("Recv coordinate [%d, %d]%n", recvX, recvY);
-            // // TODO: display X or O here
-            // } else {
-            // // TODO: handle send failed here
-            // }
-            //
-            // } catch (Exception e1) {
-            // // TODO Auto-generated catch block
-            // e1.printStackTrace();
-            // }
-            //
-            //
-            // // then switch it to false
-            // mainGameScreenController.setTurn(false);
-            // }
         });
         this.gameBoardGridPane.add(pane, colIndex, rowIndex);
     }

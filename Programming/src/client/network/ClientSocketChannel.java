@@ -10,6 +10,7 @@ import message.drawrequest.DrawRequestServerMessage;
 import message.joinqueue.JoinQueueClientMessage;
 import message.login.LoginClientMessage;
 import message.matchfound.MatchFoundServerMessage;
+import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
 import message.register.RegisterClientMessage;
@@ -119,8 +120,10 @@ public class ClientSocketChannel {
 		return sendRequest(msg.toString());
 	}
 
-	public String listenMove() {
-		return "";
+	public String listenMove(String playerName, int matchID) throws Exception {
+		ListenMoveClientMessage msg = new ListenMoveClientMessage(playerName, matchID);
+		System.out.println(msg.toString());
+		return sendRequest(msg.toString());
 	}
 
 	public String requestDraw() throws Exception {

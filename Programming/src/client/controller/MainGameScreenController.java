@@ -79,6 +79,22 @@ public class MainGameScreenController extends BaseController {
 
 	}
 
+	public boolean listenMove() throws Exception {
+		String result = ClientSocketChannel.getSocketInstance().listenMove(currentPlayer.getUsername(), this.matchID);
+		MoveServerMessage move = new MoveServerMessage(result);
+
+		if (move.getStatusCode().compareTo(StatusCode.SUCCESS) == 0) {
+			moveX = move.getX();
+			moveY = move.getY();
+			movePlayer = move.getMovePlayer();
+			moveResult = move.getResult();
+			moveState = move.getState();
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public boolean isFinal() {
 		return this.moveResult.compareToIgnoreCase("win") == 0;
 	}
