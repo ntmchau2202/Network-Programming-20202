@@ -87,11 +87,11 @@ public class MainGameScreenController extends BaseController {
 		return opponentElo;
 	}
 
-	public boolean sendMove(int x, int y) throws Exception {
+	public boolean sendMove(int x, int y, String gameResult) throws Exception {
 		System.out.println("Match id: " + this.matchID);
 		System.out.println("=====================Sending move: " + x + " - " + y);
 		String result = ClientSocketChannel.getSocketInstance().move(currentPlayer.getUsername(),
-				currentPlayer.getSessionId(), this.matchID, x, y, "valid", "");
+				currentPlayer.getSessionId(), this.matchID, x, y, "valid", gameResult);
 		MoveServerMessage move = new MoveServerMessage(result);
 
 		if (move.getStatusCode().compareTo(StatusCode.SUCCESS) == 0) {
@@ -134,6 +134,10 @@ public class MainGameScreenController extends BaseController {
 
 	public int getY() {
 		return this.moveY;
+	}
+	
+	public String getFinalMovePlayer() {
+		return this.movePlayer;
 	}
 
 	// may change the return type here, to send information to GUI for modification

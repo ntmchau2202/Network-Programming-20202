@@ -213,7 +213,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                     this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
 
                     // check victory
-                    System.out.println(hasWinner(rowIndex, colIndex));
+                    
 
                     // send move
                     try {
@@ -224,10 +224,23 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                 Boolean isSuccessfull = false;
                                 try {
                                     // send move to server
-                                    if (mainGameScreenController.sendMove(rowIndex, colIndex)) {
+                                	Boolean isWin = hasWinner(rowIndex, colIndex);
+                                	System.out.println(isWin);
+                                	String result = "";
+                                	if (isWin) {
+                                		result = "win"; 
+                                	}
+                                	
+                                    if (mainGameScreenController.sendMove(rowIndex, colIndex, result)) {
                                         int recvX = mainGameScreenController.getX();
                                         int recvY = mainGameScreenController.getY();
                                         System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
+                                        
+                                        if (mainGameScreenController.isFinal()) {
+                                        	
+                                        	System.out.println("Result from send: Win player: " + mainGameScreenController.getFinalMovePlayer());
+                                        	this.cancel();
+                                        }
 
                                         mainGameScreenController.setTurn(false);
 
@@ -238,7 +251,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                             System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
                                             // display move on pane ??
                                             addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
-
+                                            if (mainGameScreenController.isFinal()) {
+                                            	System.out.println("Result from listen: Win player: " + mainGameScreenController.getFinalMovePlayer());
+                                            	this.cancel();
+                                            }
                                             mainGameScreenController.setTurn(true);
 
                                             // release lock move
@@ -277,6 +293,21 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                     }
                                 }
                             }
+                        });
+                        
+                        sendMoveTask.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+
+							@Override
+							public void handle(WorkerStateEvent arg0) {
+								// TODO Auto-generated method stub
+								try {
+									notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+                        	
                         });
                         Thread thread = new Thread(sendMoveTask);
                         thread.start();
