@@ -119,6 +119,10 @@ public class ClientSocketChannel {
 		return sendRequest(msg.toString());
 	}
 
+	public String listenMove() {
+		return "";
+	}
+
 	public String requestDraw() throws Exception {
 		// TODO: Finish function
 		return sendRequest("");

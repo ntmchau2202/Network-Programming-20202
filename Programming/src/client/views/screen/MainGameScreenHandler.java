@@ -42,7 +42,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
     // private int[][] player = new String[15][15];
 
-    private boolean amIFirstPlayer;
     private final MainGameScreenController mainGameScreenController;
     private static final File X_IMAGE_FILE = new File(Configs.X_ICON_PATH);
     private static final File O_IMAGE_FILE = new File(Configs.O_ICON_PATH);
@@ -55,8 +54,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
      * @param screenPath path to screen fxml
      * @throws IOException exception for IO operations
      */
-    public MainGameScreenHandler(Stage stage, String screenPath, MainGameScreenController mainGameScreenController,
-            boolean amIFirstPlayer) throws IOException {
+    public MainGameScreenHandler(Stage stage, String screenPath, MainGameScreenController mainGameScreenController) throws IOException {
         super(stage, screenPath);
         this.mainGameScreenController = mainGameScreenController;
         HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
@@ -69,7 +67,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             homeHandler.show();
             homeHandler.setScreenTitle("Home Screen");
         });
-        this.amIFirstPlayer = amIFirstPlayer;
         //
         // this.gameBoardGridPane.setPrefHeight(591);
         // this.gameBoardGridPane.setPrefWidth(604);
@@ -83,9 +80,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         }
 
         // initialize player move to be X if first player or O second player
-        yourMove.setText(this.amIFirstPlayer ? "X" : "O");
+        yourMove.setText(this.mainGameScreenController.amIFirstPlayer() ? "X" : "O");
         this.MOVE_IMAGE = new Image(
-                this.amIFirstPlayer ? X_IMAGE_FILE.toURI().toString() : O_IMAGE_FILE.toURI().toString());
+                this.mainGameScreenController.amIFirstPlayer() ? X_IMAGE_FILE.toURI().toString() : O_IMAGE_FILE.toURI().toString());
 
         // initialize game board grid pane
         int numCols = 15;
@@ -125,7 +122,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         x.setImage(move);
 
         pane.setOnMousePressed(e -> {
-            this.status[rowIndex][colIndex] = (this.amIFirstPlayer ? 1 : 2);
+            this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
 
             // if(mainGameScreenController.isMyTurn()) {
             if (pane.getChildren().isEmpty()) {
@@ -172,7 +169,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     public boolean hasWinner(int row, int col) {
 
         Check myCheck = new Check(15, 15);
-        int prePlayer = (this.amIFirstPlayer ? 1 : 2);
+        int prePlayer = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
         System.out.println("Player " + prePlayer + "Win?" + myCheck.checkIt(row, col, this.status, prePlayer));
         return myCheck.checkIt(row, col, this.status, prePlayer);
 

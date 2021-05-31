@@ -24,9 +24,14 @@ public class MainGameScreenController extends BaseController {
 	private String moveResult, moveState;
 	private boolean isMyTurn;
 	private int matchID, opponentElo;
+	private boolean isFirstPlayer;
 
 	public MainGameScreenController(Player currentPlayer) {
 		this.currentPlayer = currentPlayer;
+	}
+
+	public void setIsFirstPlayer(boolean isFirstPlayer) {
+		this.isFirstPlayer = isFirstPlayer;
 	}
 
 	public void setTurn(boolean turn) {
@@ -48,6 +53,10 @@ public class MainGameScreenController extends BaseController {
 
 	public Player getCurrentPlayer() {
 		return currentPlayer;
+	}
+
+	public boolean amIFirstPlayer() {
+		return isFirstPlayer;
 	}
 
 	public boolean sendMove(int x, int y) throws Exception {

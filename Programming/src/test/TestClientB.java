@@ -72,8 +72,9 @@ public class TestClientB extends Application {
                             System.out.println("i play first mother fucker");
                         }
                         mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+                        mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
                         BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(primaryStage,
-                                Configs.MAINGAME_SCREEN_PATH, mainGameScreenController, gameModeScreenController.amIFirstPlayer());
+                                Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
                         mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
                         mainGameScreenHandler.show();
                     } else {
