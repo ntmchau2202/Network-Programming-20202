@@ -394,7 +394,9 @@ public class Server {
 		while(true) {
 			try {
 				Thread.sleep(500);
-				if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+				if(match.getNumberOfMoves() > 0) {				
+					if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+				
 					if((match.getNumberOfMoves() % 2) == 1) {
 						latestMove = match.getLatestMove();
 						movePlayer = match.getPlayer2().getUsername();
@@ -406,6 +408,7 @@ public class Server {
 						movePlayer = match.getPlayer1().getUsername();
 						break;
 					}
+				}
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
