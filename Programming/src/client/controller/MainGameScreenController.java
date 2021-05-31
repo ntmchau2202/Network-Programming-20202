@@ -62,6 +62,8 @@ public class MainGameScreenController extends BaseController {
 	}
 
 	public boolean sendMove(int x, int y) throws Exception {
+		System.out.println("Match id: " + this.matchID);
+		System.out.println("=====================Sending move: " + x + " - " + y);
 		String result = ClientSocketChannel.getSocketInstance().move(currentPlayer.getUsername(),
 				currentPlayer.getSessionId(), this.matchID, x, y, "valid", "");
 		MoveServerMessage move = new MoveServerMessage(result);
@@ -80,6 +82,7 @@ public class MainGameScreenController extends BaseController {
 	}
 
 	public boolean listenMove() throws Exception {
+		System.out.println("=====================listening move");
 		String result = ClientSocketChannel.getSocketInstance().listenMove(currentPlayer.getUsername(), this.matchID);
 		MoveServerMessage move = new MoveServerMessage(result);
 

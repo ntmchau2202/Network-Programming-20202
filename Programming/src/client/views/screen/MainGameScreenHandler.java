@@ -119,6 +119,46 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // unlock move
         isLockMove = false;
+
+        // if not first player to play, listen move from opponent
+//        Task<Boolean> listenMoveTask = new Task<Boolean>() {
+//            protected Boolean call() {
+//                Boolean isSuccessfull = false;
+//                try {
+//                    // send move to server
+//                    isSuccessfull = mainGameScreenController.listenMove();
+//                    int recvX1 = mainGameScreenController.getX();
+//                    int recvY1 = mainGameScreenController.getY();
+//                    System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+//
+//                    // display move on pane ??
+//                } catch (Exception e1) {
+//                    // TODO Auto-generated catch block
+//                    e1.printStackTrace();
+//                }
+//                return isSuccessfull;
+//            }
+//        };
+//
+//        listenMoveTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+//
+//            public void handle(WorkerStateEvent t) {
+//                Boolean isFound = (Boolean) t.getSource().getValue();
+//                System.out.println("done:" + isFound);
+//                if (isFound) {
+//                    System.out.println("listen move successfully");
+//                } else {
+//                    try {
+//                        notifyError("Can not listen move");
+//                    } catch (IOException e3) {
+//                        // TODO Auto-generated catch block
+//                        e3.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
+//        Thread thread = new Thread(listenMoveTask);
+//        thread.start();
     }
 
     private void addPane(int rowIndex, int colIndex, Image move) {
@@ -195,6 +235,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                 }
                             }
                         });
+                        Thread thread = new Thread(sendMoveTask);
+                        thread.start();
 
                     } catch (Exception e4) {
                         // TODO Auto-generated catch block

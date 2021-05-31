@@ -73,8 +73,12 @@ public class TestClientA extends Application {
                         if (gameModeScreenController.amIFirstPlayer()) {
                             System.out.println("i play first mother fucker");
                         }
-                        mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+                        mainGameScreenController.setOpponent(gameModeScreenController.getOpponent(),
+                                gameModeScreenController.getOpponentElo());
+                        mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
+                        System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
                         mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
+                        mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
                         BaseScreenHandler mainGameScreenHandler = new MainGameScreenHandler(primaryStage,
                                 Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
                         mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");

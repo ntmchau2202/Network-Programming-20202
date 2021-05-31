@@ -135,7 +135,6 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							mainGameScreenController.setOpponent(gameModeScreenController.getOpponent(),
 									gameModeScreenController.getOpponentElo());
 							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
-
 							System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
