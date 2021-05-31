@@ -13,7 +13,7 @@ public enum Command {
 	CHAT("CHAT"),
 	CHATACK("CHATACK"),
 	LOGOUT("LOGOUT"),
-	LISTENMOVE("LISTEN_MOVE");
+	LISTEN_MOVE("LISTEN_MOVE");
 
     private String command;
 

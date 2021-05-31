@@ -146,7 +146,7 @@ public class Server {
 				listResponse = this.processMoveRequest(recvMsg, sock);
 				break;
 			}
-			case LISTENMOVE:{
+			case LISTEN_MOVE:{
 				listResponse = this.processListenMove(recvMsg, sock);
 				break;
 			}
