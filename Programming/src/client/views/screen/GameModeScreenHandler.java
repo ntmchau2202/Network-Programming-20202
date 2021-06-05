@@ -99,7 +99,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			MainGameScreenController mainGameScreenController = new MainGameScreenController(
 					this.gameModeScreenController.getCurPlayer());
 			GameModeScreenHandler currentHandler = this;
-
+			
 
 			if (evt.getSource() == practicePlay) {
 				System.out.println("practice play");

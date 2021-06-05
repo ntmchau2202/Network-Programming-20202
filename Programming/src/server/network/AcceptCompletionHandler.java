@@ -25,8 +25,8 @@ public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSo
     	ByteBuffer buffer = ByteBuffer.allocate(4096);
     	// we have to use another completion handler here for reading message
     	
-    	ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer);
-    	result.read(buffer, null, readCompletionHandler);
+//    	ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer);
+//    	result.read(buffer, null, readCompletionHandler);
 	}
 
 	@Override
