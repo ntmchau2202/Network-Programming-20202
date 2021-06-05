@@ -47,6 +47,10 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	private ImageView homeScreenImageView;
 	@FXML
 	private ImageView leaderboardImageView;
+	
+	@FXML
+	private Button quitQueue;
+	
 	private final GameModeScreenController gameModeScreenController;
 
 	/**
@@ -86,6 +90,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				e.printStackTrace();
 			}
 		});
+		quitQueue.setDisable(true);
 	}
 
 	@Override
@@ -106,6 +111,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				// Boolean isFound = false;
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
+				quitQueue.setDisable(false);
 				Task<Boolean> findGameTask = new Task<Boolean>() {
 					protected Boolean call() {
 						Boolean isFound = false;
@@ -164,6 +170,9 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				thread.start();
 				// thread.join();
 			} else if (evt.getSource() == rankPlay) {
+				practicePlay.setDisable(true);
+				rankPlay.setDisable(true);
+				quitQueue.setDisable(false);
 				System.out.println("rank play");
 
 				boolean isFound = gameModeScreenController.findRankGame();
@@ -176,6 +185,25 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 					notifyError("Can not find rank play match");
 				}
 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@FXML
+	private void handleQuitQueueAction(javafx.event.Event evt) {
+		try {
+			System.out.println("Requested quit queue");
+			quitQueue.setDisable(true);
+			if(gameModeScreenController.quitQueue()) {
+				notifySuccess("Quit queue successfully!");
+				System.out.println("Quit queue successfully!");
+				practicePlay.setDisable(false);
+				rankPlay.setDisable(false);
+			} else {
+				notifyError("Quit queue failed. Please try again later");
+				System.out.println("Quit queue failed. Please try again later");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

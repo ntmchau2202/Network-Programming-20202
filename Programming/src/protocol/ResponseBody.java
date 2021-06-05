@@ -51,6 +51,11 @@ public class ResponseBody {
 		this.responseBody.put("elo", elo);
 		this.responseBody.put("player_1", player1);
 	}
+	
+	public void createQuitQueueBody(String username) {
+		this.responseBody.clear();
+		this.responseBody.put("username", username);
+	}
 
 	public void createMatchFoundBody(int matchID, String opponent, int elo, String firstPlayer) {
 		this.responseBody.put("match_id", matchID);

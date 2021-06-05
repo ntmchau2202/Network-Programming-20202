@@ -37,6 +37,13 @@ public class RequestBody {
 		this.requestBody.put("session_id", session_id);
 	}
 	
+	public void createQuitQueueBody(String username, String sesID) throws JSONException {
+		this.requestBody.clear();
+		this.requestBody.put("username", username);
+		this.requestBody.put("session_id", sesID);
+	}
+	
+	
 	public void createMoveBody(int match_id, String session_id, String move_player, int x, int y, String state, String result) throws JSONException {
 		this.requestBody.clear();
 		JSONObject move_position = new JSONObject();

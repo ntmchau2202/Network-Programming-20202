@@ -21,6 +21,8 @@ import message.login.LoginServerMessage;
 import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
+import message.quitqueue.QuitQueueClientMessage;
+import message.quitqueue.QuitQueueServerMessage;
 import message.register.RegisterClientMessage;
 import message.register.RegisterServerMessage;
 import protocol.Attachment;
@@ -121,8 +123,10 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 			}
 			case JOIN_QUEUE: {
 				listResponse = this.processJoinQueueRequest(recvMsg, sock);
-
 				break;
+			}
+			case QUIT_QUEUE: {
+				listResponse = this.processQuitQueue(recvMsg, sock);
 			}
 			case MOVE: {
 				listResponse = this.processMoveRequest(recvMsg, sock);
@@ -294,6 +298,8 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	private Map<AsynchronousSocketChannel, String> notifyMatchFound() throws Exception {
 		// TODO: Finish the function here
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		
+		
 		return listResponse;
 	}
 
@@ -353,6 +359,28 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 
 		return listResponse;
 	}
+	
+	private Map<AsynchronousSocketChannel, String> processQuitQueue(String input, AsynchronousSocketChannel sock){
+		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
+		QuitQueueClientMessage quitQueueMsg = new QuitQueueClientMessage(input);
+		
+		boolean isOK = queueController.removeFromQueue(quitQueueMsg.getUsername());
+		StatusCode statCode;
+		String errMsg = "";
+		
+		if(isOK) {
+			statCode = StatusCode.SUCCESS;
+		} else {
+			statCode = StatusCode.ERROR;
+			errMsg = "An error occured when quiting queue";
+		}
+		
+		QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getUsername(), statCode, errMsg);
+		listResponse.put(sock, response.toString());
+		
+		return listResponse;
+	}
+	
 
 	private Map<AsynchronousSocketChannel, String> processListenMove(String input, AsynchronousSocketChannel sock){
 		Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();

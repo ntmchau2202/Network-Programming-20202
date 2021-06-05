@@ -13,6 +13,7 @@ import message.matchfound.MatchFoundServerMessage;
 import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
+import message.quitqueue.QuitQueueClientMessage;
 import message.register.RegisterClientMessage;
 import protocol.Attachment;
 import protocol.Command;
@@ -111,6 +112,12 @@ public class ClientSocketChannel {
 	public String joinQueue(String sesID, String mode) throws Exception {
 		JoinQueueClientMessage joinQueueRequest = new JoinQueueClientMessage(mode, sesID);
 		return sendRequest(joinQueueRequest.toString());
+	}
+	
+	public String quitQueue(String username, String sessionID) throws Exception {
+		QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
+		return sendRequest(quitQueueRequest.toString());
+		
 	}
 
 	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
