@@ -21,4 +21,22 @@ public class HandlerController {
 		}
 		return false;
 	}
+	
+	public boolean removeHandlerFromList(ReadCompletionHandler handler) {
+		return listReadHandler.remove(handler);
+	}
+	
+	// This function return a ReadCompletionHandler with same command if there is
+	// If there isn't any, the function returns null
+	// Note that each WriteCompletionHandler must remove the handler from the list before finish
+	// If not, the result of this function will be false
+	public ReadCompletionHandler getCouple(ReadCompletionHandler curHandler) {
+		for(ReadCompletionHandler h : listReadHandler) {
+			if(h.getCommand().compareTo(curHandler.getCommand())==0) {
+				return h;
+			}
+		}
+		return null;
+	}
+	
 }

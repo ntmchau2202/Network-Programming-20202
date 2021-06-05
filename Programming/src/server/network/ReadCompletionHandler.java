@@ -37,13 +37,16 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	private final ByteBuffer buffer;
 	private String recvMsg;
 	private QueueController queueController;
+	private Command cmd;
+	private HandlerController handlerController;
+	private boolean allowSend;
 	
-	// Constructor
-	
-	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, QueueController queueController, ByteBuffer buffer) {
+	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, ByteBuffer buffer, QueueController queueController, HandlerController handlerController) {
 		this.socketChannel = socketChan;
 		this.buffer = buffer;
 		this.queueController = queueController;
+		this.handlerController = handlerController;
+		this.allowSend = true;
 	}
 	
 	@Override
@@ -61,12 +64,17 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 			recvMsg = new String(bytes, StandardCharsets.UTF_8);
 			System.out.println("Message received: " + recvMsg);
 			attachment.setReturnMessage(recvMsg);
+			this.setCommand(recvMsg);
 			attachment.getActive().set(false);
 			
 			// process message
 			try {
 				Map<AsynchronousSocketChannel, String> msgToSend = processReturn(recvMsg, socketChannel);
-				sendResponse(msgToSend);
+				if(allowSend) {
+					sendResponse(msgToSend);
+				} else {
+					System.out.print("Message is not allowed to send");
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -85,6 +93,24 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		exc.printStackTrace();
 	}
 	
+	private void setCommand(String inputMessage) {
+		JSONObject parsedMsg = new JSONObject(inputMessage);
+		this.cmd = Command.toCommand(parsedMsg.getString("command_code"));
+		
+	}
+	
+	public Command getCommand() {
+		return this.cmd;
+	}
+	
+	public HandlerController getHandlerController() {
+		return this.handlerController;
+	}
+	
+	public void setAllowSend(boolean allowance) {
+		this.allowSend = allowance;
+	}
+	
 	private void sendResponse(Map<AsynchronousSocketChannel, String> listMsg) {
 
 		for (Map.Entry<AsynchronousSocketChannel, String> item : listMsg.entrySet()) {
@@ -98,6 +124,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 			while (newAttachment.getActive().get()) {
 
 			}
+			handlerController.removeHandlerFromList(this);
 			System.out.println("Done sending msg: " + msg);
 			System.out.println("Is socket still open?: " + toSocket.isOpen());
 		}
@@ -376,6 +403,11 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		}
 		
 		QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getUsername(), statCode, errMsg);
+		// interrupt sending of the other message
+		ReadCompletionHandler joinQueueHandler = handlerController.getCouple(this);
+		joinQueueHandler.setAllowSend(false);
+		
+		// and send this msg
 		listResponse.put(sock, response.toString());
 		
 		return listResponse;

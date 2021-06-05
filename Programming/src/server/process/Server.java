@@ -34,6 +34,7 @@ import protocol.Attachment;
 import protocol.Command;
 import protocol.StatusCode;
 import server.authentication.T3Authenticator;
+import server.network.HandlerController;
 import server.network.ReadCompletionHandler;
 import server.network.WriteCompletionHandler;
 
@@ -59,7 +60,8 @@ public class Server {
 
 				@Override
 				public void completed(AsynchronousSocketChannel result, Object attachment) {
-					// TODO Auto-generated method stub
+					HandlerController handlerController = new HandlerController();
+					
 					if (serverSocketChannel.isOpen()) {
 						serverSocketChannel.accept(null, this);
 						System.out.println("Connection accepted: " + result.toString());
@@ -68,9 +70,10 @@ public class Server {
 					while (clientChannel != null && clientChannel.isOpen()) {
 						ByteBuffer buffer = ByteBuffer.allocate(4096);
 						buffer.clear();
-			    		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, queueController, buffer);
+			    		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer, queueController, handlerController);
 			    		Attachment socketAttachment = new Attachment();
 			    		clientChannel.read(buffer, socketAttachment, readCompletionHandler);
+			    		handlerController.addToListController(readCompletionHandler);
 			    		System.out.println("Listening...");
 			    		while(socketAttachment.getActive().get()){
 
