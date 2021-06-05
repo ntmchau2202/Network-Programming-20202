@@ -53,6 +53,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	
 	private final GameModeScreenController gameModeScreenController;
 
+	private Thread findGameThread, quitQueueThread;
 	/**
 	 * @param stage      stage of screen.
 	 * @param screenPath path to screen fxml
@@ -112,9 +113,9 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
 				quitQueue.setDisable(false);
-				Task<Boolean> findGameTask = new Task<Boolean>() {
-					protected Boolean call() {
-						Boolean isFound = false;
+				Task<Integer> findGameTask = new Task<Integer>() {
+					protected Integer call() {
+						Integer isFound = 1;
 						try {
 							isFound = gameModeScreenController.findPracticeGame();
 						} catch (Exception e) {
@@ -128,9 +129,9 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				findGameTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 					public void handle(WorkerStateEvent t) {
-						Boolean isFound = (Boolean) t.getSource().getValue();
+						Integer isFound = (Integer) t.getSource().getValue();
 						System.out.println("done:" + isFound);
-						if (isFound) {
+						if (isFound == 0) {
 							mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
 									gameModeScreenController.getOpponentElo());
 							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
@@ -155,19 +156,27 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 								e.printStackTrace();
 							}
 							
-						} else {
+						} else if (isFound == 1) {
 							try {
-								notifyError("Can not find practice play match");
+								notifyError("Can not find practice play match, please try again later");
+								practicePlay.setDisable(false);
+								rankPlay.setDisable(false);
+								quitQueue.setDisable(true);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
+						} else if (isFound == -1) {
+							// join queue interrupted by user
+							practicePlay.setDisable(false);
+							rankPlay.setDisable(false);
+							quitQueue.setDisable(true);
 						}
 					}
 				});
 
-				Thread thread = new Thread(findGameTask);
-				thread.start();
+				findGameThread = new Thread(findGameTask);
+				findGameThread.start();
 				// thread.join();
 			} else if (evt.getSource() == rankPlay) {
 				practicePlay.setDisable(true);
@@ -196,17 +205,50 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		try {
 			System.out.println("Requested quit queue");
 			quitQueue.setDisable(true);
-			if(gameModeScreenController.quitQueue()) {
-				notifySuccess("Quit queue successfully!");
-				System.out.println("Quit queue successfully!");
-				practicePlay.setDisable(false);
-				rankPlay.setDisable(false);
-			} else {
-				notifyError("Quit queue failed. Please try again later");
-				System.out.println("Quit queue failed. Please try again later");
-			}
+			
+			Task<Boolean> quitQueueTask = new Task<Boolean>() {
+				protected Boolean call() {
+					try {
+						return gameModeScreenController.quitQueue();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return false;
+					}
+				}
+				
+			};
+			
+			quitQueueTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					Boolean isSuccess = (Boolean) arg0.getSource().getValue();
+					System.out.println("quit queue done:" + isSuccess);	
+					try {
+						if(isSuccess) {
+							notifySuccess("Quit queue successfully!");
+							System.out.println("Quit queue successfully!");
+//							findGameThread.interrupt();
+							practicePlay.setDisable(false);
+							rankPlay.setDisable(false);
+						} else {
+							notifyError("Quit queue failed. Please try again later");
+							System.out.println("Quit queue failed. Please try again later");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				
+			});
+			
+			quitQueueThread = new Thread(quitQueueTask);
+			quitQueueThread.run();
 		} catch (Exception e) {
 			e.printStackTrace();
+			quitQueue.setDisable(false);
+			System.out.println("Cannot quit queue properly");
 		}
 	}
 }

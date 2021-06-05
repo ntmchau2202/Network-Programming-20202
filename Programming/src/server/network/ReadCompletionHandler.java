@@ -39,14 +39,14 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	private QueueController queueController;
 	private Command cmd;
 	private HandlerController handlerController;
-	private boolean allowSend;
+	private boolean isCancel;
 	
 	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, ByteBuffer buffer, QueueController queueController, HandlerController handlerController) {
 		this.socketChannel = socketChan;
 		this.buffer = buffer;
 		this.queueController = queueController;
 		this.handlerController = handlerController;
-		this.allowSend = true;
+		this.isCancel = false;
 	}
 	
 	@Override
@@ -70,11 +70,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 			// process message
 			try {
 				Map<AsynchronousSocketChannel, String> msgToSend = processReturn(recvMsg, socketChannel);
-				if(allowSend) {
-					sendResponse(msgToSend);
-				} else {
-					System.out.print("Message is not allowed to send");
-				}
+				sendResponse(msgToSend);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -107,8 +103,8 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		return this.handlerController;
 	}
 	
-	public void setAllowSend(boolean allowance) {
-		this.allowSend = allowance;
+	public void setCancelSend(boolean isCancel) {
+		this.isCancel = isCancel;
 	}
 	
 	private void sendResponse(Map<AsynchronousSocketChannel, String> listMsg) {
@@ -154,6 +150,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 			}
 			case QUIT_QUEUE: {
 				listResponse = this.processQuitQueue(recvMsg, sock);
+				break;
 			}
 			case MOVE: {
 				listResponse = this.processMoveRequest(recvMsg, sock);
@@ -283,31 +280,45 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 
 				// prepare message according to each player
 				Match match = null;
-				while(true) {
-					boolean isFound = false;
-					for(Match m : queueController.getIngameList()) {
-						if(m.isPlayerOfMatch(loggedPlayer)) {
-							match = m;
-							isFound = true;
-							break;
+				boolean isFound = false;
+				
+				for(int i = 0; i < 30; i++) {	
+					if(!isCancel) {
+						for(Match m : queueController.getIngameList()) {
+							if(m.isPlayerOfMatch(loggedPlayer)) {
+								match = m;
+								isFound = true;
+								break;
+							}
 						}
-					}
-					
-					if(isFound) {
-						break;
+						
+						if(isFound) {
+							break;
+						} else {
+							Thread.sleep(500);
+						}
 					} else {
-						Thread.sleep(500);
+						break;
 					}
 				}
+				
 				Player opponent = null;
-				if(loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())){
-					// user is player 1
-					opponent = match.getPlayer2();
-				} else {
-					// user is player 2
-					opponent = match.getPlayer1();
+				JoinQueueServerMessage serverResponse = null;
+				if(isFound) {
+					if(loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())){
+						// user is player 1
+						opponent = match.getPlayer2();
+					} else {
+						// user is player 2
+						opponent = match.getPlayer1();
+					}
+					serverResponse = new JoinQueueServerMessage(loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.SUCCESS, "");
+				} else if (!isFound){
+					serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropiate match. Please try again later"); 
+				} else if (isCancel) {
+					serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "QUIT_QUEUE sent from user");
 				}
-				JoinQueueServerMessage serverResponse = new JoinQueueServerMessage(loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.SUCCESS, ""); 
+				 
 				listResponse.put(sock, serverResponse.toString());
 			} else {
 				// if it is not ranked user, call to create a new guest player account
@@ -405,7 +416,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getUsername(), statCode, errMsg);
 		// interrupt sending of the other message
 		ReadCompletionHandler joinQueueHandler = handlerController.getCouple(this);
-		joinQueueHandler.setAllowSend(false);
+		joinQueueHandler.setCancelSend(false);
 		
 		// and send this msg
 		listResponse.put(sock, response.toString());

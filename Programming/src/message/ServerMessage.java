@@ -39,4 +39,12 @@ public abstract class ServerMessage extends Message {
 	public String getErrorMessage() {
 		return this.errorMsg;
 	}
+	
+	public void changeStatusCode(StatusCode newStatusCode) {
+		this.statusCode = newStatusCode;
+	}
+	
+	public void changeErrorMessage(String newErrMsg) {
+		this.errorMsg = newErrMsg;
+	}
 }

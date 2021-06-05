@@ -32,7 +32,7 @@ import org.json.JSONObject;
 public class ClientSocketChannel {
 	private static ClientSocketChannel socketChannelInstance;
 	private static AsynchronousSocketChannel socketChannel;
-	private static WriteCompletionHandler writeCompletionHandler;
+//	private static WriteCompletionHandler writeCompletionHandler;
 
 	private Attachment attachment;
 	// private ClientMessage clientMsg;
@@ -52,7 +52,7 @@ public class ClientSocketChannel {
 		socketChannel.connect(new InetSocketAddress(Configs.IP_ADDRESS, Configs.PORT));
 
 		// init write completion handler
-		writeCompletionHandler = new WriteCompletionHandler(socketChannel);
+//		writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 
 		// additional implementation for operations
 		// clientMsg = new ClientMessage();
@@ -72,6 +72,7 @@ public class ClientSocketChannel {
 	public Attachment sendRequestAsync(String strMsgToSend) throws Exception {
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
+		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		return attachment;
 	}
@@ -88,6 +89,7 @@ public class ClientSocketChannel {
 		System.out.println(this.getSocketInstance().socketChannel.toString());
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
+		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		while (attachment.getActive().get()) {
 

@@ -23,22 +23,26 @@ public class GameModeScreenController extends BaseController {
     public RankPlayer getCurPlayer() {
         return this.curPlayer;
     }
-
-    public boolean findPracticeGame() throws Exception {
+    // return code: 0 == success, 1 == unexpected error, -1 == user quit queue
+    public int findPracticeGame() throws Exception {
         System.out.println("Waiting for a game...");
 
         // TODO: make an interactive pop up here for waiting for server response
         String result = ClientSocketChannel.getSocketInstance().joinQueue(curPlayer.getSessionId(), "normal");
         JoinQueueServerMessage response = new JoinQueueServerMessage(result);
         if (response.getStatusCode().compareTo(StatusCode.ERROR) == 0) {
-            return false;
+            if(response.getErrorMessage().contains("QUIT_QUEUE")) {
+            	return -1;
+            } else {
+            	return 1;
+            }
         }
         matchID = response.getMatchID();
         opponentName = response.getOpponent();
         opponentElo = response.getOpponentELO();
         sessionID = response.getSessionID();
         firstPlayer = response.getFirstPlayer();
-        return true;
+        return 0;
     }
     
     public boolean quitQueue() throws Exception {

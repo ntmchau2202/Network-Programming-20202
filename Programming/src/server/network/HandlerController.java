@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class HandlerController {
 	private ArrayList<ReadCompletionHandler> listReadHandler;
 	
-	public HandlerController() {
+	private HandlerController() {
 		listReadHandler = new ArrayList<ReadCompletionHandler>();
 	}
 	
