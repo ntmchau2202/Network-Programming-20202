@@ -3,6 +3,7 @@ package client;
 import client.controller.HomeScreenController;
 import client.network.ClientSocketChannel;
 import client.utils.Configs;
+import client.utils.Misc;
 import client.views.screen.HomeScreenHandler;
 import entity.Player.LeaderboardPlayerList;
 import javafx.animation.FadeTransition;
@@ -27,7 +28,7 @@ public class ClientApp extends Application {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Caro Game");
-            primaryStage.getIcons().add(new Image(new File(Configs.APP_ICON_PATH).toURI().toString()));
+            primaryStage.getIcons().add(Misc.getImageByName(Configs.APP_ICON_PATH));
             primaryStage.show();
 
             // Load splash screen with fade in effect

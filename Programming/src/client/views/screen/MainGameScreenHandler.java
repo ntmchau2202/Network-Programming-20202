@@ -6,6 +6,7 @@ import client.controller.MainGameScreenController;
 import client.network.ClientSocketChannel;
 import client.network.InGameListener;
 import client.utils.Configs;
+import client.utils.Misc;
 import entity.Player.RankPlayer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -52,8 +53,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     // private int[][] player = new String[15][15];
 
     private final MainGameScreenController mainGameScreenController;
-    private static final File X_IMAGE_FILE = new File(Configs.X_ICON_PATH);
-    private static final File O_IMAGE_FILE = new File(Configs.O_ICON_PATH);
     private Image MOVE_IMAGE;
 
     private Thread alwaysListener;
@@ -91,8 +90,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // initialize player move to be X if first player or O second player
         yourMove.setText(this.mainGameScreenController.amIFirstPlayer() ? "X" : "O");
-        this.MOVE_IMAGE = new Image(this.mainGameScreenController.amIFirstPlayer() ? X_IMAGE_FILE.toURI().toString()
-                : O_IMAGE_FILE.toURI().toString());
+        this.MOVE_IMAGE = this.mainGameScreenController.amIFirstPlayer() ? Misc.getImageByName(Configs.X_ICON_PATH) : Misc.getImageByName(Configs.O_ICON_PATH);
 
         // initialize game board grid pane
         int numCols = 15;
@@ -184,9 +182,11 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
                 // initialize player move to be X if first player or O second player
                 if (mainGameScreenController.checkFirstPlayerByName(movePlayerName)) {
-                    x.setImage(new Image(X_IMAGE_FILE.toURI().toString()));
+                    x.setImage(Misc.getImageByName(Configs.X_ICON_PATH));
+//                    x.setImage(new Image(X_IMAGE_FILE.toURI().toString()));
                 } else {
-                    x.setImage(new Image(O_IMAGE_FILE.toURI().toString()));
+                    x.setImage(Misc.getImageByName(Configs.O_ICON_PATH));
+//                    x.setImage(new Image(O_IMAGE_FILE.toURI().toString()));
                 }
 
                 // add to pane
