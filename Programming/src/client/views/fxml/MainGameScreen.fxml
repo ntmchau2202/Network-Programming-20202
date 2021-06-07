@@ -25,12 +25,12 @@
             <Image url="@assets/img/vs.png" />
          </image>
       </ImageView>
-      <Label layoutX="684.0" layoutY="56.0" text="PhucNguyen">
+      <Label layoutX="684.0" layoutY="56.0" text="PhucNguyen" fx:id="xPlayerName">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Label layoutX="701.0" layoutY="94.0" text="1236">
+      <Label layoutX="701.0" layoutY="94.0" text="1236" fx:id="xPlayerElo">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -43,17 +43,17 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label layoutX="1052.0" layoutY="56.0" prefHeight="35.0" prefWidth="135.0" text="DzuongThai">
+      <Label fx:id="oPlayerName" layoutX="1053.0" layoutY="56.0" prefHeight="35.0" prefWidth="135.0" text="DzuongThai">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Label layoutX="1069.0" layoutY="94.0" text="1237">
+      <Label fx:id="oPlayerElo" layoutX="1100.0" layoutY="94.0" text="1237">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <ImageView fitHeight="35.0" fitWidth="28.0" layoutX="1142.0" layoutY="98.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="35.0" fitWidth="28.0" layoutX="1061.0" layoutY="98.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/podium2.png" />
          </image>
@@ -97,12 +97,12 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label layoutX="744.0" layoutY="140.0" text="1">
+      <Label layoutX="744.0" layoutY="140.0" text="1" fx:id="xPlayerWin">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="1097.0" layoutY="140.0" text="0">
+      <Label fx:id="oPlayerWin" layoutX="1097.0" layoutY="140.0" text="0">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>

@@ -59,7 +59,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		super(stage, screenPath);
 		this.gameModeScreenController = gameModeScreenController;
 		this.username.setText(this.gameModeScreenController.getCurPlayer().getUsername());
-		this.elo.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getElo()));
+		this.elo.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getElo()*100));
 		this.rank.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getRank()));
 		this.noPlayedMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoPlayedMatch()));
 		this.noWonMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoWonMatch()));

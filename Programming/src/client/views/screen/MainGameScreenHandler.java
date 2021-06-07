@@ -44,6 +44,18 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private Text playerTurnText;
     @FXML
     private Label yourMove;
+    @FXML
+    private Label xPlayerName;
+    @FXML
+    private Label oPlayerName;
+    @FXML
+    private Label xPlayerElo;
+    @FXML
+    private Label oPlayerElo;
+    @FXML
+    private Label xPlayerWin;
+    @FXML
+    private Label oPlayerWin;
 
     // locking clicking other moves when a move is chosen
     private boolean isLockMove;
@@ -76,10 +88,15 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             homeHandler.show();
             homeHandler.setScreenTitle("Home Screen");
         });
-        //
-        // this.gameBoardGridPane.setPrefHeight(591);
-        // this.gameBoardGridPane.setPrefWidth(604);
-        // this.gameBoardGridPane.setStyle("-fx-background-color: white");
+
+        // display player info
+        xPlayerName.setText(mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
+        oPlayerName.setText(!mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
+        if (mainGameScreenController.getCurrentPlayer() instanceof RankPlayer) {
+            xPlayerElo.setText(Integer.toString(mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+            oPlayerElo.setText(Integer.toString(!mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+            System.out.println(Integer.toString(mainGameScreenController.getOpponentElo()));
+        }
 
         // display player turn
         if (mainGameScreenController.isMyTurn()) {
