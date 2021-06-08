@@ -3,7 +3,7 @@ package test;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
 
-import server.network.completionHandler.AcceptCompletionHandler;
+import server.entity.network.completionHandler.AcceptCompletionHandler;
 
 public class TestAsynchronousServer {
 	public static void main(String[] args) throws Exception {

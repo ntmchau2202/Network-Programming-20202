@@ -1,8 +1,7 @@
-package server.authentication;
+package server.core.authentication;
 
-import entity.Player.Player;
 import entity.Player.RankPlayer;
-import server.entity.T3DB;
+import server.entity.database.T3DB;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

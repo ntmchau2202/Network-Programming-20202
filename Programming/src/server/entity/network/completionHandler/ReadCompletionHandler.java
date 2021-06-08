@@ -1,4 +1,4 @@
-package server.network.completionHandler;
+package server.entity.network.completionHandler;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -27,9 +27,9 @@ import message.register.RegisterServerMessage;
 import protocol.Attachment;
 import protocol.Command;
 import protocol.StatusCode;
-import server.authentication.T3Authenticator;
-import server.process.HandlerController;
-import server.process.QueueController;
+import server.core.authentication.T3Authenticator;
+import server.core.controller.CompletionHandlerController;
+import server.core.controller.QueueController;
 
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{
@@ -38,14 +38,14 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	private String recvMsg;
 	private QueueController queueController;
 	private Command cmd;
-	private HandlerController handlerController;
+	private CompletionHandlerController completionHandlerController;
 	private boolean isCancel;
 	
-	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, ByteBuffer buffer, QueueController queueController, HandlerController handlerController) {
+	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, ByteBuffer buffer, QueueController queueController, CompletionHandlerController completionHandlerController) {
 		this.socketChannel = socketChan;
 		this.buffer = buffer;
 		this.queueController = queueController;
-		this.handlerController = handlerController;
+		this.completionHandlerController = completionHandlerController;
 		this.isCancel = false;
 	}
 	
@@ -99,8 +99,8 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		return this.cmd;
 	}
 	
-	public HandlerController getHandlerController() {
-		return this.handlerController;
+	public CompletionHandlerController getHandlerController() {
+		return this.completionHandlerController;
 	}
 	
 	public void setCancelSend(boolean isCancel) {
@@ -120,7 +120,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 			while (newAttachment.getActive().get()) {
 
 			}
-			handlerController.removeHandlerFromList(this);
+			completionHandlerController.removeHandlerFromList(this);
 			System.out.println("Done sending msg: " + msg);
 			System.out.println("Is socket still open?: " + toSocket.isOpen());
 		}
@@ -415,7 +415,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		
 		QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getUsername(), statCode, errMsg);
 		// interrupt sending of the other message
-		ReadCompletionHandler joinQueueHandler = handlerController.getCouple(this);
+		ReadCompletionHandler joinQueueHandler = completionHandlerController.getCouple(this);
 		joinQueueHandler.setCancelSend(false);
 		
 		// and send this msg

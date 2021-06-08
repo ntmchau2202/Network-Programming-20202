@@ -1,4 +1,4 @@
-package server.process;
+package server.core;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -8,15 +8,15 @@ import java.nio.channels.CompletionHandler;
 //import java.util.ArrayList;
 
 import protocol.Attachment;
-import server.process.HandlerController;
-import server.network.completionHandler.ReadCompletionHandler;
-import server.process.QueueController;
+import server.core.controller.CompletionHandlerController;
+import server.core.controller.QueueController;
+import server.entity.network.completionHandler.ReadCompletionHandler;
 
-public class ServerSocketChannel {
+public class ServerCore {
 	private AsynchronousServerSocketChannel serverSocketChannel;
 	private QueueController queueController;
 
-	public ServerSocketChannel() throws Exception {
+	public ServerCore() throws Exception {
 		serverSocketChannel = AsynchronousServerSocketChannel.open();
 	}
 
@@ -34,7 +34,7 @@ public class ServerSocketChannel {
 
 				@Override
 				public void completed(AsynchronousSocketChannel result, Object attachment) {
-					HandlerController handlerController = new HandlerController();
+					CompletionHandlerController completionHandlerController = new CompletionHandlerController();
 					
 					if (serverSocketChannel.isOpen()) {
 						serverSocketChannel.accept(null, this);
@@ -44,10 +44,10 @@ public class ServerSocketChannel {
 					while (clientChannel != null && clientChannel.isOpen()) {
 						ByteBuffer buffer = ByteBuffer.allocate(4096);
 						buffer.clear();
-			    		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer, queueController, handlerController);
+			    		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer, queueController, completionHandlerController);
 			    		Attachment socketAttachment = new Attachment();
 			    		clientChannel.read(buffer, socketAttachment, readCompletionHandler);
-			    		handlerController.addToListController(readCompletionHandler);
+			    		completionHandlerController.addToListController(readCompletionHandler);
 			    		System.out.println("Listening...");
 			    		while(socketAttachment.getActive().get()){
 

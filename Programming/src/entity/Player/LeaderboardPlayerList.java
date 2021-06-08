@@ -1,6 +1,6 @@
 package entity.Player;
 
-import server.entity.T3DB;
+import server.entity.database.T3DB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

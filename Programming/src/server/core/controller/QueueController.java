@@ -1,20 +1,11 @@
-package server.process;
+package server.core.controller;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import entity.Match.Match;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
-import javafx.util.Pair;
-import message.matchfound.MatchFoundServerMessage;
 
 public class QueueController {
 	private  ArrayList<RankPlayer> hall;

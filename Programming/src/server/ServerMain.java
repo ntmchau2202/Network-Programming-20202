@@ -1,11 +1,11 @@
 package server;
 
-import server.process.ServerSocketChannel;
+import server.core.ServerCore;
 
 public class ServerMain {
 
 	public static void main(String[] args) throws Exception{
-		ServerSocketChannel server = new ServerSocketChannel();
+		ServerCore server = new ServerCore();
 		server.start(6666);
 	}
 }

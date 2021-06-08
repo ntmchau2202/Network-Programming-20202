@@ -1,8 +1,7 @@
-package server.entity;
+package server.entity.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class T3DB {
     private static Connection connect;

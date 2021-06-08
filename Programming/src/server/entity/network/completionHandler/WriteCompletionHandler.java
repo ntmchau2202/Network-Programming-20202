@@ -1,4 +1,4 @@
-package server.network.completionHandler;
+package server.entity.network.completionHandler;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
