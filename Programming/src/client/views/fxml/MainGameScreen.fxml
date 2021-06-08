@@ -61,7 +61,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <TextField layoutX="605.0" layoutY="548.0" prefHeight="43.0" prefWidth="558.0" styleClass="chat-text-field" stylesheets="@assets/css/style.css" />
+      <TextField fx:id="chatTextField" layoutX="605.0" layoutY="548.0" prefHeight="43.0" prefWidth="558.0" styleClass="chat-text-field" stylesheets="@assets/css/style.css" />
       <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="843.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/cross.png" />
@@ -72,15 +72,11 @@
             <Image url="@assets/img/circle.png" />
          </image>
       </ImageView>
-      <Button layoutX="1164.0" layoutY="548.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" styleClass="send-buttton" stylesheets="@assets/css/style.css" text="Send">
+      <Button fx:id="sendButton" layoutX="1164.0" layoutY="548.0" mnemonicParsing="false" onMouseClicked="#sendMessage" prefHeight="17.0" prefWidth="76.0" styleClass="send-buttton" stylesheets="@assets/css/style.css" text="Send">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <ScrollPane layoutX="605.0" layoutY="257.0" prefHeight="290.0" prefWidth="634.0">
-         <content>
-            <AnchorPane prefHeight="289.0" prefWidth="630.0" style="-fx-background-color: white; -fx-border-color: transparent;" />
-         </content>
-      </ScrollPane>
+      <ScrollPane fx:id="chatScrollPane" layoutX="605.0" layoutY="257.0" prefHeight="290.0" prefWidth="634.0" stylesheets="@assets/css/style.css" />
       <ImageView fx:id="prevScreenImageView" fitHeight="35.0" fitWidth="35.0" layoutX="607.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/back.png" />

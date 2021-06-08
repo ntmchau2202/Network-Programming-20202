@@ -59,11 +59,11 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		super(stage, screenPath);
 		this.gameModeScreenController = gameModeScreenController;
 		this.username.setText(this.gameModeScreenController.getCurPlayer().getUsername());
-		this.elo.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getElo()*100));
+		this.elo.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getElo()));
 		this.rank.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getRank()));
 		this.noPlayedMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoPlayedMatch()));
 		this.noWonMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoWonMatch()));
-		this.winningRate.setText(Float.toString(this.gameModeScreenController.getCurPlayer().getWinningRate()));
+		this.winningRate.setText(Float.toString(this.gameModeScreenController.getCurPlayer().getWinningRate()*100));
 		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
 				new HomeScreenController());
 		prevScreenImageView.setOnMouseClicked(e -> {
