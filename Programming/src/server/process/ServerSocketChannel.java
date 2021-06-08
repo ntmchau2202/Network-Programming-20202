@@ -5,44 +5,18 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 //import java.util.ArrayList;
-import java.util.Queue;
 
-import org.json.JSONObject;
-
-import entity.Match.Match;
-import entity.Move.Move;
-import entity.Player.Player;
-import entity.Player.RankPlayer;
-import javafx.util.Pair;
-import message.ClientMessage;
-import message.joinqueue.JoinQueueClientMessage;
-import message.joinqueue.JoinQueueServerMessage;
-import message.login.LoginClientMessage;
-import message.login.LoginServerMessage;
-import message.move.ListenMoveClientMessage;
-import message.move.MoveClientMessage;
-import message.move.MoveServerMessage;
-import message.register.RegisterClientMessage;
-import message.register.RegisterServerMessage;
 import protocol.Attachment;
-import protocol.Command;
-import protocol.StatusCode;
-import server.authentication.T3Authenticator;
-import server.network.HandlerController;
-import server.network.ReadCompletionHandler;
-import server.network.WriteCompletionHandler;
+import server.process.HandlerController;
+import server.network.completionHandler.ReadCompletionHandler;
+import server.process.QueueController;
 
-public class Server {
+public class ServerSocketChannel {
 	private AsynchronousServerSocketChannel serverSocketChannel;
 	private QueueController queueController;
 
-	public Server() throws Exception {
+	public ServerSocketChannel() throws Exception {
 		serverSocketChannel = AsynchronousServerSocketChannel.open();
 	}
 

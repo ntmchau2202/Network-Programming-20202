@@ -1,11 +1,13 @@
-package server.network;
+package server.process;
+
+import server.network.completionHandler.ReadCompletionHandler;
 
 import java.util.ArrayList;
 
 public class HandlerController {
 	private ArrayList<ReadCompletionHandler> listReadHandler;
 	
-	private HandlerController() {
+	public HandlerController() {
 		listReadHandler = new ArrayList<ReadCompletionHandler>();
 	}
 	
