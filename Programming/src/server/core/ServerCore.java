@@ -42,13 +42,23 @@ public class ServerCore {
 					}
 					AsynchronousSocketChannel clientChannel = result;
 					while (clientChannel != null && clientChannel.isOpen()) {
+						// init buffer
 						ByteBuffer buffer = ByteBuffer.allocate(4096);
 						buffer.clear();
+
+						// init handler & attachment
 			    		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(result, buffer, queueController, completionHandlerController);
 			    		Attachment socketAttachment = new Attachment();
+
+			    		// start listening from socket
 			    		clientChannel.read(buffer, socketAttachment, readCompletionHandler);
+
+			    		// add current handler to current client's handler controller
 			    		completionHandlerController.addToListController(readCompletionHandler);
+
 			    		System.out.println("Listening...");
+			    		// when current handler parse new message successfully -> this `while` loop is exited
+						// -> init new handler for new message
 			    		while(socketAttachment.getActive().get()){
 
 			    		}

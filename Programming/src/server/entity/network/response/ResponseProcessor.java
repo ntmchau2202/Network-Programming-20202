@@ -10,23 +10,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ResponseProcessor {
-    private void sendResponse(Map<AsynchronousSocketChannel, String> listMsg) {
+    AsynchronousSocketChannel socketChannel;
 
-        for (Map.Entry<AsynchronousSocketChannel, String> item : listMsg.entrySet()) {
-            String msg = item.getValue();
-            AsynchronousSocketChannel toSocket = item.getKey();
-            Attachment newAttachment = new Attachment(msg, true);
-            ByteBuffer bufferRequest = ByteBuffer.wrap(msg.getBytes(StandardCharsets.UTF_8));
+    public ResponseProcessor(AsynchronousSocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
+    }
 
-            WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(toSocket);
-            toSocket.write(bufferRequest, newAttachment, writeCompletionHandler);
-            while (newAttachment.getActive().get()) {
+    public void sendResponse(String resMsg) {
+        Attachment newAttachment = new Attachment(resMsg, true);
+        ByteBuffer bufferRequest = ByteBuffer.wrap(resMsg.getBytes(StandardCharsets.UTF_8));
 
-            }
-            completionHandlerController.removeHandlerFromList(this);
-            System.out.println("Done sending msg: " + msg);
-            System.out.println("Is socket still open?: " + toSocket.isOpen());
+        WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(this.socketChannel);
+        this.socketChannel.write(bufferRequest, newAttachment, writeCompletionHandler);
+        while (newAttachment.getActive().get()) {
+
         }
+        System.out.println("Done sending msg: " + resMsg);
+        System.out.println("Is socket still open?: " + this.socketChannel.isOpen());
     }
 
 

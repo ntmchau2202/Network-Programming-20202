@@ -4,47 +4,32 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.json.JSONObject;
-
-import entity.Match.Match;
-import entity.Move.Move;
-import entity.Player.Player;
-import entity.Player.RankPlayer;
-import message.joinqueue.JoinQueueClientMessage;
-import message.joinqueue.JoinQueueServerMessage;
-import message.login.LoginClientMessage;
-import message.login.LoginServerMessage;
-import message.move.ListenMoveClientMessage;
-import message.move.MoveClientMessage;
-import message.move.MoveServerMessage;
-import message.quitqueue.QuitQueueClientMessage;
-import message.quitqueue.QuitQueueServerMessage;
-import message.register.RegisterClientMessage;
-import message.register.RegisterServerMessage;
 import protocol.Attachment;
 import protocol.Command;
-import protocol.StatusCode;
-import server.core.authentication.T3Authenticator;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
+import server.entity.network.request.RequestProcessor;
+import server.entity.network.response.ResponseProcessor;
 
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{
-	private final AsynchronousSocketChannel socketChannel;
 	private final ByteBuffer buffer;
-	private String recvMsg;
-	private CompletionHandlerController completionHandlerController;
-	private boolean isCancel;
-	
-	public ReadCompletionHandler(AsynchronousSocketChannel socketChan, ByteBuffer buffer, QueueController queueController, CompletionHandlerController completionHandlerController) {
-		this.socketChannel = socketChan;
+	private final CompletionHandlerController completionHandlerController;
+	private final RequestProcessor reqProc;
+	private final ResponseProcessor resProc;
+	private Command cmd;
+
+	public ReadCompletionHandler(AsynchronousSocketChannel socketChannel, ByteBuffer buffer, QueueController queueController, CompletionHandlerController completionHandlerController) {
 		this.buffer = buffer;
-		this.queueController = queueController;
 		this.completionHandlerController = completionHandlerController;
-		this.isCancel = false;
+		// init processors
+		this.reqProc = new RequestProcessor(queueController);
+		this.resProc = new ResponseProcessor(socketChannel);
+	}
+
+	public Command getCommand() {
+		return this.cmd;
 	}
 	
 	@Override
@@ -58,23 +43,36 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 			buffer.flip();
 			byte[] bytes = new byte[buffer.limit()];
 			buffer.get(bytes);
-			
-			recvMsg = new String(bytes, StandardCharsets.UTF_8);
+
+			String recvMsg = new String(bytes, StandardCharsets.UTF_8);
 			System.out.println("Message received: " + recvMsg);
+
 			attachment.setReturnMessage(recvMsg);
-			this.setCommand(recvMsg);
+//			this.setCommand(recvMsg);
+
+			// free attachment and allow new message from current client
 			attachment.getActive().set(false);
 			
-			// process message
 			try {
-				Map<AsynchronousSocketChannel, String> msgToSend = processReturn(recvMsg, socketChannel);
-				sendResponse(msgToSend);
+				// store current message to Request Processor
+				reqProc.storeCurrentCommand(recvMsg);
+
+				// store current cmd to current handler
+				this.cmd = reqProc.getCommand();
+
+				// process request message
+				String msgToSend = reqProc.processReturn(recvMsg);
+
+				// response client
+				resProc.sendResponse(msgToSend);
+
+				// remove current handler from handler list
+				completionHandlerController.removeHandlerFromList(this);
+
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
 		} else if (result == 0) {
 			System.out.println("Client send empty message");
 		} else {
@@ -91,10 +89,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		return this.completionHandlerController;
 	}
 	
-	public void setCancelSend(boolean isCancel) {
-		this.isCancel = isCancel;
+	public void stopHandler() {
+		reqProc.stopProcessingRequest();
 	}
-	
-
-	
 }

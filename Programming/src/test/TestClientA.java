@@ -66,8 +66,8 @@ public class TestClientA extends Application {
                     }
                     GameModeScreenController gameModeScreenController = new GameModeScreenController(loginFormController.getLoggedPlayer());
                     MainGameScreenController mainGameScreenController = new MainGameScreenController(gameModeScreenController.getCurPlayer());
-                    boolean isFound = gameModeScreenController.findPracticeGame();
-                    if (isFound) {
+                    int foundResult = gameModeScreenController.findPracticeGame();
+                    if (foundResult == 0) {
                         if (gameModeScreenController.amIFirstPlayer()) {
                             System.out.println("i play first mother fucker");
                         }
@@ -82,7 +82,7 @@ public class TestClientA extends Application {
                         mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
                         mainGameScreenHandler.show();
                     } else {
-                        System.out.println("Can not find practice play match");
+                        System.out.println("Can not find practice play match: " + foundResult);
                         System.exit(-1);
                     }
                 } catch (Exception exception) {
