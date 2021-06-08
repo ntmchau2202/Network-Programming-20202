@@ -40,6 +40,7 @@ public class RequestProcessor {
     public void storeCurrentCommand(String recvMsg) {
         JSONObject clientMsg = new JSONObject(recvMsg);
         this.cmd = Command.toCommand(clientMsg.getString("command_code"));
+        // TODO: check cmd if it's null
     }
 
     public Command getCommand() {
@@ -50,7 +51,6 @@ public class RequestProcessor {
             throws Exception {
 
         String resMsg = "";
-        // TODO: check cmd if it's null
 
         switch (this.cmd) {
             case LOGIN: {
@@ -116,7 +116,6 @@ public class RequestProcessor {
 
     private String processLoginRequest(String input)
             throws Exception {
-        String resMsg = "";
         LoginServerMessage serverResponse = null;
 
         LoginClientMessage clientRequest = new LoginClientMessage(input);
@@ -134,12 +133,12 @@ public class RequestProcessor {
                     loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
                     loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
         }
-        return resMsg;
+
+        return serverResponse.toString();
     }
 
     private String processRegisterRequest(String input)
             throws Exception {
-        String resMsg = "";
         RegisterServerMessage serverResponse = null;
 
         RegisterClientMessage clientRequest = new RegisterClientMessage(input);
@@ -158,17 +157,19 @@ public class RequestProcessor {
                     loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
                     loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
         }
-        return resMsg;
+        return serverResponse.toString();
     }
 
     private String processJoinQueueRequest(String input)
             throws Exception {
         System.out.println("======== Start processing join queue request");
 
-        String listResponse = "";
         JoinQueueClientMessage clientRequest = new JoinQueueClientMessage(input);
         String sessionID = clientRequest.getSessionID();
         String mode = clientRequest.getGameMode();
+
+        JoinQueueServerMessage serverResponse = null;
+
         if (mode.compareToIgnoreCase("normal") == 0) {
             // check if this is ranked user
             System.out.println("Normal request!");
@@ -183,21 +184,12 @@ public class RequestProcessor {
             if (loggedPlayer != null) {
                 queueController.removeFromHall(loggedPlayer);
                 queueController.pushToQueue(loggedPlayer, mode);
-//				while (normalQueue.size() < 2) {
-//
-//				}
-//
-//				Player player1 = normalQueue.poll();
-//				Player player2 = normalQueue.poll();
-//
-//				ingameList.add(player1);
-//				ingameList.add(player2);
 
                 // prepare message according to each player
                 Match match = null;
                 boolean isFound = false;
 
-                for(int i = 0; i < 30; i++) {
+                for(int i = 0; i < 100; i++) {
                     if(!isCancel) {
                         for(Match m : queueController.getIngameList()) {
                             if(m.isPlayerOfMatch(loggedPlayer)) {
@@ -218,7 +210,6 @@ public class RequestProcessor {
                 }
 
                 Player opponent = null;
-                JoinQueueServerMessage serverResponse = null;
                 if(isFound) {
                     if(loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())){
                         // user is player 1
@@ -245,13 +236,12 @@ public class RequestProcessor {
         } else {
             // error
         }
-        return listResponse;
+        return serverResponse.toString();
     }
 
     private String processMoveRequest(String input)
             throws Exception {
         // TODO: Finish the function here
-        String listResponse = "";
         MoveClientMessage moveMsg = new MoveClientMessage(input);
 
         int matchID = moveMsg.getMatchID();
@@ -300,11 +290,10 @@ public class RequestProcessor {
 
 //        listResponse.put(sock, fwdMsg.toString());
 
-        return listResponse;
+        return fwdMsg.toString();
     }
 
     private String processQuitQueue(String input){
-        String listResponse = "";
         QuitQueueClientMessage quitQueueMsg = new QuitQueueClientMessage(input);
 
         boolean isOK = queueController.removeFromQueue(quitQueueMsg.getUsername());
@@ -323,11 +312,10 @@ public class RequestProcessor {
         // and send this msg
 //        listResponse.put(sock, response.toString());
 
-        return listResponse;
+        return response.toString();
     }
 
     private String processListenMove(String input){
-        String listResponse = "";
         // strategy: polling until there is a new move
 
         ListenMoveClientMessage listenMsg = new ListenMoveClientMessage(input);
@@ -379,7 +367,7 @@ public class RequestProcessor {
         }
         MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, latestMove.getX(), latestMove.getY(), latestMove.getState(), latestMove.getResult(), StatusCode.SUCCESS, "");
 //        listResponse.put(sock, fwdMsg.toString());
-        return listResponse;
+        return fwdMsg.toString();
     }
 
 //    private Map<AsynchronousSocketChannel, String> processRequestDrawRequest() throws Exception {
