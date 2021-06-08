@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import protocol.Attachment;
 import protocol.Command;
@@ -19,6 +20,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	private final RequestProcessor reqProc;
 	private final ResponseProcessor resProc;
 	private Command cmd;
+	private final String handlerID;
 
 	public ReadCompletionHandler(AsynchronousSocketChannel socketChannel, ByteBuffer buffer, QueueController queueController, CompletionHandlerController completionHandlerController) {
 		this.buffer = buffer;
@@ -26,6 +28,11 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		// init processors
 		this.reqProc = new RequestProcessor(queueController);
 		this.resProc = new ResponseProcessor(socketChannel);
+		this.handlerID = UUID.randomUUID().toString();
+	}
+
+	public String getHandlerID() {
+		return this.handlerID;
 	}
 
 	public Command getCommand() {
@@ -36,6 +43,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	public void completed(Integer result, Attachment attachment) {
 		// log out what received
 		System.out.println("Bytes received: " + result.toString());
+		System.out.println("***Handler ID: " + handlerID + "***");
 		
 		// parsing data
 		if (result > 0) {
@@ -59,6 +67,14 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 
 				// store current cmd to current handler
 				this.cmd = reqProc.getCommand();
+
+				// trigger CompletionHandlerController to cancel other lower priority handler
+				if (this.completionHandlerController.cancelLowPriorityHandler(this.cmd)) {
+					 System.out.println("READCOMPLETIONHANDLER: Cancel other low priority operations successfully");
+				} else {
+					// TODO: print something here
+					System.out.println("READCOMPLETIONHANDLER: Cancel other low priority operations errorrrrrrrr");
+				}
 
 				// process request message
 				String msgToSend = reqProc.processReturn(recvMsg);

@@ -20,7 +20,6 @@ import protocol.Command;
 import protocol.StatusCode;
 import server.core.authentication.T3Authenticator;
 import server.core.controller.QueueController;
-import server.entity.network.completionHandler.ReadCompletionHandler;
 
 public class RequestProcessor {
 
