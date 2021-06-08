@@ -8,3 +8,7 @@ build/
 .idea
 *.iml
 out
+
+# Client folder
+**/*.class
+#Programming/src/client/**/*.class
