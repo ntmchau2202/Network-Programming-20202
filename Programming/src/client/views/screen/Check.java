@@ -91,13 +91,13 @@ public class Check {
 
         int count = 0;
         try {
-            while (col > 0 && row < 15) {
+            while (col > 0 && row < 14) {
                 col--;
                 row++;
 
             }
 
-            while (col <= 31 && row >= 0) {
+            while (col <= 29 && row >= 0) {
                 if (status[row][col] == player) {
                     count++;
                     if (count >= 5) {
