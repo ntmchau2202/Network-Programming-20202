@@ -16,6 +16,8 @@
 }
 .scroll-pane {
    -fx-background-color: white;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: lightgray transparent transparent transparent;
 }
 .mygridStyle Line {
   -fx-stroke   : lightgray;

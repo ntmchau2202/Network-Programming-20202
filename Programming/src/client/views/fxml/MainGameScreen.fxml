@@ -25,7 +25,7 @@
             <Image url="@assets/img/vs.png" />
          </image>
       </ImageView>
-      <Label layoutX="684.0" layoutY="56.0" text="PhucNguyen" fx:id="xPlayerName">
+      <Label alignment="CENTER_RIGHT" layoutX="609.0" layoutY="56.0" prefHeight="35.0" prefWidth="191.0" text="PhucNguyen" textAlignment="RIGHT" fx:id="xPlayerName">
          <font>
             <Font size="24.0" />
          </font>
@@ -43,7 +43,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label fx:id="oPlayerName" layoutX="1053.0" layoutY="56.0" prefHeight="35.0" prefWidth="135.0" text="DzuongThai">
+      <Label fx:id="oPlayerName" layoutX="1060.0" layoutY="56.0" prefHeight="35.0" prefWidth="184.0" text="DzuongThai">
          <font>
             <Font size="24.0" />
          </font>

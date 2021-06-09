@@ -16,6 +16,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -63,8 +64,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private ScrollPane chatScrollPane;
     @FXML
     private TextField chatTextField;
+    @FXML
+    private Button sendButton;
 
-    private VBox chat;
+    private VBox chatVbox;
     private Label chatName;
     // locking clicking other moves when a move is chosen
     private boolean isLockMove;
@@ -198,11 +201,13 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 //        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
 
         // init chat vbox
-        chat = new VBox();
-        chat.setSpacing(5);
-        chatScrollPane.setContent(chat);
+        chatVbox = new VBox();
+        chatVbox.setSpacing(5);
+        chatScrollPane.setContent(chatVbox);
 
-        chatScrollPane.setStyle("-fx-border-width: 1 0 0 0; -fx-border-color: lightgray transparent transparent transparent;");
+        chatTextField.setOnKeyTyped(e -> {
+            sendButton.setDisable(chatTextField.getText().isEmpty());
+        });
     }
 
     private void addImageToPane(Pane pane, String movePlayerName) {
@@ -408,24 +413,30 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
 
     }
+
+
     @FXML
     void sendMessage(final MouseEvent event) {
-
-        chat.getChildren().add(addMessage(chatTextField.getText()));
+        chatVbox.getChildren().add(addMessage(chatTextField.getText()));
         chatTextField.setText("");
+        sendButton.setDisable(true);
     }
 
     public HBox addMessage(String message)
-    {   chatName = new Label();
+    {
+        // chat name set
+        chatName = new Label();
         chatName.setText(mainGameScreenController.getCurrentPlayer().getUsername()+": ");
         chatName.setTextFill(Color.web(this.mainGameScreenController.amIFirstPlayer() ? "#FF4A05" : "#0082ec"));
         chatName.setPrefWidth(80);
         chatName.setStyle("-fx-font-size: 20px");
         chatName.setWrapText(true);
 
+        // message HBox set
         HBox hbox = new HBox();
         hbox.setPrefWidth(600);
 
+        // msg set
         Label msg = new Label(message);
         msg.setWrapText(true);
         msg.setPrefWidth(400);
