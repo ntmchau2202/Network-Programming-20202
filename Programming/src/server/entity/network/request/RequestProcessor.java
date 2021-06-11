@@ -315,6 +315,17 @@ public class RequestProcessor {
         
         ReadCompletionHandler joinQueueHandler = handlerController.getHandlerByCommand(Command.JOIN_QUEUE);
         joinQueueHandler.cancelHandler();
+        
+        // wait a minute so that the previous message is sent back appropiately...
+        
+        for(int i = 0; i < 3; i++) {
+        	try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
 
         QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getUsername(), statCode, errMsg);
 

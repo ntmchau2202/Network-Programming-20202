@@ -26,12 +26,14 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.JSONObject;
 
 public class ClientSocketChannel {
 	private static ClientSocketChannel socketChannelInstance;
 	private static AsynchronousSocketChannel socketChannel;
+	private MessageQueue messageQueue;
 //	private static WriteCompletionHandler writeCompletionHandler;
 
 	private Attachment attachment;
@@ -47,6 +49,7 @@ public class ClientSocketChannel {
 		socketChannel.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
 		socketChannel.setOption(StandardSocketOptions.SO_SNDBUF, 4096);
 		socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+		socketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 
 		// connect to server
 		socketChannel.connect(new InetSocketAddress(Configs.IP_ADDRESS, Configs.PORT));
@@ -55,9 +58,10 @@ public class ClientSocketChannel {
 //		writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 
 		// additional implementation for operations
-		// clientMsg = new ClientMessage();
+//		 clientMsg = new ClientMessage();
 		buffer = ByteBuffer.allocate(4096);
-
+		messageQueue = new MessageQueue(socketChannel);
+		messageQueue.startMessageQueue();
 		// how to implement close socket when object is destroyed?
 	}
 
@@ -76,7 +80,7 @@ public class ClientSocketChannel {
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		ByteBuffer readBuffer = ByteBuffer.allocate(4096);
 		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(readBuffer);
-		socketChannel.read(buffer, attachment, readCompletionHandler);
+		socketChannel.read(readBuffer, attachment, readCompletionHandler);
 		return attachment;
 	}
 
@@ -92,7 +96,7 @@ public class ClientSocketChannel {
 		System.out.println(this.getSocketInstance().socketChannel.toString());
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
-		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
+		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel, new AtomicBoolean(false));
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		while (attachment.getActive().get()) {
 
@@ -105,7 +109,16 @@ public class ClientSocketChannel {
 	public String login(String username, String password) throws Exception {
 		LoginClientMessage loginRequest = new LoginClientMessage(username, password);
 		// return sendRequest(loginRequest.toString());
-		return sendRequest(loginRequest.toString());
+//		return sendRequest(loginRequest.toString());
+		int msgID = messageQueue.pushToMessageToSendQueue(loginRequest.toString());
+		System.out.println("Returned msg ID: " + msgID);
+		while(true) {
+			Thread.sleep(500);
+			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+			if(attachment != null) {
+				return attachment.getReturnMessage();
+			}
+		}
 //		return receiveResponseAsync(att);
 	}
 
@@ -114,14 +127,28 @@ public class ClientSocketChannel {
 		return sendRequest(registerRequest.toString());
 	}
 
-	public Attachment joinQueue(String sesID, String mode) throws Exception {
+	public String joinQueue(String sesID, String mode) throws Exception {
 		JoinQueueClientMessage joinQueueRequest = new JoinQueueClientMessage(mode, sesID);
-		return sendRequestAsync(joinQueueRequest.toString());
+//		return sendRequestAsync(joinQueueRequest.toString());
+		int msgID = messageQueue.pushToMessageToSendQueue(joinQueueRequest.toString());
+		while(true) {
+			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+			if(attachment != null) {
+				return attachment.getReturnMessage();
+			}
+		}
 	}
 	
-	public Attachment quitQueue(String username, String sessionID) throws Exception {
+	public String quitQueue(String username, String sessionID) throws Exception {
 		QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
-		return sendRequestAsync(quitQueueRequest.toString());
+//		return sendRequestAsync(quitQueueRequest.toString());
+		int msgID = messageQueue.pushToMessageToSendQueue(quitQueueRequest.toString());
+		while(true) {
+			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+			if(attachment != null) {
+				return attachment.getReturnMessage();
+			}
+		}
 		
 	}
 

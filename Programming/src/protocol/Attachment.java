@@ -8,6 +8,7 @@ public class Attachment {
 	private String []returnMessage;
 	private final AtomicBoolean active;
 	private AsynchronousSocketChannel socket;
+	private int attachmentID;
 	
 	public Attachment() {
 		this.sendMessage = "";
@@ -16,6 +17,14 @@ public class Attachment {
 		// tricky, aren't they?
 		this.returnMessage = new String[1];
 		this.returnMessage[0] = "";
+	}
+	
+	public int getAttachmentID() {
+		return this.attachmentID;
+	}
+	
+	public void setAttachmentID(int id) {
+		this.attachmentID = id;
 	}
 	
 	public Attachment(String msg, boolean act) {

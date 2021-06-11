@@ -3,15 +3,18 @@ package client.network;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import protocol.Attachment;
 
 public class WriteCompletionHandler implements CompletionHandler<Integer, Attachment> {
 
 	private final AsynchronousSocketChannel socketChannel;
+	private AtomicBoolean isWriteDone;
 
-	public WriteCompletionHandler(AsynchronousSocketChannel sockChannel) {
+	public WriteCompletionHandler(AsynchronousSocketChannel sockChannel, AtomicBoolean isWriting) {
 		this.socketChannel = sockChannel;
+		this.isWriteDone = isWriting;
 	}
 	
 	@Override
@@ -21,16 +24,7 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, Attach
 		
 		ByteBuffer buffer = ByteBuffer.allocate(4096);
 		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(buffer);
-		try {
-			socketChannel.read(buffer, attachment, readCompletionHandler);
-			
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("Pending sending...");
-			socketChannel.read(buffer, attachment, readCompletionHandler);
-		}
-		
-		
+		socketChannel.read(buffer, attachment, readCompletionHandler);
 	}
 
 	@Override
