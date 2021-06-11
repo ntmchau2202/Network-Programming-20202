@@ -19,16 +19,20 @@ import org.json.JSONObject;
 import protocol.Command;
 import protocol.StatusCode;
 import server.core.authentication.T3Authenticator;
+import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
+import server.entity.network.completionHandler.ReadCompletionHandler;
 
 public class RequestProcessor {
 
     private final QueueController queueController;
     private boolean isCancel;
     private Command cmd;
+    private CompletionHandlerController handlerController;
 
-    public RequestProcessor(QueueController queueController) {
+    public RequestProcessor(QueueController queueController, CompletionHandlerController handlerController) {
         this.queueController = queueController;
+        this.handlerController = handlerController;
         this.isCancel = false;
     }
 
@@ -204,6 +208,7 @@ public class RequestProcessor {
                             Thread.sleep(500);
                         }
                     } else {
+                    	System.out.println("Cancelled from user. Quiting...");
                         break;
                     }
                 }
@@ -219,9 +224,11 @@ public class RequestProcessor {
                     }
                     serverResponse = new JoinQueueServerMessage(loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.SUCCESS, "");
                 } else if (!isFound){
-                    serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropiate match. Please try again later");
-                } else if (isCancel) {
-                    serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "QUIT_QUEUE sent from user");
+                	if (isCancel) {
+                        serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "QUIT_QUEUE sent from user");
+                	} else {
+                		serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropiate match. Please try again later");
+                	} 
                 }
 
 //                listResponse.put(sock, serverResponse.toString());
@@ -305,11 +312,11 @@ public class RequestProcessor {
             statCode = StatusCode.ERROR;
             errMsg = "An error occured when quiting queue";
         }
+        
+        ReadCompletionHandler joinQueueHandler = handlerController.getHandlerByCommand(Command.JOIN_QUEUE);
+        joinQueueHandler.cancelHandler();
 
         QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getUsername(), statCode, errMsg);
-
-        // and send this msg
-//        listResponse.put(sock, response.toString());
 
         return response.toString();
     }

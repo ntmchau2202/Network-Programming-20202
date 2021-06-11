@@ -49,13 +49,21 @@ public class CompletionHandlerController {
 	
 	// This function return a ReadCompletionHandler with same command if there is
 	// If there isn't any, the function returns null
-	public ReadCompletionHandler getCouple(ReadCompletionHandler curHandler) {
+//	public ReadCompletionHandler getCouple(ReadCompletionHandler curHandler) {
+//		for(ReadCompletionHandler h : listReadHandler) {
+//			if(h.getCommand().compareTo(curHandler.getCommand())==0) {
+//				return h;
+//			}
+//		}
+//		return null;
+//	}
+	
+	public ReadCompletionHandler getHandlerByCommand(Command cmd) {
 		for(ReadCompletionHandler h : listReadHandler) {
-			if(h.getCommand().compareTo(curHandler.getCommand())==0) {
+			if(h.getCommand().compareTo(cmd)==0) {
 				return h;
 			}
 		}
 		return null;
 	}
-	
 }

@@ -14,7 +14,7 @@ public class Misc {
             imgPath = "../" + Configs.IMAGE_PATH + imageName;
             System.out.println("Path is invalid");
             // remove this exit statement
-            System.exit(-1);
+//            System.exit(-1);
         }
         return new Image(new File(imgPath).toURI().toString());
     }

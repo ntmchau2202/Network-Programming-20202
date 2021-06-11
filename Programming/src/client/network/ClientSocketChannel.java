@@ -72,8 +72,11 @@ public class ClientSocketChannel {
 	public Attachment sendRequestAsync(String strMsgToSend) throws Exception {
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
-		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
+		WriteAndReturnHandler writeCompletionHandler = new WriteAndReturnHandler(socketChannel);
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
+		ByteBuffer readBuffer = ByteBuffer.allocate(4096);
+		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(readBuffer);
+		socketChannel.read(buffer, attachment, readCompletionHandler);
 		return attachment;
 	}
 
@@ -102,8 +105,8 @@ public class ClientSocketChannel {
 	public String login(String username, String password) throws Exception {
 		LoginClientMessage loginRequest = new LoginClientMessage(username, password);
 		// return sendRequest(loginRequest.toString());
-		Attachment att = sendRequestAsync(loginRequest.toString());
-		return receiveResponseAsync(att);
+		return sendRequest(loginRequest.toString());
+//		return receiveResponseAsync(att);
 	}
 
 	public String register(String username, String password) throws Exception {
@@ -111,14 +114,14 @@ public class ClientSocketChannel {
 		return sendRequest(registerRequest.toString());
 	}
 
-	public String joinQueue(String sesID, String mode) throws Exception {
+	public Attachment joinQueue(String sesID, String mode) throws Exception {
 		JoinQueueClientMessage joinQueueRequest = new JoinQueueClientMessage(mode, sesID);
-		return sendRequest(joinQueueRequest.toString());
+		return sendRequestAsync(joinQueueRequest.toString());
 	}
 	
-	public String quitQueue(String username, String sessionID) throws Exception {
+	public Attachment quitQueue(String username, String sessionID) throws Exception {
 		QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
-		return sendRequest(quitQueueRequest.toString());
+		return sendRequestAsync(quitQueueRequest.toString());
 		
 	}
 

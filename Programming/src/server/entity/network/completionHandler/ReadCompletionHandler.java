@@ -26,9 +26,13 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		this.buffer = buffer;
 		this.completionHandlerController = completionHandlerController;
 		// init processors
-		this.reqProc = new RequestProcessor(queueController);
+		this.reqProc = new RequestProcessor(queueController, completionHandlerController);
 		this.resProc = new ResponseProcessor(socketChannel);
 		this.handlerID = UUID.randomUUID().toString();
+	}
+	
+	public void cancelHandler() {
+		this.reqProc.stopProcessingRequest();
 	}
 
 	public String getHandlerID() {
@@ -67,14 +71,16 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 
 				// store current cmd to current handler
 				this.cmd = reqProc.getCommand();
-
-				// trigger CompletionHandlerController to cancel other lower priority handler
-				if (this.completionHandlerController.cancelLowPriorityHandler(this.cmd)) {
-					 System.out.println("READCOMPLETIONHANDLER: Cancel other low priority operations successfully");
-				} else {
-					// TODO: print something here
-					System.out.println("READCOMPLETIONHANDLER: Cancel other low priority operations errorrrrrrrr");
-				}
+				
+				// This is dangerous. What if there is other low priority command but are not required to be cancelled?
+				
+//				// trigger CompletionHandlerController to cancel other lower priority handler
+//				if (this.completionHandlerController.cancelLowPriorityHandler(this.cmd)) {
+//					 System.out.println("READCOMPLETIONHANDLER: Cancel other low priority operations successfully");
+//				} else {
+//					// TODO: print something here
+//					System.out.println("READCOMPLETIONHANDLER: Cancel other low priority operations errorrrrrrrr");
+//				}
 
 				// process request message
 				String msgToSend = reqProc.processReturn(recvMsg);
