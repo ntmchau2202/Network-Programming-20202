@@ -44,14 +44,14 @@ public class MessageQueue {
 		return attachment.getAttachmentID();
 	}
 	
-//	public Attachment getAttachmentByID(int id) {
-//		for(Attachment a : messageDoneList) {
-//			if (a.getAttachmentID() == id) {
-//				return a;
-//			}
-//		}
-//		return null;
-//	}
+	public Attachment getAttachmentByID(int id) {
+		for(Attachment a : messageDoneList) {
+			if (a.getAttachmentID() == id) {
+				return a;
+			}
+		}
+		return null;
+	}
 	
 	public void startMessageQueue() {
 		Thread thread = new Thread(new MessageThread());
@@ -116,6 +116,8 @@ public class MessageQueue {
 			for(Attachment a : pendingReadList) {
 				if(a.getAttachmentID() == msgID) {
 					a.setReturnMessage(tmp);
+					messageDoneList.add(a);
+					pendingReadList.remove(a);
 					return true;
 				}
 			}
