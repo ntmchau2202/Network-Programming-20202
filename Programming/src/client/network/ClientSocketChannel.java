@@ -130,7 +130,7 @@ public class ClientSocketChannel {
 	public String joinQueue(String sesID, String mode) throws Exception {
 		JoinQueueClientMessage joinQueueRequest = new JoinQueueClientMessage(mode, sesID);
 //		return sendRequestAsync(joinQueueRequest.toString());
-		int msgID = messageQueue.pushToMessageToSendQueue(joinQueueRequest.toString());
+		int msgID = messageQueue.pushMessageToSendQueue(joinQueueRequest.toString(), joinQueueRequest.getMessageID());
 		while(true) {
 			Attachment attachment = messageQueue.getAttachmentByID(msgID);
 			if(attachment != null) {
@@ -142,7 +142,7 @@ public class ClientSocketChannel {
 	public String quitQueue(String username, String sessionID) throws Exception {
 		QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
 //		return sendRequestAsync(quitQueueRequest.toString());
-		int msgID = messageQueue.pushToMessageToSendQueue(quitQueueRequest.toString());
+		int msgID = messageQueue.pushMessageToSendQueue(quitQueueRequest.toString(), quitQueueRequest.getMessageID());
 		while(true) {
 			Attachment attachment = messageQueue.getAttachmentByID(msgID);
 			if(attachment != null) {
