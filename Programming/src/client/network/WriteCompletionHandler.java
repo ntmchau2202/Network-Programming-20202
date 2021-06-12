@@ -12,9 +12,8 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, Attach
 	private final AsynchronousSocketChannel socketChannel;
 	private AtomicBoolean isWriteDone;
 
-	public WriteCompletionHandler(AsynchronousSocketChannel sockChannel, AtomicBoolean isWriting) {
+	public WriteCompletionHandler(AsynchronousSocketChannel sockChannel) {
 		this.socketChannel = sockChannel;
-		this.isWriteDone = isWriting;
 	}
 	
 	@Override
@@ -22,9 +21,9 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, Attach
 		System.out.println("Client written " + result.toString() + " bytes");
 		System.out.println("Message sent from client: " + attachment.getSendMessage());
 		
-		ByteBuffer buffer = ByteBuffer.allocate(4096);
-		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(buffer);
-		socketChannel.read(buffer, attachment, readCompletionHandler);
+//		ByteBuffer buffer = ByteBuffer.allocate(4096);
+//		ReadCompletionHandler readCompletionHandler = new ReadCompletionHandler(buffer);
+//		socketChannel.read(buffer, attachment, readCompletionHandler);
 	}
 
 	@Override

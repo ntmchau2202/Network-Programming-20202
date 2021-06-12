@@ -96,7 +96,7 @@ public class ClientSocketChannel {
 		System.out.println(this.getSocketInstance().socketChannel.toString());
 		attachment = new Attachment(strMsgToSend, true);
 		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
-		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel, new AtomicBoolean(false));
+		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		while (attachment.getActive().get()) {
 
@@ -110,7 +110,7 @@ public class ClientSocketChannel {
 		LoginClientMessage loginRequest = new LoginClientMessage(username, password);
 		// return sendRequest(loginRequest.toString());
 //		return sendRequest(loginRequest.toString());
-		int msgID = messageQueue.pushToMessageToSendQueue(loginRequest.toString());
+		int msgID = messageQueue.pushMessageToSendQueue(loginRequest.toString(), loginRequest.getMessageID());
 		System.out.println("Returned msg ID: " + msgID);
 		while(true) {
 			Thread.sleep(500);
