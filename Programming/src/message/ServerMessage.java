@@ -22,6 +22,7 @@ public abstract class ServerMessage extends Message {
 		
 		this.statusCode = StatusCode.toStatusCode(this.finalMessageObject.getString("status_code"));
 		this.errorMsg = this.finalMessageObject.getString("error");
+		this.messageID = this.finalMessageObject.getInt("message_id");
 		
 	}
 	
