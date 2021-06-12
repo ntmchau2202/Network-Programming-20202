@@ -152,14 +152,24 @@ public class ClientSocketChannel {
 	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
 			throws Exception {
 		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
-		System.out.println(msg.toString());
-		return sendRequest(msg.toString());
+		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
+		while(true) {
+			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+			if(attachment != null) {
+				return attachment.getReturnMessage();
+			}
+		}
 	}
 
 	public String listenMove(String playerName, int matchID) throws Exception {
 		ListenMoveClientMessage msg = new ListenMoveClientMessage(playerName, matchID);
-		System.out.println(msg.toString());
-		return sendRequest(msg.toString());
+		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
+		while(true) {
+			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+			if(attachment != null) {
+				return attachment.getReturnMessage();
+			}
+		}
 	}
 
 	public String requestDraw() throws Exception {
