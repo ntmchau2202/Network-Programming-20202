@@ -19,6 +19,7 @@ public abstract class ClientMessage extends Message {
 	protected void finalizeMessageObject() {
 		this.finalMessageObject.put("command_code", this.command.toString());
 		this.finalMessageObject.put("info", requestBody.getBody());
+		this.finalMessageObject.put("message_id", this.messageID);
 	}
 	
 }

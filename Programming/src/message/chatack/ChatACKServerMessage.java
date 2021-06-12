@@ -28,7 +28,7 @@ public class ChatACKServerMessage extends ServerMessage {
 		this.statusCode = StatusCode.toStatusCode(this.responseBody.getBody().getString("status_code"));
 	}
 	
-	public String getMessageID() {
+	public String getChatMessageID() {
 		return this.messageID;
 	}
 	

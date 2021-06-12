@@ -37,11 +37,11 @@ public class ChatServerMessage extends ServerMessage {
 		return this.toUser;
 	}
 	
-	public String getMessage() {
+	public String getChatMessage() {
 		return this.message;
 	}
 	
-	public String getMessageID() {
+	public String getChatMessageID() {
 		return this.messageID;
 	}
 	

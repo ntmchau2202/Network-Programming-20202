@@ -1,5 +1,7 @@
 package message;
 
+import java.util.Random;
+
 import org.json.JSONObject;
 
 import protocol.Command;
@@ -7,9 +9,12 @@ import protocol.Command;
 public abstract class Message {
 	protected Command command;
 	protected JSONObject finalMessageObject;
+	protected int messageID;
 	
 	public Message() {
 		this.finalMessageObject = new JSONObject();
+		Random rn = new Random();
+		this.messageID = rn.nextInt(1000000);
 	}
 	
 	public Message(String input) {
@@ -31,5 +36,9 @@ public abstract class Message {
 	
 	public String toString() {
 		return finalMessageObject.toString();
+	}
+	
+	public int getMessageID() {
+		return this.messageID;
 	}
 }

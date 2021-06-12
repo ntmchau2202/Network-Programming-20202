@@ -30,6 +30,7 @@ public abstract class ServerMessage extends Message {
 		this.finalMessageObject.put("info", responseBody.getBody());
 		this.finalMessageObject.put("status_code", statusCode.toString());
 		this.finalMessageObject.put("error", errorMsg);
+		this.finalMessageObject.put("message_id", this.messageID);
 	}
 	
 	public StatusCode getStatusCode() {
