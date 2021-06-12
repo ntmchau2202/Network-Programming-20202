@@ -13,8 +13,8 @@ public class LeaderboardServerMessage extends ServerMessage {
 	private List<String> listUsername;
 	private List<Integer> listElo, listRank;
 	
-	public LeaderboardServerMessage(List<String> listUsr, List<Integer> listElo, List<Integer> listRank, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public LeaderboardServerMessage(int messageCommandID, List<String> listUsr, List<Integer> listElo, List<Integer> listRank, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		this.listUsername = listUsr;
 		this.listElo = listElo;
 		this.listRank = listRank;

@@ -11,8 +11,8 @@ public class EndgameServerMessage extends ServerMessage {
 	private String winner, loser;
 	private boolean isDraw;
 
-	public EndgameServerMessage(int matchID, String winner, int winnerElo, int loserElo, String loser, boolean isDraw, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public EndgameServerMessage(int messageCommandID, int matchID, String winner, int winnerElo, int loserElo, String loser, boolean isDraw, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		
 		this.matchID = matchID;
 		this.winner = winner;

@@ -1,7 +1,6 @@
 package client.network;
 
 import client.utils.Configs;
-import javafx.application.Platform;
 import message.ServerMessage;
 import message.chat.ChatServerMessage;
 import message.chatack.ChatACKServerMessage;
@@ -24,9 +23,7 @@ import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.JSONObject;
 
@@ -110,7 +107,7 @@ public class ClientSocketChannel {
 		LoginClientMessage loginRequest = new LoginClientMessage(username, password);
 		// return sendRequest(loginRequest.toString());
 //		return sendRequest(loginRequest.toString());
-		int msgID = messageQueue.pushMessageToSendQueue(loginRequest.toString(), loginRequest.getMessageID());
+		int msgID = messageQueue.pushMessageToSendQueue(loginRequest.toString(), loginRequest.getMessageCommandID());
 		System.out.println("Returned msg ID: " + msgID);
 		while(true) {
 			Thread.sleep(500);
@@ -130,7 +127,7 @@ public class ClientSocketChannel {
 	public String joinQueue(String sesID, String mode) throws Exception {
 		JoinQueueClientMessage joinQueueRequest = new JoinQueueClientMessage(mode, sesID);
 //		return sendRequestAsync(joinQueueRequest.toString());
-		int msgID = messageQueue.pushMessageToSendQueue(joinQueueRequest.toString(), joinQueueRequest.getMessageID());
+		int msgID = messageQueue.pushMessageToSendQueue(joinQueueRequest.toString(), joinQueueRequest.getMessageCommandID());
 		while(true) {
 			Attachment attachment = messageQueue.getAttachmentByID(msgID);
 			if(attachment != null) {
@@ -142,7 +139,7 @@ public class ClientSocketChannel {
 	public String quitQueue(String username, String sessionID) throws Exception {
 		QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
 //		return sendRequestAsync(quitQueueRequest.toString());
-		int msgID = messageQueue.pushMessageToSendQueue(quitQueueRequest.toString(), quitQueueRequest.getMessageID());
+		int msgID = messageQueue.pushMessageToSendQueue(quitQueueRequest.toString(), quitQueueRequest.getMessageCommandID());
 		while(true) {
 			Attachment attachment = messageQueue.getAttachmentByID(msgID);
 			if(attachment != null) {

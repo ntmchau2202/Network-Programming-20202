@@ -9,12 +9,12 @@ import protocol.Command;
 public abstract class Message {
 	protected Command command;
 	protected JSONObject finalMessageObject;
-	protected int messageID;
+	protected int messageCommandID;
 	
 	public Message() {
 		this.finalMessageObject = new JSONObject();
 		Random rn = new Random();
-		this.messageID = rn.nextInt(1000000);
+		this.messageCommandID = rn.nextInt(1000000);
 	}
 	
 	public Message(String input) {
@@ -38,7 +38,7 @@ public abstract class Message {
 		return finalMessageObject.toString();
 	}
 	
-	public int getMessageID() {
-		return this.messageID;
+	public int getMessageCommandID() {
+		return this.messageCommandID;
 	}
 }

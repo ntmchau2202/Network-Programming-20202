@@ -11,8 +11,8 @@ public class MoveServerMessage extends ServerMessage{
 	private int matchID, posX, posY;
 	private String movePlayer, state, result;
 	
-	public MoveServerMessage(int matchID, String player, int posX, int posY, String state, String res, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public MoveServerMessage(int messageCommandID, int matchID, String player, int posX, int posY, String state, String res, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		
 		this.matchID = matchID;
 		this.movePlayer = player;

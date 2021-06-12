@@ -9,8 +9,8 @@ public class DrawRequestServerMessage extends ServerMessage {
 	private int matchID;
 	private String movePlayer, sessionID;
 	
-	public DrawRequestServerMessage(int matchID, String player, String sessionID, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public DrawRequestServerMessage(int messageCommandID, int matchID, String player, String sessionID, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		
 		this.matchID = matchID;
 		this.movePlayer = player;

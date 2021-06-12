@@ -1,7 +1,5 @@
 package message.register;
 
-import java.math.BigDecimal;
-
 import message.ServerMessage;
 import protocol.Command;
 import protocol.StatusCode;
@@ -11,8 +9,8 @@ public class RegisterServerMessage extends ServerMessage {
 	private float winRate;
 	private String username, sessionID;
 	
-	public RegisterServerMessage(String username, String sessionID, int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public RegisterServerMessage(int messageCommandID, String username, String sessionID, int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		this.username = username;
 		this.sessionID = sessionID;
 		this.elo = elo;

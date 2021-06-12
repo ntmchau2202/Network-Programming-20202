@@ -9,8 +9,8 @@ public class DrawConfirmServerMessage extends ServerMessage {
 	private String movePlayer, sessionID;
 	private boolean acceptance;
 	
-	public DrawConfirmServerMessage(int matchID, String player, String sessionID, boolean acceptance, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public DrawConfirmServerMessage(int messageCommandID, int matchID, String player, String sessionID, boolean acceptance, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		
 		this.matchID = matchID;
 		this.movePlayer = player;

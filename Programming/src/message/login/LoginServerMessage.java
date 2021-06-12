@@ -3,15 +3,14 @@ package message.login;
 import message.ServerMessage;
 import protocol.Command;
 import protocol.StatusCode;
-import java.math.*;
 
 public class LoginServerMessage extends ServerMessage {
 	private int rank, elo, noMatchPlayed, noMatchWon;
 	private float winRate;
 	private String username, sessionID;
 	
-	public LoginServerMessage(String username, String sessionID, int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public LoginServerMessage(int messageCommandID, String username, String sessionID, int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		this.username = username;
 		this.sessionID = sessionID;
 		this.elo = elo;

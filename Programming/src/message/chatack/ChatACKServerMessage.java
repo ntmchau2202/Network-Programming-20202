@@ -9,7 +9,7 @@ public class ChatACKServerMessage extends ServerMessage {
 	private int matchID;
 	
 	public ChatACKServerMessage(String messageID, int matchID, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+		super(statCode, errMsg, );
 		this.messageID = messageID;
 		this.errorMsg = errMsg;
 		this.statusCode = statCode;

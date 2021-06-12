@@ -8,8 +8,8 @@ public class JoinQueueServerMessage extends ServerMessage {
 	private String username, sessionID, player1, opponent;
 	private int matchID, opponentElo;
 	
-	public JoinQueueServerMessage(String usr, String sesID, String opponent, int opponentElo, int matchID, String player1, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public JoinQueueServerMessage(int messageCommandID, String usr, String sesID, String opponent, int opponentElo, int matchID, String player1, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		this.username = usr;
 		this.sessionID = sesID;
 		

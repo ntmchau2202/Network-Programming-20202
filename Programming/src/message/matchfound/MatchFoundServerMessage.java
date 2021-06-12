@@ -9,8 +9,8 @@ public class MatchFoundServerMessage extends ServerMessage {
 	private int matchID, elo;
 	private String opponent, firstPlayer; 
 	
-	public MatchFoundServerMessage(int matchID, String opponent, int elo, String firstPlayer, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public MatchFoundServerMessage(int messageCommandID, int matchID, String opponent, int elo, String firstPlayer, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		
 		this.matchID = matchID;
 		this.elo = elo;

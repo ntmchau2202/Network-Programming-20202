@@ -8,11 +8,12 @@ public abstract class ServerMessage extends Message {
 	protected StatusCode statusCode;
 	protected String errorMsg;
 	
-	public ServerMessage(StatusCode statCode, String errMsg) {
+	public ServerMessage(StatusCode statCode, String errMsg, int messageCommandID) {
 		super();
 		this.responseBody = new ResponseBody();
 		this.statusCode = statCode;
 		this.errorMsg = errMsg;
+		this.messageCommandID = messageCommandID;
 	}
 	
 	public ServerMessage(String input) {
@@ -22,7 +23,7 @@ public abstract class ServerMessage extends Message {
 		
 		this.statusCode = StatusCode.toStatusCode(this.finalMessageObject.getString("status_code"));
 		this.errorMsg = this.finalMessageObject.getString("error");
-		this.messageID = this.finalMessageObject.getInt("message_id");
+		this.messageCommandID = this.finalMessageObject.getInt("message_id");
 		
 	}
 	
@@ -31,7 +32,7 @@ public abstract class ServerMessage extends Message {
 		this.finalMessageObject.put("info", responseBody.getBody());
 		this.finalMessageObject.put("status_code", statusCode.toString());
 		this.finalMessageObject.put("error", errorMsg);
-		this.finalMessageObject.put("message_id", this.messageID);
+		this.finalMessageObject.put("message_id", this.messageCommandID);
 	}
 	
 	public StatusCode getStatusCode() {

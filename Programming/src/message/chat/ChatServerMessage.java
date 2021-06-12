@@ -7,8 +7,8 @@ public class ChatServerMessage extends ServerMessage {
 	private String fromUser, toUser, message, messageID;
 	private int matchID;
 	
-	public ChatServerMessage(String fromUsr, String toUsr, String msg, String msgID, int matchID, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg);
+	public ChatServerMessage(int messageCommandID, String fromUsr, String toUsr, String msg, String msgID, int matchID, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, messageCommandID);
 		this.fromUser = fromUsr;
 		this.toUser = toUsr;
 		this.message = msg;

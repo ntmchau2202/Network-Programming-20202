@@ -127,12 +127,12 @@ public class RequestProcessor {
         // get logged player
         RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
         if (loggedPlayer == null) {
-            serverResponse = new LoginServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
+            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
                     "Username / Password is not valid");
         } else {
 //            loggedPlayer.setUserSocket(sock);
             queueController.pushToHall(loggedPlayer);
-            serverResponse = new LoginServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
+            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
                     loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
                     loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
         }
@@ -151,12 +151,12 @@ public class RequestProcessor {
         // register new player
         RankPlayer loggedPlayer = new T3Authenticator().register(username, password);
         if (loggedPlayer == null) {
-            serverResponse = new RegisterServerMessage("", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
+            serverResponse = new RegisterServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
                     "Username / Password is not valid");
         } else {
 //            loggedPlayer.setUserSocket(sock);
             queueController.pushToHall(loggedPlayer);
-            serverResponse = new RegisterServerMessage(username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
+            serverResponse = new RegisterServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
                     loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
                     loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
         }
@@ -222,12 +222,12 @@ public class RequestProcessor {
                         // user is player 2
                         opponent = match.getPlayer1();
                     }
-                    serverResponse = new JoinQueueServerMessage(loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.SUCCESS, "");
+                    serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.SUCCESS, "");
                 } else if (!isFound){
                 	if (isCancel) {
-                        serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "QUIT_QUEUE sent from user");
+                        serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "QUIT_QUEUE sent from user");
                 	} else {
-                		serverResponse = new JoinQueueServerMessage("", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropiate match. Please try again later");
+                		serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropiate match. Please try again later");
                 	} 
                 }
 
@@ -292,7 +292,7 @@ public class RequestProcessor {
             }
         }
 
-        MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, x, y, state, result, statCode, errMsg);
+        MoveServerMessage fwdMsg = new MoveServerMessage(moveMsg.getMessageCommandID(), matchID, movePlayer, x, y, state, result, statCode, errMsg);
 
 //        listResponse.put(sock, fwdMsg.toString());
 
@@ -327,7 +327,7 @@ public class RequestProcessor {
 			}
         }
 
-        QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getUsername(), statCode, errMsg);
+        QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getMessageCommandID(), quitQueueMsg.getUsername(), statCode, errMsg);
 
         return response.toString();
     }
@@ -382,7 +382,7 @@ public class RequestProcessor {
             }
 
         }
-        MoveServerMessage fwdMsg = new MoveServerMessage(matchID, movePlayer, latestMove.getX(), latestMove.getY(), latestMove.getState(), latestMove.getResult(), StatusCode.SUCCESS, "");
+        MoveServerMessage fwdMsg = new MoveServerMessage(listenMsg.getMessageCommandID(), matchID, movePlayer, latestMove.getX(), latestMove.getY(), latestMove.getState(), latestMove.getResult(), StatusCode.SUCCESS, "");
 //        listResponse.put(sock, fwdMsg.toString());
         return fwdMsg.toString();
     }
