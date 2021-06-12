@@ -54,10 +54,12 @@ public class MessageQueue {
 	}
 	
 	public void startMessageQueue() {
-		Thread thread = new Thread(new MessageThread());
-		thread.start();
+		Thread readThread = new Thread(new MessageSendThread());
+		Thread writeThread = new Thread(new MessageReadThread());
+		readThread.start();
+		writeThread.start();
 	}
-	
+		
 	private void sendMessage(Attachment attachment) {
 //		Attachment attachment = new Attachment(strMsgToSend, true);
 		ByteBuffer buffer = ByteBuffer.wrap(attachment.getSendMessage().getBytes(StandardCharsets.UTF_8));
@@ -65,8 +67,10 @@ public class MessageQueue {
 		isSending.set(true);
 //		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		Future<Integer> futureWrite = socketChannel.write(buffer);
+		System.out.println("write returned");
 		try{
 			futureWrite.get();
+			pendingReadList.add(attachment);
 			isSending.set(false);
 		}catch (Exception e) {
 			System.out.println("Error when sending message: " + attachment.getSendMessage());
@@ -96,6 +100,7 @@ public class MessageQueue {
 		// Attachment tmpAttachment = new Attachment();
 		ByteBuffer buffer = ByteBuffer.allocate(4096);
 		Future<Integer> futureRead = socketChannel.read(buffer);
+		System.out.println("read returned");
 		try {
 			isReading.set(true);
 			futureRead.get();
@@ -111,13 +116,18 @@ public class MessageQueue {
 		try {
 			inputBuffer.flip();
 			String tmp = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
+			System.out.println("Msg received: " + tmp);
 			JSONObject tmpJS = new JSONObject(tmp);
 			int msgID = tmpJS.getInt("message_id");
+			System.out.println("Msg ID received from server: " + msgID);
+			
 			for(Attachment a : pendingReadList) {
+				System.out.println("item: " + a.getAttachmentID());
 				if(a.getAttachmentID() == msgID) {
 					a.setReturnMessage(tmp);
 					messageDoneList.add(a);
 					pendingReadList.remove(a);
+					System.out.println("Size of pendingReadList: " + pendingReadList.size());
 					return true;
 				}
 			}
@@ -129,7 +139,30 @@ public class MessageQueue {
 		}
 	}
 	
-	private class MessageThread implements Runnable {
+	private class MessageSendThread implements Runnable {
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					Thread.sleep(500);
+						// send
+						if(pendingWriteList.size()!=0) {
+							System.out.println("Pending send queue size is not 0. Start polling");
+							if(!isSending.get()) {
+								System.out.println("Channel not busy. Start sending");
+								Attachment atchmtToSend = pendingWriteList.remove(0);
+								sendMessage(atchmtToSend);
+							}
+						} 
+				}  catch (Exception e) {
+					System.out.println("Error in run of MessageThread");
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private class MessageReadThread implements Runnable {
 
 		@Override
 		public void run() {
@@ -137,18 +170,10 @@ public class MessageQueue {
 			while(true) {
 				try {
 				Thread.sleep(500);
-					// send
-					if(pendingWriteList.size()!=0) {
-						System.out.println("Pending send queue size is not 0. Start polling");
-						if(!isSending.get()) {
-							Attachment atchmtToSend = pendingWriteList.remove(0);
-							sendMessage(atchmtToSend);
-						}
-					} 
-					// read
 					if(pendingReadList.size()!=0) {
 						System.out.println("Pending read queue is not 0. Start reading and merging");
 						if(!isReading.get()) {
+							System.out.println("Channel not busy. Start receiving");
 							readMessage();
 						}
 					}

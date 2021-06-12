@@ -8,8 +8,8 @@ public class ChatACKServerMessage extends ServerMessage {
 	private StatusCode statusCode;
 	private int matchID;
 	
-	public ChatACKServerMessage(String messageID, int matchID, StatusCode statCode, String errMsg) {
-		super(statCode, errMsg, );
+	public ChatACKServerMessage(String messageID, int matchID, StatusCode statCode, String errMsg, int messageCommandID) {
+		super(statCode, errMsg, messageCommandID);
 		this.messageID = messageID;
 		this.errorMsg = errMsg;
 		this.statusCode = statCode;

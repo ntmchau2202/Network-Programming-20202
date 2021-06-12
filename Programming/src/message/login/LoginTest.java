@@ -19,7 +19,7 @@ public class LoginTest {
 		System.out.println("password: " + loginRequestFromString.getPassword());
 		System.out.println("command: " + loginRequestFromString.getCommand().toString());
 		
-		LoginServerMessage loginResponse = new LoginServerMessage("hikaru", "ASKLRJGBARSKLHJBGA", 1500, 5000, (float)0.69, 1000, 69, StatusCode.SUCCESS, "");
+		LoginServerMessage loginResponse = new LoginServerMessage(1324, "hikaru", "ASKLRJGBARSKLHJBGA", 1500, 5000, (float)0.69, 1000, 69, StatusCode.SUCCESS, "");
 		tmp = loginResponse.toString();
 		System.out.println("Raw login response: " + tmp);
 		System.out.println("username: " + loginResponse.getUsername());

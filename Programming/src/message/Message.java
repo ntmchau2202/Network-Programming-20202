@@ -20,6 +20,7 @@ public abstract class Message {
 	public Message(String input) {
 		this.finalMessageObject = new JSONObject(input);
 		this.command = Command.toCommand(this.finalMessageObject.getString("command_code"));
+		this.messageCommandID = this.finalMessageObject.getInt("message_id");
 	}
 	
 	protected void setCommand(Command cmd) {
