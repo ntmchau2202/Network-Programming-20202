@@ -100,7 +100,13 @@ public class ClientSocketChannel {
 		}
 		System.out.println("This is printed from client: " + attachment.getReturnMessage());
 		return attachment.getReturnMessage();
-
+//		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
+//		while(true) {
+//			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+//			if(attachment != null) {
+//				return attachment.getReturnMessage();
+//			}
+//		}
 	}
 
 	public String login(String username, String password) throws Exception {
