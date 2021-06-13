@@ -210,7 +210,7 @@ public class RequestProcessor {
                 Match match = null;
                 boolean isFound = false;
 
-                for(int i = 0; i < 5; i++) {
+                for(int i = 0; i < 20; i++) {
                     System.out.println("- in the loop: " + i);
                     if(!isCancel) {
                         for(Match m : queueController.getIngameList()) {
@@ -461,6 +461,7 @@ public class RequestProcessor {
                         // if no message, just continue
                         continue;
                     } else {
+                    	statCode = StatusCode.SUCCESS;
                         break;
                     }
                 } catch (InterruptedException e) {

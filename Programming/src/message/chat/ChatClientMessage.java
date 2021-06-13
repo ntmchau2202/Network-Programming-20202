@@ -3,6 +3,7 @@ package message.chat;
 import java.util.Random;
 
 import message.ClientMessage;
+import protocol.Command;
 
 public class ChatClientMessage extends ClientMessage {
 	private String fromUser, toUser, message, messageID;
@@ -19,8 +20,11 @@ public class ChatClientMessage extends ClientMessage {
 		this.messageID = "CHAT" + Integer.toString(idNum);
 		this.matchID = matchID;
 		System.out.println("Is is okay here?");
+		this.setCommand(Command.CHAT);
 		this.requestBody.createChatBody(fromUsr, toUsr, msg, this.messageID, matchID);
 		this.finalizeMessageObject();
+		
+		System.out.println(this.requestBody.toString()); // ??????????????????
 	}
 	
 	public ChatClientMessage(String input) {

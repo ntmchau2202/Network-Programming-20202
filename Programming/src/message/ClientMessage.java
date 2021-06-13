@@ -17,9 +17,13 @@ public abstract class ClientMessage extends Message {
 	}
 	
 	protected void finalizeMessageObject() {
+		System.out.println("finalizeMessageObject:::: got here");
 		this.finalMessageObject.put("command_code", this.command.toString());
+		System.out.println("finalizeMessageObject:::: oneeeeeeeeeee");
 		this.finalMessageObject.put("info", requestBody.getBody());
+		System.out.println("finalizeMessageObject:::: twwwwwwwwoooooooooooooooooooooo");
 		this.finalMessageObject.put("message_id", this.messageCommandID);
+		System.out.println("finalizeMessageObject: done: " + this.finalMessageObject.toString());
 	}
 	
 }

@@ -1,6 +1,7 @@
 package message.chat;
 
 import message.ServerMessage;
+import protocol.Command;
 import protocol.StatusCode;
 import server.entity.chat.ChatMessage;
 
@@ -15,7 +16,7 @@ public class ChatServerMessage extends ServerMessage {
 		this.message = chatClientMessage.getChatMessage();
 		this.messageID = chatClientMessage.getChatMessageID();
 		this.matchID = chatClientMessage.getMatchID();
-
+		this.command = chatClientMessage.getCommand();
 		this.responseBody.createChatBody(this.fromUser, this.toUser, this.message, this.messageID, matchID);
 		this.finalizeMessageObject();
 	}
@@ -27,7 +28,7 @@ public class ChatServerMessage extends ServerMessage {
 		this.message = chatMessage.getMessage();
 		this.messageID = chatMessage.getMessageID();
 		this.matchID = chatMessage.getMatchID();
-		
+		this.command = Command.CHAT;
 		this.responseBody.createChatBody(this.fromUser, this.toUser, this.message, this.messageID, this.matchID);
 		this.finalizeMessageObject();
 	}

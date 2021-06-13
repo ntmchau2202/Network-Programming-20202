@@ -207,7 +207,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 					System.out.println("================================= Start listening to chatttttttttttt");
 					String recvMsg = mainGameScreenController.listenChat();
 					if(recvMsg.length() != 0) {
+						System.out.println("Message length !=0: " + recvMsg);
 						chatVbox.getChildren().add(addMessage(recvMsg));
+					} else {
+						System.out.println("Empty message :(");
 					}
 				}
 			}
@@ -460,7 +463,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 				} else {
 					chatVbox.getChildren().add(addMessage(mainGameScreenController.getFinalErrorMessage()));
 				}
-				sendButton.setDisable(true);
+				sendButton.setDisable(false);
 			}
         });
         Thread sendChatThread = new Thread(sendChatTask);
