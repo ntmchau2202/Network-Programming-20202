@@ -6,7 +6,19 @@ import protocol.StatusCode;
 public class ChatServerMessage extends ServerMessage {
 	private String fromUser, toUser, message, messageID;
 	private int matchID;
-	
+
+	public ChatServerMessage(ChatClientMessage chatClientMessage, StatusCode statCode, String errMsg) {
+		super(statCode, errMsg, chatClientMessage.getMessageCommandID());
+		this.fromUser = chatClientMessage.getSendUser();
+		this.toUser = chatClientMessage.getReceiveUser();
+		this.message = chatClientMessage.getChatMessage();
+		this.messageID = chatClientMessage.getChatMessageID();
+		this.matchID = chatClientMessage.getMatchID();
+
+		this.responseBody.createChatBody(this.fromUser, this.toUser, this.message, this.messageID, matchID);
+		this.finalizeMessageObject();
+	}
+
 	public ChatServerMessage(int messageCommandID, String fromUsr, String toUsr, String msg, String msgID, int matchID, StatusCode statCode, String errMsg) {
 		super(statCode, errMsg, messageCommandID);
 		this.fromUser = fromUsr;

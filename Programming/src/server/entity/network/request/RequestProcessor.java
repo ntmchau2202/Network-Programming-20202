@@ -4,6 +4,8 @@ import entity.Match.Match;
 import entity.Move.Move;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
+import message.chat.ChatClientMessage;
+import message.chat.ChatServerMessage;
 import message.joinqueue.JoinQueueClientMessage;
 import message.joinqueue.JoinQueueServerMessage;
 import message.login.LoginClientMessage;
@@ -80,6 +82,10 @@ public class RequestProcessor {
                 resMsg = this.processListenMove(recvMsg);
                 break;
             }
+//            case LISTEN_CHAT: {
+//                resMsg = this.processListenChat(recvMsg);
+//                break;
+//            }
 //            case DRAW_REQUEST: {
 //                resMsg = this.processRequestDrawRequest();
 //                break;
@@ -96,10 +102,10 @@ public class RequestProcessor {
 //                resMsg = this.processGetLeaderBoardRequest();
 //                break;
 //            }
-//            case CHAT: {
-//                resMsg = this.processChatRequest();
-//                break;
-//            }
+            case CHAT: {
+                resMsg = this.processChatRequest(recvMsg);
+                break;
+            }
 //            case CHATACK: {
 //                resMsg = this.processChatACKRequest();
 //                break;
@@ -403,57 +409,126 @@ public class RequestProcessor {
         return fwdMsg.toString();
     }
 
-//    private Map<AsynchronousSocketChannel, String> processRequestDrawRequest() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//        return listResponse;
-//    }
-//
-//    private Map<AsynchronousSocketChannel, String> processConfirmDrawRequest() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//        return listResponse;
-//    }
-//
-//    private Map<AsynchronousSocketChannel, String> processGetLeaderBoardRequest() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//        return listResponse;
-//    }
-//
-//    private Map<AsynchronousSocketChannel, String> processChatRequest() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//        return listResponse;
-//    }
-//
-//    private Map<AsynchronousSocketChannel, String> processChatACKRequest() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//        return listResponse;
-//    }
-//
-//    private void processLogoutRequest() throws Exception {
-//
-//    }
-//
-//    private Map<AsynchronousSocketChannel, String> notifyMatchFound() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//
-//
-//        return listResponse;
-//    }
-//
-//    private Map<AsynchronousSocketChannel, String> notifyEndgame() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//        return listResponse;
-//    }
-//
-//    private Map<AsynchronousSocketChannel, String> notifyUnknownCommand() throws Exception {
-//        // TODO: Finish the function here
-//        Map<AsynchronousSocketChannel, String> listResponse = new HashMap<AsynchronousSocketChannel, String>();
-//        return listResponse;
-//    }
+    private String processRequestDrawRequest() throws Exception {
+        // TODO: Finish the function here
+        String serverResponse = "";
+        return serverResponse;
+    }
+
+    private String processConfirmDrawRequest() throws Exception {
+        // TODO: Finish the function here
+        String serverResponse = "";
+        return serverResponse;
+    }
+
+    private String processGetLeaderBoardRequest() throws Exception {
+        // TODO: Finish the function here
+        String serverResponse = "";
+        return serverResponse;
+    }
+
+    private String processChatRequest(String input) throws Exception {
+        ChatServerMessage serverResponse = null;
+
+        ChatClientMessage clientRequest = new ChatClientMessage(input);
+        String username = clientRequest.getUsername();
+        String password = clientRequest.getPassword();
+        // get logged player
+        RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+        if (loggedPlayer == null) {
+            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
+                    "Username / Password is not valid");
+        } else {
+//            loggedPlayer.setUserSocket(sock);
+            queueController.pushToHall(loggedPlayer);
+            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
+                    loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
+                    loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+        }
+
+        return serverResponse.toString();
+    }
+
+    private String processListenChat(String input){
+        // strategy: polling until there is a new move
+
+        ListenChatClientMessage listenMsg = new ListenChatClientMessage(input);
+
+        String username = listenMsg.getUsername();
+        int matchID = listenMsg.getMatchID();
+        Match match = null;
+
+//		for(Match m : queueController.getIngameList()) {
+//			if (m.getMatchID() == matchID) {
+//				match = m;
+//				break;
+//			}
+//		}
+
+        Move latestMove;
+        String movePlayer = "";
+        while(true) {
+            try {
+                Thread.sleep(500);
+                for(Match m : queueController.getIngameList()) {
+                    if (m.getMatchID() == matchID) {
+                        match = m;
+                        break;
+                    }
+                }
+
+                if(match.getNumberOfMoves() > 0) {
+                    if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+
+                        if((match.getNumberOfMoves() % 2) == 0) {
+                            latestMove = match.getLatestMove();
+                            movePlayer = match.getPlayer2().getUsername();
+                            break;
+                        }
+                    } else {
+                        if((match.getNumberOfMoves() % 2 == 1)) {
+                            latestMove = match.getLatestMove();
+                            movePlayer = match.getPlayer1().getUsername();
+                            break;
+                        }
+                    }
+                }
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+        ChatServerMessage fwdMsg = new ChatServerMessage(, StatusCode.SUCCESS, "");
+//        listResponse.put(sock, fwdMsg.toString());
+        return fwdMsg.toString();
+    }
+
+    private String processChatACKRequest() throws Exception {
+        // TODO: Finish the function here
+        String serverResponse = "";
+        return serverResponse;
+    }
+
+    private void processLogoutRequest() throws Exception {
+
+    }
+
+    private String notifyMatchFound() throws Exception {
+        // TODO: Finish the function here
+        String serverResponse = "";
+        return serverResponse;
+    }
+
+    private String notifyEndgame() throws Exception {
+        // TODO: Finish the function here
+        String serverResponse = "";
+        return serverResponse;
+    }
+
+    private String notifyUnknownCommand() throws Exception {
+        // TODO: Finish the function here
+        String serverResponse = "";
+        return serverResponse;
+    }
 }
