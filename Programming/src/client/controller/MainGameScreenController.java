@@ -155,6 +155,7 @@ public class MainGameScreenController extends BaseController {
 	
 	public boolean sendChatMessage(String chatMsg) throws Exception{
 		//(String fromUsr, String toUsr, String msg, int matchID)
+		System.out.println("Gotta send msg: " + chatMsg);
 		String result = ClientSocketChannel.getSocketInstance().chat(currentPlayer.getUsername(), opponentPlayerName, chatMsg, matchID);
 		ChatServerMessage ret = new ChatServerMessage(result);
 		if(ret.getStatusCode().compareTo(StatusCode.ERROR)==0) {

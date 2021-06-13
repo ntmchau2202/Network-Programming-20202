@@ -452,6 +452,7 @@ public class RequestProcessor {
                         // if no message, just continue
                         continue;
                     } else {
+                    	statCode = StatusCode.SUCCESS;
                         break;
                     }
                 } catch (InterruptedException e) {
