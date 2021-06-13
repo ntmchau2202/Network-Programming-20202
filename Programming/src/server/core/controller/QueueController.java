@@ -43,6 +43,17 @@ public class QueueController {
 		return ingameList;
 	}
 
+	public Match getMatchById(int matchID) {
+		Match match = null;
+		for(Match m : this.getIngameList()) {
+			if (m.getMatchID() == matchID) {
+				match = m;
+				break;
+			}
+		}
+		return match;
+	}
+
 	public void viewHall() {
 		System.out.println("///////// list of players in hall");
 		for(RankPlayer rankPlayer: hall) {

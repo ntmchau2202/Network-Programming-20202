@@ -6,6 +6,7 @@ import entity.Player.Player;
 import entity.Player.RankPlayer;
 import message.chat.ChatClientMessage;
 import message.chat.ChatServerMessage;
+import message.chat.ListenChatClientMessage;
 import message.joinqueue.JoinQueueClientMessage;
 import message.joinqueue.JoinQueueServerMessage;
 import message.login.LoginClientMessage;
@@ -23,6 +24,7 @@ import protocol.StatusCode;
 import server.core.authentication.T3Authenticator;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
+import server.entity.chat.ChatMessage;
 import server.entity.network.completionHandler.ReadCompletionHandler;
 
 public class RequestProcessor {
@@ -282,13 +284,7 @@ public class RequestProcessor {
         // find user with match id. Should add a field of match ID for player?
         // Nah, maybe query in database
         // only do a prototype here
-        Match match = null;
-        for (Match m : queueController.getIngameList()) {
-            if (m.getMatchID() == matchID) {
-                match = m;
-                break;
-            }
-        }
+        Match match = queueController.getMatchById(matchID);
 
         // should have a check here
         // but first, let's try to successfully send data to both clients
@@ -361,27 +357,13 @@ public class RequestProcessor {
 
         String username = listenMsg.getUsername();
         int matchID = listenMsg.getMatchID();
-        Match match = null;
-
-//		for(Match m : queueController.getIngameList()) {
-//			if (m.getMatchID() == matchID) {
-//				match = m;
-//				break;
-//			}
-//		}
+        Match match = queueController.getMatchById(matchID);
 
         Move latestMove;
         String movePlayer = "";
         while(true) {
             try {
                 Thread.sleep(500);
-                for(Match m : queueController.getIngameList()) {
-                    if (m.getMatchID() == matchID) {
-                        match = m;
-                        break;
-                    }
-                }
-
                 if(match.getNumberOfMoves() > 0) {
                     if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
 
@@ -428,107 +410,72 @@ public class RequestProcessor {
     }
 
     private String processChatRequest(String input) throws Exception {
+        String errMsg = "";
+        StatusCode statCode = null;
+
         ChatClientMessage clientRequest = new ChatClientMessage(input);
-        int matchID = moveMsg.getMatchID();
-        int x = moveMsg.getX();
-        int y = moveMsg.getY();
-        String movePlayer = moveMsg.getMovePlayer();
-        String state = moveMsg.getState();
-        String result = moveMsg.getResult();
+        int matchID = clientRequest.getMatchID();
 
         // find user with match id. Should add a field of match ID for player?
         // Nah, maybe query in database
         // only do a prototype here
-        Match match = null;
-        for (Match m : queueController.getIngameList()) {
-            if (m.getMatchID() == matchID) {
-                match = m;
-                break;
-            }
-        }
-
-        // should have a check here
-        // but first, let's try to successfully send data to both clients
-
-        String errMsg = "";
-        StatusCode statCode = null;
-
-        if(movePlayer.equalsIgnoreCase(match.getPlayer1().getUsername())) {
-            if((match.getNumberOfMoves() % 2) == 0) {
-                match.addNewMoveRecord(x, y, movePlayer, state, result);
-                statCode = StatusCode.SUCCESS;
-            } else {
-                errMsg = "Invalid turn";
-                statCode = StatusCode.ERROR;
-            }
+        Match match = queueController.getMatchById(matchID);
+        if (match == null) {
+            errMsg = "Message is not from the valid match";
+            statCode = StatusCode.ERROR;
         } else {
-            if((match.getNumberOfMoves() % 2) == 1) {
-                match.addNewMoveRecord(x, y, movePlayer, state, result);
+            if (match.addNewMsgRecord(matchID, clientRequest.getSendUser(), clientRequest.getReceiveUser(), clientRequest.getChatMessageID(), clientRequest.getChatMessage())) {
                 statCode = StatusCode.SUCCESS;
             } else {
-                errMsg = "Invalid turn";
+                errMsg = "Cannot send message";
                 statCode = StatusCode.ERROR;
             }
-        }
 
+        }
         ChatServerMessage serverResponse = new ChatServerMessage(clientRequest, statCode, errMsg);
         return serverResponse.toString();
     }
 
     private String processListenChat(String input){
-//        // strategy: polling until there is a new move
-//
-//        ListenChatClientMessage listenMsg = new ListenChatClientMessage(input);
-//
-//        String username = listenMsg.getUsername();
-//        int matchID = listenMsg.getMatchID();
-//        Match match = null;
-//
-////		for(Match m : queueController.getIngameList()) {
-////			if (m.getMatchID() == matchID) {
-////				match = m;
-////				break;
-////			}
-////		}
-//
-//        Move latestMove;
-//        String movePlayer = "";
-//        while(true) {
-//            try {
-//                Thread.sleep(500);
-//                for(Match m : queueController.getIngameList()) {
-//                    if (m.getMatchID() == matchID) {
-//                        match = m;
-//                        break;
-//                    }
-//                }
-//
-//                if(match.getNumberOfMoves() > 0) {
-//                    if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
-//
-//                        if((match.getNumberOfMoves() % 2) == 0) {
-//                            latestMove = match.getLatestMove();
-//                            movePlayer = match.getPlayer2().getUsername();
-//                            break;
-//                        }
-//                    } else {
-//                        if((match.getNumberOfMoves() % 2 == 1)) {
-//                            latestMove = match.getLatestMove();
-//                            movePlayer = match.getPlayer1().getUsername();
-//                            break;
-//                        }
-//                    }
-//                }
-//            } catch (InterruptedException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//
-//        }
-//        ChatServerMessage fwdMsg = new ChatServerMessage(, StatusCode.SUCCESS, "");
-////        listResponse.put(sock, fwdMsg.toString());
-//        return fwdMsg.toString();
-        return "";
+        // strategy: polling until there is a new move
+
+        String errMsg = "";
+        StatusCode statCode = null;
+        ChatMessage chatMsg = null;
+
+        ListenChatClientMessage listenMsg = new ListenChatClientMessage(input);
+
+        String username = listenMsg.getUsername();
+        int matchID = listenMsg.getMatchID();
+        Match match = queueController.getMatchById(matchID);
+
+        if (match == null) {
+            errMsg = "Message is not from the valid match";
+            statCode = StatusCode.ERROR;
+        } else {
+            while(true) {
+                try {
+                    Thread.sleep(500);
+                    chatMsg = match.getUnreadMsg();
+                    if (chatMsg == null) {
+                        // if no message, just continue
+                        continue;
+                    } else {
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    errMsg = e.toString();
+                    statCode = StatusCode.ERROR;
+                }
+            }
+        }
+        if (chatMsg == null) {
+            chatMsg = new ChatMessage(-1, "", "", "INVALIDMESSAGE", "null message");
+        }
+        ChatServerMessage fwdMsg = new ChatServerMessage(listenMsg.getMessageCommandID(), chatMsg, statCode, errMsg);
+        return fwdMsg.toString();
     }
 
     private String processChatACKRequest() throws Exception {

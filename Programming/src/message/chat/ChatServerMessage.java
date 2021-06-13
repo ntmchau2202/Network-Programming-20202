@@ -2,6 +2,7 @@ package message.chat;
 
 import message.ServerMessage;
 import protocol.StatusCode;
+import server.entity.chat.ChatMessage;
 
 public class ChatServerMessage extends ServerMessage {
 	private String fromUser, toUser, message, messageID;
@@ -19,15 +20,15 @@ public class ChatServerMessage extends ServerMessage {
 		this.finalizeMessageObject();
 	}
 
-	public ChatServerMessage(int messageCommandID, String fromUsr, String toUsr, String msg, String msgID, int matchID, StatusCode statCode, String errMsg) {
+	public ChatServerMessage(int messageCommandID, ChatMessage chatMessage, StatusCode statCode, String errMsg) {
 		super(statCode, errMsg, messageCommandID);
-		this.fromUser = fromUsr;
-		this.toUser = toUsr;
-		this.message = msg;
-		this.messageID = msgID;
-		this.matchID = matchID;
+		this.fromUser = chatMessage.getSendPlayerName();
+		this.toUser = chatMessage.getRecvPlayerName();
+		this.message = chatMessage.getMessage();
+		this.messageID = chatMessage.getMessageID();
+		this.matchID = chatMessage.getMatchID();
 		
-		this.responseBody.createChatBody(fromUsr, toUsr, msg, msgID, matchID);
+		this.responseBody.createChatBody(this.fromUser, this.toUser, this.message, this.messageID, this.matchID);
 		this.finalizeMessageObject();
 	}
 	
