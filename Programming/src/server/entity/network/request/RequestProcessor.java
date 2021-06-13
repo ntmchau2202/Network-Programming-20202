@@ -84,10 +84,10 @@ public class RequestProcessor {
                 resMsg = this.processListenMove(recvMsg);
                 break;
             }
-//            case LISTEN_CHAT: {
-//                resMsg = this.processListenChat(recvMsg);
-//                break;
-//            }
+            case LISTEN_CHAT: {
+                resMsg = this.processListenChat(recvMsg);
+                break;
+            }
 //            case DRAW_REQUEST: {
 //                resMsg = this.processRequestDrawRequest();
 //                break;

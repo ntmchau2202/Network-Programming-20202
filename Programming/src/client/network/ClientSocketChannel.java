@@ -161,20 +161,20 @@ public class ClientSocketChannel {
 		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 
-	public String requestDraw() throws Exception {
-		// TODO: Finish function
-		return sendRequest("");
-	}
-
-	public String confirmDraw() throws Exception {
-		// TODO: Finish function
-		return sendRequest("");
-	}
-
-	public String getLeaderBoard() throws Exception {
-		// TODO: Finish function
-		return sendRequest("");
-	}
+//	public String requestDraw() throws Exception {
+//		// TODO: Finish function
+//		return sendRequest("");
+//	}
+//
+//	public String confirmDraw() throws Exception {
+//		// TODO: Finish function
+//		return sendRequest("");
+//	}
+//
+//	public String getLeaderBoard() throws Exception {
+//		// TODO: Finish function
+//		return sendRequest("");
+//	}
 
 	public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
 		// TODO: Finish function
@@ -182,15 +182,15 @@ public class ClientSocketChannel {
 		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 
-	public String chatACK() throws Exception {
-		// TODO: Finish function
-		return sendRequest("");
-	}
-
-	public String logout() throws Exception {
-		// TODO: Finish function
-		return sendRequest("");
-	}
+//	public String chatACK() throws Exception {
+//		// TODO: Finish function
+//		return sendRequest("");
+//	}
+//
+//	public String logout() throws Exception {
+//		// TODO: Finish function
+//		return sendRequest("");
+//	}
 
 	public ServerMessage listenIngameMessage() {
 
