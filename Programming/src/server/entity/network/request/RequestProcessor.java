@@ -185,16 +185,25 @@ public class RequestProcessor {
             }
 
             if (loggedPlayer != null) {
+                System.out.println("requested username: " + loggedPlayer.getUsername());
+                queueController.viewHall();
+                queueController.viewNormalQueue();
                 // remove player from hall
                 queueController.removeFromHall(loggedPlayer);
+                System.out.println("remove player from hall successfully");
                 // add player to normal / ranked queue
                 queueController.pushToQueue(loggedPlayer, mode);
+                System.out.println("push player to queue successfully");
+
+                queueController.viewHall();
+                queueController.viewNormalQueue();
 
                 // prepare message according to each player
                 Match match = null;
                 boolean isFound = false;
 
                 for(int i = 0; i < 5; i++) {
+                    System.out.println("- in the loop: " + i);
                     if(!isCancel) {
                         for(Match m : queueController.getIngameList()) {
                             if(m.isPlayerOfMatch(loggedPlayer)) {
@@ -247,6 +256,8 @@ public class RequestProcessor {
             // error
             serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
         }
+        queueController.viewHall();
+        queueController.viewNormalQueue();
         return serverResponse.toString();
     }
 
