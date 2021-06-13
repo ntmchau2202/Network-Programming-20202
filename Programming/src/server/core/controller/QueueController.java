@@ -39,14 +39,21 @@ public class QueueController {
 		return rankedQueue;
 	}
 	
-	public  ArrayList<Match> getIngameList(){
-		return ingameList;
-	}
-
 	public Match getMatchById(int matchID) {
 		Match match = null;
-		for(Match m : this.getIngameList()) {
+		for(Match m : this.ingameList) {
 			if (m.getMatchID() == matchID) {
+				match = m;
+				break;
+			}
+		}
+		return match;
+	}
+
+	public Match getMatchByPlayer(Player player) {
+		Match match = null;
+		for (Match m : this.ingameList) {
+			if (m.isPlayerOfMatch(player)) {
 				match = m;
 				break;
 			}

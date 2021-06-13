@@ -80,7 +80,7 @@ public class RequestProcessor {
                 resMsg = this.processMoveRequest(recvMsg);
                 break;
             }
-            case LISTEN_MOVE:{
+            case LISTEN_MOVE: {
                 resMsg = this.processListenMove(recvMsg);
                 break;
             }
@@ -181,18 +181,19 @@ public class RequestProcessor {
 
         JoinQueueServerMessage serverResponse = null;
         System.out.println("Starting process match request with mode: " + mode);
-        if (mode.compareToIgnoreCase("normal") == 0) {
-            // check if this is ranked user
-            System.out.println("Normal request!");
-            RankPlayer loggedPlayer = null;
-            for (RankPlayer player : queueController.getHall()) {
-                if (sessionID.compareTo(player.getSessionId()) == 0) {
-                    loggedPlayer = player;
-                    break;
-                }
-            }
 
-            if (loggedPlayer != null) {
+        // check if this is ranked user
+        System.out.println("Normal request!");
+        RankPlayer loggedPlayer = null;
+        for (RankPlayer player : queueController.getHall()) {
+            if (sessionID.compareTo(player.getSessionId()) == 0) {
+                loggedPlayer = player;
+                break;
+            }
+        }
+
+        if (loggedPlayer != null) {
+            if (mode.compareToIgnoreCase("normal") == 0 || mode.compareToIgnoreCase("ranked") == 0) {
                 System.out.println("requested username: " + loggedPlayer.getUsername());
                 queueController.viewHall();
                 queueController.viewNormalQueue();
@@ -208,33 +209,24 @@ public class RequestProcessor {
 
                 // prepare message according to each player
                 Match match = null;
-                boolean isFound = false;
 
-                for(int i = 0; i < 5; i++) {
+                for (int i = 0; i < 100; i++) {
                     System.out.println("- in the loop: " + i);
-                    if(!isCancel) {
-                        for(Match m : queueController.getIngameList()) {
-                            if(m.isPlayerOfMatch(loggedPlayer)) {
-                                match = m;
-                                isFound = true;
-                                break;
-                            }
-                        }
-
-                        if(isFound) {
+                    if (!isCancel) {
+                        match = queueController.getMatchByPlayer(loggedPlayer);
+                        if (match != null) {
                             break;
-                        } else {
-                            Thread.sleep(500);
                         }
+                        Thread.sleep(500);
                     } else {
-                    	System.out.println("Cancelled from user. Quiting...");
+                        System.out.println("Cancelled from user. Quiting...");
                         break;
                     }
                 }
 
                 Player opponent = null;
-                if(isFound) {
-                    if(loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())){
+                if (match != null) {
+                    if (loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())) {
                         // user is player 1
                         opponent = match.getPlayer2();
                     } else {
@@ -243,27 +235,26 @@ public class RequestProcessor {
                     }
                     serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), loggedPlayer.getUsername(), loggedPlayer.getSessionId(), opponent.getUsername(), 1234 /*mimic elo here*/, match.getMatchID(), match.getPlayer1().getUsername(), StatusCode.SUCCESS, "");
                 } else {
-                	if (isCancel) {
+                    if (isCancel) {
                         serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "QUIT_QUEUE sent from user");
-                	} else {
-                		serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropriate match. Please try again later");
-                	}
-                	// when join queue meets error or cancelation, push player back to hall
+                    } else {
+                        serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropriate match. Please try again later");
+                    }
+                    // when join queue meets error or cancelation, push player back to hall
                     queueController.pushToHall(loggedPlayer);
-                	// and remove player from normal/ranked queue
+                    // and remove player from normal/ranked queue
                     queueController.removeFromQueue(loggedPlayer.getUsername());
                 }
 //                listResponse.put(sock, serverResponse.toString());
             } else {
-                // if it is not ranked user, call to create a new guest player account
-                System.out.println("im here bitch");
+                // error
+                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
             }
-        } else if (mode.compareToIgnoreCase("ranked") == 0) {
-            serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Rank match is not supported yet. Please try again");
         } else {
-            // error
-            serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
+            // if it is not ranked user, call to create a new guest player account
+
         }
+
         queueController.viewHall();
         queueController.viewNormalQueue();
         return serverResponse.toString();
@@ -292,8 +283,8 @@ public class RequestProcessor {
         String errMsg = "";
         StatusCode statCode = null;
 
-        if(movePlayer.equalsIgnoreCase(match.getPlayer1().getUsername())) {
-            if((match.getNumberOfMoves() % 2) == 0) {
+        if (movePlayer.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+            if ((match.getNumberOfMoves() % 2) == 0) {
                 match.addNewMoveRecord(x, y, movePlayer, state, result);
                 statCode = StatusCode.SUCCESS;
             } else {
@@ -301,7 +292,7 @@ public class RequestProcessor {
                 statCode = StatusCode.ERROR;
             }
         } else {
-            if((match.getNumberOfMoves() % 2) == 1) {
+            if ((match.getNumberOfMoves() % 2) == 1) {
                 match.addNewMoveRecord(x, y, movePlayer, state, result);
                 statCode = StatusCode.SUCCESS;
             } else {
@@ -317,14 +308,14 @@ public class RequestProcessor {
         return fwdMsg.toString();
     }
 
-    private String processQuitQueue(String input){
+    private String processQuitQueue(String input) {
         QuitQueueClientMessage quitQueueMsg = new QuitQueueClientMessage(input);
 
         boolean isOK = queueController.removeFromQueue(quitQueueMsg.getUsername());
         StatusCode statCode;
         String errMsg = "";
 
-        if(isOK) {
+        if (isOK) {
             ReadCompletionHandler joinQueueHandler = handlerController.getHandlerByCommand(Command.JOIN_QUEUE);
             if (joinQueueHandler == null) {
                 statCode = StatusCode.ERROR;
@@ -338,19 +329,19 @@ public class RequestProcessor {
             errMsg = "An error occured when quiting queue";
         }
         // wait a minute so that the previous message is sent back appropiately...
-        for(int i = 0; i < 3; i++) {
-        	try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        for (int i = 0; i < 3; i++) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getMessageCommandID(), quitQueueMsg.getUsername(), statCode, errMsg);
         return response.toString();
     }
 
-    private String processListenMove(String input){
+    private String processListenMove(String input) {
         // strategy: polling until there is a new move
 
         ListenMoveClientMessage listenMsg = new ListenMoveClientMessage(input);
@@ -361,19 +352,19 @@ public class RequestProcessor {
 
         Move latestMove;
         String movePlayer = "";
-        while(true) {
+        while (true) {
             try {
                 Thread.sleep(500);
-                if(match.getNumberOfMoves() > 0) {
-                    if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+                if (match.getNumberOfMoves() > 0) {
+                    if (username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
 
-                        if((match.getNumberOfMoves() % 2) == 0) {
+                        if ((match.getNumberOfMoves() % 2) == 0) {
                             latestMove = match.getLatestMove();
                             movePlayer = match.getPlayer2().getUsername();
                             break;
                         }
                     } else {
-                        if((match.getNumberOfMoves() % 2 == 1)) {
+                        if ((match.getNumberOfMoves() % 2 == 1)) {
                             latestMove = match.getLatestMove();
                             movePlayer = match.getPlayer1().getUsername();
                             break;
@@ -436,7 +427,7 @@ public class RequestProcessor {
         return serverResponse.toString();
     }
 
-    private String processListenChat(String input){
+    private String processListenChat(String input) {
         // strategy: polling until there is a new move
 
         String errMsg = "";
@@ -453,7 +444,7 @@ public class RequestProcessor {
             errMsg = "Message is not from the valid match";
             statCode = StatusCode.ERROR;
         } else {
-            while(true) {
+            while (true) {
                 try {
                     Thread.sleep(500);
                     chatMsg = match.getUnreadMsg();

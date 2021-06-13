@@ -38,7 +38,6 @@ public class Match {
 	}
 	
 	public boolean isPlayerOfMatch(Player player) {
-		
 		return player.getSessionId().equalsIgnoreCase(player1.getSessionId()) || player.getSessionId().equalsIgnoreCase(player2.getSessionId());
 	}
 	
