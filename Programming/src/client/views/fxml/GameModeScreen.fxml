@@ -99,7 +99,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label fx:id="winningRate" layoutX="1079.0" layoutY="125.0" prefHeight="35.0" prefWidth="56.0" text="831">
+      <Label fx:id="winningRate" layoutX="1079.0" layoutY="125.0" prefHeight="35.0" prefWidth="63.0" text="100.0">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -120,7 +120,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label layoutX="1135.0" layoutY="125.0" prefHeight="35.0" prefWidth="22.0" text="\%">
+      <Label layoutX="1143.0" layoutY="125.0" prefHeight="35.0" prefWidth="22.0" text="\%">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>

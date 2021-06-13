@@ -20,6 +20,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -47,8 +49,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     @FXML
     private Text playerTurnText;
     @FXML
-    private Label yourMove;
-    @FXML
     private Label xPlayerName;
     @FXML
     private Label oPlayerName;
@@ -57,9 +57,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     @FXML
     private Label oPlayerElo;
     @FXML
-    private Label xPlayerWin;
+    private ImageView xImageView;
     @FXML
-    private Label oPlayerWin;
+    private ImageView oImageView;
     @FXML
     private ScrollPane chatScrollPane;
     @FXML
@@ -78,7 +78,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
     private final MainGameScreenController mainGameScreenController;
     private Image MOVE_IMAGE;
-
+    private DropShadow xDropShadow = new DropShadow(BlurType.THREE_PASS_BOX, Color.web("#ff5252"), 10, 0,0,0);
+    private DropShadow oDropShadow = new DropShadow(BlurType.THREE_PASS_BOX, Color.web("#1793ff"), 10, 0,0,0);
     private Thread alwaysListener;
 
     /**
@@ -111,14 +112,17 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         }
 
         // display player turn
-        if (mainGameScreenController.isMyTurn()) {
-            playerTurnText.setText(mainGameScreenController.getCurrentPlayer().getUsername());
-        } else {
-            playerTurnText.setText("Opponent");
-        }
-
+//        if (mainGameScreenController.isMyTurn()) {
+//            playerTurnText.setText("It's "+mainGameScreenController.getCurrentPlayer().getUsername());
+//        } else {
+//            playerTurnText.setText("Opponent");
+//        }
+        // init player turn
+        playerTurnText.setText(mainGameScreenController.isMyTurn() ? "It's your turn" : "It's "+mainGameScreenController.getOpponentPlayerName()+"'s turn");
+        xImageView.setEffect(xDropShadow);
+        xPlayerName.setEffect(xDropShadow);
         // initialize player move to be X if first player or O second player
-        yourMove.setText(this.mainGameScreenController.amIFirstPlayer() ? "X" : "O");
+
         this.MOVE_IMAGE = this.mainGameScreenController.amIFirstPlayer() ? Misc.getImageByName(Configs.X_ICON_PATH) : Misc.getImageByName(Configs.O_ICON_PATH);
 
         // initialize game board grid pane
@@ -246,7 +250,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                 if (pane.getChildren().isEmpty()) {
                     System.out.printf("Mouse clicked cell [%d, %d]%n", rowIndex, colIndex);
                     addImageToPane(pane, this.mainGameScreenController.getCurrentPlayer().getUsername());
-
                     // set move status array for checking winning state
                     this.status[rowIndex][colIndex] = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
 
@@ -279,11 +282,26 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                         	System.out.println("Result from send: Win player: " + mainGameScreenController.getFinalMovePlayer());
                                         	this.cancel();
                                         }
+                                        xImageView.setEffect(mainGameScreenController.amIFirstPlayer() && mainGameScreenController.isMyTurn() ? xDropShadow : null);
+                                        oImageView.setEffect(!mainGameScreenController.amIFirstPlayer() && mainGameScreenController.isMyTurn() ? oDropShadow : null);
 
                                         mainGameScreenController.setTurn(false);
-
+                                        playerTurnText.setText("It's "+mainGameScreenController.getOpponentPlayerName()+"'s turn");
+                                        if (mainGameScreenController.amIFirstPlayer()) {
+                                            xImageView.setEffect(null);
+                                            xPlayerName.setEffect(null);
+                                            oImageView.setEffect(oDropShadow);
+                                            oPlayerName.setEffect(oDropShadow);
+                                        }
+                                        else {
+                                            xImageView.setEffect(xDropShadow);
+                                            xPlayerName.setEffect(xDropShadow);
+                                            oImageView.setEffect(null);
+                                            oPlayerName.setEffect(null);
+                                        }
                                         // start listening for opponent move
                                         if (mainGameScreenController.listenMove()) {
+
                                             int recvX1 = mainGameScreenController.getX();
                                             int recvY1 = mainGameScreenController.getY();
                                             System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
@@ -294,6 +312,19 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                             	this.cancel();
                                             }
                                             mainGameScreenController.setTurn(true);
+                                            playerTurnText.setText("It's your turn");
+                                            if (mainGameScreenController.amIFirstPlayer()) {
+                                                xImageView.setEffect(xDropShadow);
+                                                xPlayerName.setEffect(xDropShadow);
+                                                oImageView.setEffect(null);
+                                                oPlayerName.setEffect(null);
+                                            }
+                                            else {
+                                                xImageView.setEffect(null);
+                                                xPlayerName.setEffect(null);
+                                                oImageView.setEffect(oDropShadow);
+                                                oPlayerName.setEffect(oDropShadow);
+                                            }
 
                                             // release lock move
                                             isLockMove = false;
@@ -361,6 +392,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                     System.out.printf("Already clicked [%d, %d]%n", rowIndex, colIndex);
                 }
             }
+            
         });
         this.gameBoardGridPane.add(pane, colIndex, rowIndex);
     }
