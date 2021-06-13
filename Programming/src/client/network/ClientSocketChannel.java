@@ -4,6 +4,7 @@ import client.utils.Configs;
 import message.ServerMessage;
 import message.chat.ChatClientMessage;
 import message.chat.ChatServerMessage;
+import message.chat.ListenChatClientMessage;
 import message.chatack.ChatACKServerMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
 import message.drawrequest.DrawRequestServerMessage;
@@ -152,6 +153,11 @@ public class ClientSocketChannel {
 
 	public String listenMove(String playerName, int matchID) throws Exception {
 		ListenMoveClientMessage msg = new ListenMoveClientMessage(playerName, matchID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
+	
+	public String listenChat(String playerName, int matchID) throws Exception {
+		ListenChatClientMessage msg = new ListenChatClientMessage(playerName, matchID);
 		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 

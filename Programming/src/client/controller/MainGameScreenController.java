@@ -124,6 +124,18 @@ public class MainGameScreenController extends BaseController {
 			return false;
 		}
 	}
+	
+	public String listenChat() throws Exception {
+		System.out.println("=====================listening chat");
+		String result = ClientSocketChannel.getSocketInstance().listenChat(currentPlayer.getUsername(), this.matchID);
+		ChatServerMessage chat = new ChatServerMessage(result);
+
+		if (chat.getStatusCode().compareTo(StatusCode.SUCCESS) == 0) {
+			return chat.getChatMessage();
+		} else {
+			return "";
+		}
+	}
 
 	public boolean isFinal() {
 		return this.moveResult.compareToIgnoreCase("win") == 0;
