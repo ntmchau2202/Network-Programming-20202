@@ -6,12 +6,14 @@ import java.util.Random;
 import entity.Move.Move;
 import entity.Player.Player;
 import javafx.util.Pair;
+import server.entity.chat.ChatMessage;
 
 public class Match {
 	private Player player1;
 	private Player player2;
 	private int matchID;
 	private ArrayList<Move> moveRecord;
+	private ArrayList<ChatMessage> chatMsgRecord;
 	
 	public Match(Player player1, Player player2) {
 		// TODO: think about duplicated match ID here
@@ -19,7 +21,8 @@ public class Match {
 		this.player1 = player1;
 		this.player2 = player2;
 		this.matchID = random.nextInt(9216);
-		moveRecord = new ArrayList<Move>(); 
+		moveRecord = new ArrayList<Move>();
+		chatMsgRecord = new ArrayList<ChatMessage>();
 	}
 	
 	public Player getPlayer1() {
@@ -50,5 +53,30 @@ public class Match {
 	
 	public int getNumberOfMoves() {
 		return this.moveRecord.size();
+	}
+
+	public ChatMessage getUnreadMsg() {
+		ChatMessage chatMsg = null;
+		for (ChatMessage cm: chatMsgRecord) {
+			if (!cm.isRead()) {
+				chatMsg = cm;
+				break;
+			}
+		}
+		// mark msg as read
+		if (chatMsg != null) {
+			chatMsg.setRead(true);
+		}
+		return chatMsg;
+	}
+
+	public boolean addNewMsgRecord(int matchID, String sendPlayer, String recvPlayer, String messageID, String message) {
+		// check if send player / receive player exists in current match
+		if ((!sendPlayer.equals(player1.getUsername()) && !sendPlayer.equals(player2.getUsername())) || (!recvPlayer.equals(player1.getUsername()) && !recvPlayer.equals(player2.getUsername()))) {
+			return false;
+		}
+		ChatMessage chatMsg = new ChatMessage(matchID, sendPlayer, recvPlayer, messageID, message);
+		this.chatMsgRecord.add(chatMsg);
+		return true;
 	}
 }

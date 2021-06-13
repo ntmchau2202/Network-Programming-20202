@@ -428,80 +428,107 @@ public class RequestProcessor {
     }
 
     private String processChatRequest(String input) throws Exception {
-        ChatServerMessage serverResponse = null;
-
         ChatClientMessage clientRequest = new ChatClientMessage(input);
-        String username = clientRequest.getUsername();
-        String password = clientRequest.getPassword();
-        // get logged player
-        RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
-        if (loggedPlayer == null) {
-            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
-                    "Username / Password is not valid");
-        } else {
-//            loggedPlayer.setUserSocket(sock);
-            queueController.pushToHall(loggedPlayer);
-            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
-                    loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
-                    loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+        int matchID = moveMsg.getMatchID();
+        int x = moveMsg.getX();
+        int y = moveMsg.getY();
+        String movePlayer = moveMsg.getMovePlayer();
+        String state = moveMsg.getState();
+        String result = moveMsg.getResult();
+
+        // find user with match id. Should add a field of match ID for player?
+        // Nah, maybe query in database
+        // only do a prototype here
+        Match match = null;
+        for (Match m : queueController.getIngameList()) {
+            if (m.getMatchID() == matchID) {
+                match = m;
+                break;
+            }
         }
 
+        // should have a check here
+        // but first, let's try to successfully send data to both clients
+
+        String errMsg = "";
+        StatusCode statCode = null;
+
+        if(movePlayer.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+            if((match.getNumberOfMoves() % 2) == 0) {
+                match.addNewMoveRecord(x, y, movePlayer, state, result);
+                statCode = StatusCode.SUCCESS;
+            } else {
+                errMsg = "Invalid turn";
+                statCode = StatusCode.ERROR;
+            }
+        } else {
+            if((match.getNumberOfMoves() % 2) == 1) {
+                match.addNewMoveRecord(x, y, movePlayer, state, result);
+                statCode = StatusCode.SUCCESS;
+            } else {
+                errMsg = "Invalid turn";
+                statCode = StatusCode.ERROR;
+            }
+        }
+
+        ChatServerMessage serverResponse = new ChatServerMessage(clientRequest, statCode, errMsg);
         return serverResponse.toString();
     }
 
     private String processListenChat(String input){
-        // strategy: polling until there is a new move
-
-        ListenChatClientMessage listenMsg = new ListenChatClientMessage(input);
-
-        String username = listenMsg.getUsername();
-        int matchID = listenMsg.getMatchID();
-        Match match = null;
-
-//		for(Match m : queueController.getIngameList()) {
-//			if (m.getMatchID() == matchID) {
-//				match = m;
-//				break;
-//			}
-//		}
-
-        Move latestMove;
-        String movePlayer = "";
-        while(true) {
-            try {
-                Thread.sleep(500);
-                for(Match m : queueController.getIngameList()) {
-                    if (m.getMatchID() == matchID) {
-                        match = m;
-                        break;
-                    }
-                }
-
-                if(match.getNumberOfMoves() > 0) {
-                    if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
-
-                        if((match.getNumberOfMoves() % 2) == 0) {
-                            latestMove = match.getLatestMove();
-                            movePlayer = match.getPlayer2().getUsername();
-                            break;
-                        }
-                    } else {
-                        if((match.getNumberOfMoves() % 2 == 1)) {
-                            latestMove = match.getLatestMove();
-                            movePlayer = match.getPlayer1().getUsername();
-                            break;
-                        }
-                    }
-                }
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-        }
-        ChatServerMessage fwdMsg = new ChatServerMessage(, StatusCode.SUCCESS, "");
-//        listResponse.put(sock, fwdMsg.toString());
-        return fwdMsg.toString();
+//        // strategy: polling until there is a new move
+//
+//        ListenChatClientMessage listenMsg = new ListenChatClientMessage(input);
+//
+//        String username = listenMsg.getUsername();
+//        int matchID = listenMsg.getMatchID();
+//        Match match = null;
+//
+////		for(Match m : queueController.getIngameList()) {
+////			if (m.getMatchID() == matchID) {
+////				match = m;
+////				break;
+////			}
+////		}
+//
+//        Move latestMove;
+//        String movePlayer = "";
+//        while(true) {
+//            try {
+//                Thread.sleep(500);
+//                for(Match m : queueController.getIngameList()) {
+//                    if (m.getMatchID() == matchID) {
+//                        match = m;
+//                        break;
+//                    }
+//                }
+//
+//                if(match.getNumberOfMoves() > 0) {
+//                    if(username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
+//
+//                        if((match.getNumberOfMoves() % 2) == 0) {
+//                            latestMove = match.getLatestMove();
+//                            movePlayer = match.getPlayer2().getUsername();
+//                            break;
+//                        }
+//                    } else {
+//                        if((match.getNumberOfMoves() % 2 == 1)) {
+//                            latestMove = match.getLatestMove();
+//                            movePlayer = match.getPlayer1().getUsername();
+//                            break;
+//                        }
+//                    }
+//                }
+//            } catch (InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//
+//        }
+//        ChatServerMessage fwdMsg = new ChatServerMessage(, StatusCode.SUCCESS, "");
+////        listResponse.put(sock, fwdMsg.toString());
+//        return fwdMsg.toString();
+        return "";
     }
 
     private String processChatACKRequest() throws Exception {
