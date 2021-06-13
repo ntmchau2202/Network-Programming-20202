@@ -195,7 +195,22 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             });
             Thread thread = new Thread(listenMoveTask);
             thread.start();
-        }
+        };
+        
+        // thread for chat listening
+        
+        Task<String> listenChatTask = new Task<String>() {
+
+			@Override
+			protected String call() throws Exception {
+				// TODO Auto-generated method stub
+				return mainGameScreenController.listenChat();
+			}
+        	
+        };
+        
+        Thread listenChatThread = new Thread(listenChatTask);
+        listenChatThread.start();
 
         // test display in (0, 0)
 //        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
