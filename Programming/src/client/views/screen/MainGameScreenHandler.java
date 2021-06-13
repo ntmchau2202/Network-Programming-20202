@@ -15,11 +15,15 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import message.ServerMessage;
@@ -43,7 +47,27 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private Text playerTurnText;
     @FXML
     private Label yourMove;
+    @FXML
+    private Label xPlayerName;
+    @FXML
+    private Label oPlayerName;
+    @FXML
+    private Label xPlayerElo;
+    @FXML
+    private Label oPlayerElo;
+    @FXML
+    private Label xPlayerWin;
+    @FXML
+    private Label oPlayerWin;
+    @FXML
+    private ScrollPane chatScrollPane;
+    @FXML
+    private TextField chatTextField;
+    @FXML
+    private Button sendButton;
 
+    private VBox chatVbox;
+    private Label chatName;
     // locking clicking other moves when a move is chosen
     private boolean isLockMove;
 
@@ -75,10 +99,15 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             homeHandler.show();
             homeHandler.setScreenTitle("Home Screen");
         });
-        //
-        // this.gameBoardGridPane.setPrefHeight(591);
-        // this.gameBoardGridPane.setPrefWidth(604);
-        // this.gameBoardGridPane.setStyle("-fx-background-color: white");
+
+        // display player info
+        xPlayerName.setText(mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
+        oPlayerName.setText(!mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
+        if (mainGameScreenController.getCurrentPlayer() instanceof RankPlayer) {
+            xPlayerElo.setText(Integer.toString(mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+            oPlayerElo.setText(Integer.toString(!mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+            System.out.println(Integer.toString(mainGameScreenController.getOpponentElo()));
+        }
 
         // display player turn
         if (mainGameScreenController.isMyTurn()) {
@@ -170,6 +199,14 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // test display in (0, 0)
 //        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
 
+        // init chat vbox
+        chatVbox = new VBox();
+        chatVbox.setSpacing(5);
+        chatScrollPane.setContent(chatVbox);
+
+        chatTextField.setOnKeyTyped(e -> {
+            sendButton.setDisable(chatTextField.getText().isEmpty());
+        });
     }
 
     private void addImageToPane(Pane pane, String movePlayerName) {
@@ -372,5 +409,39 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // return true;
         //
         // }
+
+
+    }
+
+
+    @FXML
+    void sendMessage(final MouseEvent event) {
+        chatVbox.getChildren().add(addMessage(chatTextField.getText()));
+        chatTextField.setText("");
+        sendButton.setDisable(true);
+    }
+
+    public HBox addMessage(String message)
+    {
+        // chat name set
+        chatName = new Label();
+        chatName.setText(mainGameScreenController.getCurrentPlayer().getUsername()+": ");
+        chatName.setTextFill(Color.web(this.mainGameScreenController.amIFirstPlayer() ? "#FF4A05" : "#0082ec"));
+        chatName.setPrefWidth(80);
+        chatName.setStyle("-fx-font-size: 20px");
+        chatName.setWrapText(true);
+
+        // message HBox set
+        HBox hbox = new HBox();
+        hbox.setPrefWidth(600);
+
+        // msg set
+        Label msg = new Label(message);
+        msg.setWrapText(true);
+        msg.setPrefWidth(400);
+        msg.setMaxWidth(500);
+        msg.setStyle("-fx-font-size: 20px");
+        hbox.getChildren().addAll(chatName,msg);
+        return hbox;
     }
 }

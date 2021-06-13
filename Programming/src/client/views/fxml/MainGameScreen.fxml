@@ -25,12 +25,12 @@
             <Image url="@assets/img/vs.png" />
          </image>
       </ImageView>
-      <Label layoutX="684.0" layoutY="56.0" text="PhucNguyen">
+      <Label alignment="CENTER_RIGHT" layoutX="609.0" layoutY="56.0" prefHeight="35.0" prefWidth="191.0" text="PhucNguyen" textAlignment="RIGHT" fx:id="xPlayerName">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Label layoutX="701.0" layoutY="94.0" text="1236">
+      <Label layoutX="701.0" layoutY="94.0" text="1236" fx:id="xPlayerElo">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -43,17 +43,17 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label layoutX="1052.0" layoutY="56.0" prefHeight="35.0" prefWidth="135.0" text="DzuongThai">
+      <Label fx:id="oPlayerName" layoutX="1060.0" layoutY="56.0" prefHeight="35.0" prefWidth="184.0" text="DzuongThai">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Label layoutX="1069.0" layoutY="94.0" text="1237">
+      <Label fx:id="oPlayerElo" layoutX="1100.0" layoutY="94.0" text="1237">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <ImageView fitHeight="35.0" fitWidth="28.0" layoutX="1142.0" layoutY="98.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="35.0" fitWidth="28.0" layoutX="1061.0" layoutY="98.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/podium2.png" />
          </image>
@@ -61,7 +61,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <TextField layoutX="605.0" layoutY="548.0" prefHeight="43.0" prefWidth="558.0" styleClass="chat-text-field" stylesheets="@assets/css/style.css" />
+      <TextField fx:id="chatTextField" layoutX="605.0" layoutY="548.0" prefHeight="43.0" prefWidth="558.0" styleClass="chat-text-field" stylesheets="@assets/css/style.css" />
       <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="843.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/cross.png" />
@@ -72,15 +72,11 @@
             <Image url="@assets/img/circle.png" />
          </image>
       </ImageView>
-      <Button layoutX="1164.0" layoutY="548.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" styleClass="send-buttton" stylesheets="@assets/css/style.css" text="Send">
+      <Button fx:id="sendButton" layoutX="1164.0" layoutY="548.0" mnemonicParsing="false" onMouseClicked="#sendMessage" prefHeight="17.0" prefWidth="76.0" styleClass="send-buttton" stylesheets="@assets/css/style.css" text="Send">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <ScrollPane layoutX="605.0" layoutY="257.0" prefHeight="290.0" prefWidth="634.0">
-         <content>
-            <AnchorPane prefHeight="289.0" prefWidth="630.0" style="-fx-background-color: white; -fx-border-color: transparent;" />
-         </content>
-      </ScrollPane>
+      <ScrollPane fx:id="chatScrollPane" layoutX="605.0" layoutY="257.0" prefHeight="290.0" prefWidth="634.0" stylesheets="@assets/css/style.css" />
       <ImageView fx:id="prevScreenImageView" fitHeight="35.0" fitWidth="35.0" layoutX="607.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/back.png" />
@@ -97,12 +93,12 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label layoutX="744.0" layoutY="140.0" text="1">
+      <Label layoutX="744.0" layoutY="140.0" text="1" fx:id="xPlayerWin">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="1097.0" layoutY="140.0" text="0">
+      <Label fx:id="oPlayerWin" layoutX="1097.0" layoutY="140.0" text="0">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>

@@ -95,17 +95,17 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label fx:id="noPlayedMatch" layoutX="1087.0" layoutY="26.0" text="120">
+      <Label fx:id="noPlayedMatch" layoutX="1078.0" layoutY="26.0" text="120">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label fx:id="noWonMatch" layoutX="1087.0" layoutY="75.0" text="100">
+      <Label fx:id="noWonMatch" layoutX="1078.0" layoutY="75.0" text="100">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label fx:id="winningRate" layoutX="1090.0" layoutY="125.0" prefHeight="35.0" prefWidth="42.0" text="83">
+      <Label fx:id="winningRate" layoutX="1079.0" layoutY="125.0" prefHeight="35.0" prefWidth="56.0" text="831">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -126,7 +126,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label layoutX="1131.0" layoutY="125.0" prefHeight="35.0" prefWidth="22.0" text="\%">
+      <Label layoutX="1135.0" layoutY="125.0" prefHeight="35.0" prefWidth="22.0" text="\%">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
