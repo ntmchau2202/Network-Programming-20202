@@ -32,6 +32,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	}
 	
 	public void cancelHandler() {
+		System.out.println("Canceling request");
 		this.reqProc.stopProcessingRequest();
 	}
 

@@ -42,13 +42,39 @@ public class QueueController {
 	public  ArrayList<Match> getIngameList(){
 		return ingameList;
 	}
-	
-	public  void removeFromHall(Player player) {
-		hall.remove(player);
+
+	public void viewHall() {
+		System.out.println("///////// list of players in hall");
+		for(RankPlayer rankPlayer: hall) {
+			System.out.println(">>> Hall Player " + rankPlayer.getUsername());
+		}
+	}
+
+	public void viewNormalQueue() {
+		System.out.println("///////// list of players in normal queue");
+		for(Player player: normalQueue) {
+			System.out.println(">>> Normal Queue Player " + player.getUsername());
+		}
 	}
 	
-	public  void pushToHall(RankPlayer player) {
-		hall.add(player);
+	public void removeFromHall(Player player) {
+		try {
+			mutex.acquire();
+			hall.remove(player);
+			mutex.release();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void pushToHall(RankPlayer player) {
+		try {
+			mutex.acquire();
+			hall.add(player);
+			mutex.release();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void pushToQueue(Player player, String mode) {
@@ -57,7 +83,9 @@ public class QueueController {
 				case "normal":{
 					mutex.acquire();
 					normalQueue.add(player);
+					System.out.println("Mutex info before acquiring " + mutex.toString());
 					mutex.release();
+					System.out.println("Mutex info after releasing " + mutex.toString());
 					break;
 				}
 				case "ranked":{
@@ -79,7 +107,7 @@ public class QueueController {
 				if(p.getUsername().equalsIgnoreCase(username)) {
 					if(p instanceof RankPlayer) {
 						mutex.acquire();
-						hall.add((RankPlayer)p);
+//						hall.add((RankPlayer)p);
 						normalQueue.remove(p);
 						isOK = true;
 						break;
@@ -90,7 +118,7 @@ public class QueueController {
 			for(RankPlayer p : rankedQueue) {
 				if(p.getUsername().equalsIgnoreCase(username)) {
 					mutex.acquire();
-					hall.add(p);
+//					hall.add(p);
 					rankedQueue.remove(p);
 					isOK = true;
 					break;
@@ -99,9 +127,12 @@ public class QueueController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(mutex.isFair()) {
+//			System.out.println("i made it here");
+//			if(mutex.isFair()) {
+//				System.out.println("it's fair");
 				mutex.release();
-			}
+//				System.out.println("it released");
+//			}
 			return isOK;
 		}
 	}
