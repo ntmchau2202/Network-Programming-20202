@@ -199,12 +199,16 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         
         // thread for chat listening
         
-        Task<String> listenChatTask = new Task<String>() {
+        Task<Void> listenChatTask = new Task<Void>() {
 
 			@Override
-			protected String call() throws Exception {
-				// TODO Auto-generated method stub
-				return mainGameScreenController.listenChat();
+			protected Void call() throws Exception {
+				while(true) {
+					String recvMsg = mainGameScreenController.listenChat();
+					if(recvMsg.length() != 0) {
+						chatVbox.getChildren().add(addMessage(recvMsg));
+					}
+				}
 			}
         	
         };
