@@ -2,6 +2,7 @@ package client.network;
 
 import client.utils.Configs;
 import message.ServerMessage;
+import message.chat.ChatClientMessage;
 import message.chat.ChatServerMessage;
 import message.chatack.ChatACKServerMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
@@ -89,24 +90,24 @@ public class ClientSocketChannel {
 		return attachment.getReturnMessage();
 	}
 
-	private String sendRequest(String strMsgToSend) throws Exception {
-		System.out.println(this.getSocketInstance().socketChannel.toString());
-		attachment = new Attachment(strMsgToSend, true);
-		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
-		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
-		socketChannel.write(buffer, attachment, writeCompletionHandler);
-		while (attachment.getActive().get()) {
-
-		}
-		System.out.println("This is printed from client: " + attachment.getReturnMessage());
-		return attachment.getReturnMessage();
-//		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
-//		while(true) {
-//			Attachment attachment = messageQueue.getAttachmentByID(msgID);
-//			if(attachment != null) {
-//				return attachment.getReturnMessage();
-//			}
+	private String sendRequest(String strMsgToSend, int msgCmdID) throws Exception {
+//		System.out.println(this.getSocketInstance().socketChannel.toString());
+//		attachment = new Attachment(strMsgToSend, true);
+//		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
+//		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
+//		socketChannel.write(buffer, attachment, writeCompletionHandler);
+//		while (attachment.getActive().get()) {
+//
 //		}
+//		System.out.println("This is printed from client: " + attachment.getReturnMessage());
+//		return attachment.getReturnMessage();
+		int msgID = messageQueue.pushMessageToSendQueue(strMsgToSend, msgCmdID);
+		while(true) {
+			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+			if(attachment != null) {
+				return attachment.getReturnMessage();
+			}
+		}
 	}
 
 	public String login(String username, String password) throws Exception {
@@ -127,55 +128,31 @@ public class ClientSocketChannel {
 
 	public String register(String username, String password) throws Exception {
 		RegisterClientMessage registerRequest = new RegisterClientMessage(username, password);
-		return sendRequest(registerRequest.toString());
+		return sendRequest(registerRequest.toString(), registerRequest.getMessageCommandID());
 	}
 
 	public String joinQueue(String sesID, String mode) throws Exception {
 		JoinQueueClientMessage joinQueueRequest = new JoinQueueClientMessage(mode, sesID);
 //		return sendRequestAsync(joinQueueRequest.toString());
-		int msgID = messageQueue.pushMessageToSendQueue(joinQueueRequest.toString(), joinQueueRequest.getMessageCommandID());
-		while(true) {
-			Attachment attachment = messageQueue.getAttachmentByID(msgID);
-			if(attachment != null) {
-				return attachment.getReturnMessage();
-			}
-		}
+		return sendRequest(joinQueueRequest.toString(), joinQueueRequest.getMessageCommandID());
 	}
 	
 	public String quitQueue(String username, String sessionID) throws Exception {
 		QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
 //		return sendRequestAsync(quitQueueRequest.toString());
-		int msgID = messageQueue.pushMessageToSendQueue(quitQueueRequest.toString(), quitQueueRequest.getMessageCommandID());
-		while(true) {
-			Attachment attachment = messageQueue.getAttachmentByID(msgID);
-			if(attachment != null) {
-				return attachment.getReturnMessage();
-			}
-		}
+		return sendRequest(quitQueueRequest.toString(), quitQueueRequest.getMessageCommandID());
 		
 	}
 
 	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
 			throws Exception {
 		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
-		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
-		while(true) {
-			Attachment attachment = messageQueue.getAttachmentByID(msgID);
-			if(attachment != null) {
-				return attachment.getReturnMessage();
-			}
-		}
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 
 	public String listenMove(String playerName, int matchID) throws Exception {
 		ListenMoveClientMessage msg = new ListenMoveClientMessage(playerName, matchID);
-		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
-		while(true) {
-			Attachment attachment = messageQueue.getAttachmentByID(msgID);
-			if(attachment != null) {
-				return attachment.getReturnMessage();
-			}
-		}
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 
 	public String requestDraw() throws Exception {
@@ -193,9 +170,10 @@ public class ClientSocketChannel {
 		return sendRequest("");
 	}
 
-	public String chat(String chatMsg) throws Exception {
+	public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
 		// TODO: Finish function
-		return sendRequest("");
+		ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 
 	public String chatACK() throws Exception {

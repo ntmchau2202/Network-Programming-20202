@@ -1,20 +1,24 @@
 package message.chat;
 
+import java.util.Random;
+
 import message.ClientMessage;
 
 public class ChatClientMessage extends ClientMessage {
 	private String fromUser, toUser, message, messageID;
 	private int matchID;
 	
-	public ChatClientMessage(String fromUsr, String toUsr, String msg, String msgID, int matchID) {
+	public ChatClientMessage(String fromUsr, String toUsr, String msg, int matchID) {
 		super();
 		this.fromUser = fromUsr;
 		this.toUser = toUsr;
 		this.message = msg;
-		this.messageID = msgID;
+		Random rn = new Random();
+		int idNum = rn.nextInt(10000);
+		this.messageID = "CHAT" + Integer.toString(idNum);
 		this.matchID = matchID;
 		
-		this.requestBody.createChatBody(fromUsr, toUsr, msg, msgID, matchID);
+		this.requestBody.createChatBody(fromUsr, toUsr, msg, this.messageID, matchID);
 		this.finalizeMessageObject();
 	}
 	

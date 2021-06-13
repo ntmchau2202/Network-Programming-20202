@@ -417,9 +417,33 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
     @FXML
     void sendMessage(final MouseEvent event) {
-        chatVbox.getChildren().add(addMessage(chatTextField.getText()));
-        chatTextField.setText("");
-        sendButton.setDisable(true);
+        // send msg here
+    	String msgToSend = chatTextField.getText();
+    	chatTextField.setText("");
+    	sendButton.setDisable(true);
+        Task<Boolean> sendChatTask = new Task<Boolean>() {
+			@Override
+			protected Boolean call() throws Exception {
+				// TODO Auto-generated method stub
+				return mainGameScreenController.sendChatMessage(msgToSend);
+			}
+        	
+        };
+        
+        sendChatTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				Boolean isOK = (Boolean) arg0.getSource().getValue();
+				if(isOK) {
+					chatVbox.getChildren().add(addMessage(msgToSend));
+				} else {
+					chatVbox.getChildren().add(addMessage(mainGameScreenController.getFinalErrorMessage()));
+				}
+				sendButton.setDisable(true);
+			}
+        });
+        Thread sendChatThread = new Thread(sendChatTask);
+        sendChatThread.start();
     }
 
     public HBox addMessage(String message)

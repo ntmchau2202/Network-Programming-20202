@@ -36,6 +36,7 @@ public class MainGameScreenController extends BaseController {
 
 	private String movePlayer;
 	private String moveResult, moveState;
+	private String errMsg;
 
 	public MainGameScreenController(Player currentPlayer) {
 		this.currentPlayer = currentPlayer;
@@ -139,33 +140,20 @@ public class MainGameScreenController extends BaseController {
 	public String getFinalMovePlayer() {
 		return this.movePlayer;
 	}
-
-	// may change the return type here, to send information to GUI for modification
-	public ServerMessage listening(MainGameScreenHandler screenHandler) {
-		// screen handler is for displaying stuff on the screen
-		ServerMessage svMsg = null;
-		try {
-			svMsg = ClientSocketChannel.getSocketInstance().listenIngameMessage();
-			// analysis here
-			if (svMsg instanceof MoveServerMessage) {
-				MoveServerMessage moveMsg = (MoveServerMessage)svMsg;
-				int x = moveMsg.getX();
-				int y = moveMsg.getY();
-				System.out.println("Recv (X,Y): "+ x + ":" +y);				
-			} else if (svMsg instanceof ChatServerMessage) {
-				
-			} else if (svMsg instanceof ChatACKServerMessage) {
-				
-			} else if (svMsg instanceof DrawRequestServerMessage) {
-				
-			} else if (svMsg instanceof DrawConfirmServerMessage){
-				// do st here
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	
+	public boolean sendChatMessage(String chatMsg) throws Exception{
+		//(String fromUsr, String toUsr, String msg, int matchID)
+		String result = ClientSocketChannel.getSocketInstance().chat(currentPlayer.getUsername(), opponentPlayerName, chatMsg, matchID);
+		ChatServerMessage ret = new ChatServerMessage(result);
+		if(ret.getStatusCode().compareTo(StatusCode.ERROR)==0) {
+			this.errMsg = ret.getErrorMessage();
+			return false;
+		} else {
+			return true;
 		}
-	return svMsg;
+	}
+	
+	public String getFinalErrorMessage() {
+		return this.errMsg;
 	}
 }
