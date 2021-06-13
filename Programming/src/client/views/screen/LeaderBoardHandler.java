@@ -68,6 +68,7 @@ public class LeaderBoardHandler extends BaseScreenHandler implements Initializab
             for (LeaderboardPlayer leaderboardPlayer :lstLeaderboardPlayer) {
                 leaderboardTableView.getItems().add(leaderboardPlayer);
             }
+//            System.out.println(lstLeaderboardPlayer);
         } catch (SQLException | IOException | InterruptedException throwables) {
             throwables.printStackTrace();
         }

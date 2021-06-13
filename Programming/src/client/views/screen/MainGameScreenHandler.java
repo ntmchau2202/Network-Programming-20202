@@ -15,11 +15,15 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import message.ServerMessage;
@@ -29,6 +33,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainGameScreenHandler extends BaseScreenHandler implements Initializable {
     @FXML
@@ -43,7 +48,27 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private Text playerTurnText;
     @FXML
     private Label yourMove;
+    @FXML
+    private Label xPlayerName;
+    @FXML
+    private Label oPlayerName;
+    @FXML
+    private Label xPlayerElo;
+    @FXML
+    private Label oPlayerElo;
+    @FXML
+    private Label xPlayerWin;
+    @FXML
+    private Label oPlayerWin;
+    @FXML
+    private ScrollPane chatScrollPane;
+    @FXML
+    private TextField chatTextField;
+    @FXML
+    private Button sendButton;
 
+    private VBox chatVbox;
+    private Label chatName;
     // locking clicking other moves when a move is chosen
     private boolean isLockMove;
 
@@ -54,8 +79,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private final MainGameScreenController mainGameScreenController;
     private Image MOVE_IMAGE;
 
-    private Thread alwaysListener;
-
+    private AtomicBoolean isGameEnded;
     /**
      * @param stage      stage of screen.
      * @param screenPath path to screen fxml
@@ -75,10 +99,15 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             homeHandler.show();
             homeHandler.setScreenTitle("Home Screen");
         });
-        //
-        // this.gameBoardGridPane.setPrefHeight(591);
-        // this.gameBoardGridPane.setPrefWidth(604);
-        // this.gameBoardGridPane.setStyle("-fx-background-color: white");
+
+        // display player info
+        xPlayerName.setText(mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
+        oPlayerName.setText(!mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
+        if (mainGameScreenController.getCurrentPlayer() instanceof RankPlayer) {
+            xPlayerElo.setText(Integer.toString(mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+            oPlayerElo.setText(Integer.toString(!mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+            System.out.println(Integer.toString(mainGameScreenController.getOpponentElo()));
+        }
 
         // display player turn
         if (mainGameScreenController.isMyTurn()) {
@@ -119,6 +148,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // unlock move
         isLockMove = false;
+        isGameEnded = new AtomicBoolean(false);
 
         // if not first player to play, listen move from opponent
         if (!this.mainGameScreenController.amIFirstPlayer()) {
@@ -170,6 +200,14 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // test display in (0, 0)
 //        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
 
+        // init chat vbox
+        chatVbox = new VBox();
+        chatVbox.setSpacing(5);
+        chatScrollPane.setContent(chatVbox);
+
+        chatTextField.setOnKeyTyped(e -> {
+            sendButton.setDisable(chatTextField.getText().isEmpty());
+        });
     }
 
     private void addImageToPane(Pane pane, String movePlayerName) {
@@ -237,38 +275,38 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                         System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
                                         
                                         if (mainGameScreenController.isFinal()) {
-                                        	
+                                        	isGameEnded.set(true);
                                         	System.out.println("Result from send: Win player: " + mainGameScreenController.getFinalMovePlayer());
                                         	this.cancel();
                                         }
 
-                                        mainGameScreenController.setTurn(false);
+                                        if(!isGameEnded.get()) {
+                                        	mainGameScreenController.setTurn(false);
+                                            
+                                            // start listening for opponent move
+                                        	if (mainGameScreenController.listenMove()) {
+                                                int recvX1 = mainGameScreenController.getX();
+                                                int recvY1 = mainGameScreenController.getY();
+                                                System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+                                                // display move on pane ??
+                                                addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+                                                if (mainGameScreenController.isFinal()) {
+                                                	System.out.println("Result from listen: Win player: " + mainGameScreenController.getFinalMovePlayer());
+                                                	this.cancel();
+                                                }
+                                                mainGameScreenController.setTurn(true);
 
-                                        // start listening for opponent move
-                                        if (mainGameScreenController.listenMove()) {
-                                            int recvX1 = mainGameScreenController.getX();
-                                            int recvY1 = mainGameScreenController.getY();
-                                            System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
-                                            // display move on pane ??
-                                            addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
-                                            if (mainGameScreenController.isFinal()) {
-                                            	System.out.println("Result from listen: Win player: " + mainGameScreenController.getFinalMovePlayer());
-                                            	this.cancel();
+                                                // release lock move
+                                                isLockMove = false;
+                                                isSuccessfull = true;
+                                            } else {
+                                                // TODO: handle send failed here
+                                                isSuccessfull = false;
                                             }
-                                            mainGameScreenController.setTurn(true);
-
-                                            // release lock move
-                                            isLockMove = false;
-                                            isSuccessfull = true;
-                                        } else {
-                                            // TODO: handle send failed here
-                                            isSuccessfull = false;
                                         }
                                     } else {
                                         isSuccessfull = false;
                                     }
-
-
                                 } catch (Exception e1) {
                                     // TODO Auto-generated catch block
                                     e1.printStackTrace();
@@ -372,5 +410,63 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // return true;
         //
         // }
+
+
+    }
+
+
+    @FXML
+    void sendMessage(final MouseEvent event) {
+        // send msg here
+    	String msgToSend = chatTextField.getText();
+    	chatTextField.setText("");
+    	sendButton.setDisable(true);
+        Task<Boolean> sendChatTask = new Task<Boolean>() {
+			@Override
+			protected Boolean call() throws Exception {
+				// TODO Auto-generated method stub
+				return mainGameScreenController.sendChatMessage(msgToSend);
+			}
+        	
+        };
+        
+        sendChatTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				Boolean isOK = (Boolean) arg0.getSource().getValue();
+				if(isOK) {
+					chatVbox.getChildren().add(addMessage(msgToSend));
+				} else {
+					chatVbox.getChildren().add(addMessage(mainGameScreenController.getFinalErrorMessage()));
+				}
+				sendButton.setDisable(true);
+			}
+        });
+        Thread sendChatThread = new Thread(sendChatTask);
+        sendChatThread.start();
+    }
+
+    public HBox addMessage(String message)
+    {
+        // chat name set
+        chatName = new Label();
+        chatName.setText(mainGameScreenController.getCurrentPlayer().getUsername()+": ");
+        chatName.setTextFill(Color.web(this.mainGameScreenController.amIFirstPlayer() ? "#FF4A05" : "#0082ec"));
+        chatName.setPrefWidth(80);
+        chatName.setStyle("-fx-font-size: 20px");
+        chatName.setWrapText(true);
+
+        // message HBox set
+        HBox hbox = new HBox();
+        hbox.setPrefWidth(600);
+
+        // msg set
+        Label msg = new Label(message);
+        msg.setWrapText(true);
+        msg.setPrefWidth(400);
+        msg.setMaxWidth(500);
+        msg.setStyle("-fx-font-size: 20px");
+        hbox.getChildren().addAll(chatName,msg);
+        return hbox;
     }
 }
