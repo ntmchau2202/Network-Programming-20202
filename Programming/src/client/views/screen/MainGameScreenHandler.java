@@ -208,7 +208,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 					String recvMsg = mainGameScreenController.listenChat();
 					if(recvMsg.length() != 0) {
 						System.out.println("Message length !=0: " + recvMsg);
-						chatVbox.getChildren().add(addMessage(recvMsg));
+						updateChatAfterListen(recvMsg);
 					} else {
 						System.out.println("Empty message :(");
 					}
@@ -221,7 +221,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         listenChatThread.start();
 
         // test display in (0, 0)
-//        addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
+        // addImageToPane((Pane)getNodeByRowColumnIndex(0, 0, gameBoardGridPane), mainGameScreenController.getCurrentPlayer().getUsername());
 
         // init chat vbox
         chatVbox = new VBox();
@@ -233,6 +233,17 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         });
     }
 
+    private void updateChatAfterListen(String recvMsg) {
+    	Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				chatVbox.getChildren().add(addMessage(recvMsg));
+			}
+    		
+    	});
+    }
+    
     private void addImageToPane(Pane pane, String movePlayerName) {
         Platform.runLater(new Runnable() {
             @Override public void run() {
@@ -459,9 +470,12 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			public void handle(WorkerStateEvent arg0) {
 				Boolean isOK = (Boolean) arg0.getSource().getValue();
 				if(isOK) {
-					chatVbox.getChildren().add(addMessage(msgToSend));
+//					chatVbox.getChildren().add(addMessage(msgToSend));
+//					System.out.println("Send msg ok <3: " + msgToSend);
+					updateChatAfterListen(msgToSend);
 				} else {
-					chatVbox.getChildren().add(addMessage(mainGameScreenController.getFinalErrorMessage()));
+//					chatVbox.getChildren().add(addMessage(mainGameScreenController.getFinalErrorMessage()));
+					updateChatAfterListen(mainGameScreenController.getFinalErrorMessage());
 				}
 				sendButton.setDisable(false);
 			}
