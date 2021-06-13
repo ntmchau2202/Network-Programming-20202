@@ -204,6 +204,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			@Override
 			protected Void call() throws Exception {
 				while(true) {
+					System.out.println("================================= Start listening to chatttttttttttt");
 					String recvMsg = mainGameScreenController.listenChat();
 					if(recvMsg.length() != 0) {
 						chatVbox.getChildren().add(addMessage(recvMsg));
@@ -444,6 +445,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			@Override
 			protected Boolean call() throws Exception {
 				// TODO Auto-generated method stub
+				System.out.println("Gotta send something...: " + msgToSend);
 				return mainGameScreenController.sendChatMessage(msgToSend);
 			}
         	

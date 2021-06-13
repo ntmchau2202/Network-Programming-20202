@@ -12,7 +12,7 @@ public class ListenChatClientMessage extends ClientMessage {
 		this.username = username;
 		this.matchID = matchID;
 		
-		this.setCommand(Command.LISTEN_MOVE);
+		this.setCommand(Command.LISTEN_CHAT);
 		this.requestBody.createListenMoveBody(username, matchID);
 		this.finalizeMessageObject();
 		

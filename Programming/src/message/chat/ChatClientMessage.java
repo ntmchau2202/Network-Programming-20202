@@ -10,6 +10,7 @@ public class ChatClientMessage extends ClientMessage {
 	
 	public ChatClientMessage(String fromUsr, String toUsr, String msg, int matchID) {
 		super();
+		System.out.println("Have we got into here yet?");
 		this.fromUser = fromUsr;
 		this.toUser = toUsr;
 		this.message = msg;
@@ -17,7 +18,7 @@ public class ChatClientMessage extends ClientMessage {
 		int idNum = rn.nextInt(10000);
 		this.messageID = "CHAT" + Integer.toString(idNum);
 		this.matchID = matchID;
-		
+		System.out.println("Is is okay here?");
 		this.requestBody.createChatBody(fromUsr, toUsr, msg, this.messageID, matchID);
 		this.finalizeMessageObject();
 	}

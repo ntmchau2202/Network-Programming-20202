@@ -102,7 +102,9 @@ public class ClientSocketChannel {
 //		}
 //		System.out.println("This is printed from client: " + attachment.getReturnMessage());
 //		return attachment.getReturnMessage();
+		System.out.println("Gotta send: " + strMsgToSend);
 		int msgID = messageQueue.pushMessageToSendQueue(strMsgToSend, msgCmdID);
+		
 		while(true) {
 			Attachment attachment = messageQueue.getAttachmentByID(msgID);
 			if(attachment != null) {
@@ -178,8 +180,17 @@ public class ClientSocketChannel {
 
 	public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
 		// TODO: Finish function
-		ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID);
-		return sendRequest(msg.toString(), msg.getMessageCommandID());
+		System.out.println("Got into here ~~~ chat!! 1234567986532");
+		ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID); // ??????????????????????????
+		System.out.println("Gotta send: " + msg.toString());
+		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
+		
+		while(true) {
+			Attachment attachment = messageQueue.getAttachmentByID(msgID);
+			if(attachment != null) {
+				return attachment.getReturnMessage();
+			}
+		}
 	}
 
 //	public String chatACK() throws Exception {
