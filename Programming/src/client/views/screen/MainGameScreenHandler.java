@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainGameScreenHandler extends BaseScreenHandler implements Initializable {
     @FXML
@@ -78,8 +79,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private final MainGameScreenController mainGameScreenController;
     private Image MOVE_IMAGE;
 
-    private Thread alwaysListener;
-
+    private AtomicBoolean isGameEnded;
     /**
      * @param stage      stage of screen.
      * @param screenPath path to screen fxml
@@ -148,6 +148,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // unlock move
         isLockMove = false;
+        isGameEnded = new AtomicBoolean(false);
 
         // if not first player to play, listen move from opponent
         if (!this.mainGameScreenController.amIFirstPlayer()) {
@@ -274,38 +275,38 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                         System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
                                         
                                         if (mainGameScreenController.isFinal()) {
-                                        	
+                                        	isGameEnded.set(true);
                                         	System.out.println("Result from send: Win player: " + mainGameScreenController.getFinalMovePlayer());
                                         	this.cancel();
                                         }
 
-                                        mainGameScreenController.setTurn(false);
+                                        if(!isGameEnded.get()) {
+                                        	mainGameScreenController.setTurn(false);
+                                            
+                                            // start listening for opponent move
+                                        	if (mainGameScreenController.listenMove()) {
+                                                int recvX1 = mainGameScreenController.getX();
+                                                int recvY1 = mainGameScreenController.getY();
+                                                System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+                                                // display move on pane ??
+                                                addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+                                                if (mainGameScreenController.isFinal()) {
+                                                	System.out.println("Result from listen: Win player: " + mainGameScreenController.getFinalMovePlayer());
+                                                	this.cancel();
+                                                }
+                                                mainGameScreenController.setTurn(true);
 
-                                        // start listening for opponent move
-                                        if (mainGameScreenController.listenMove()) {
-                                            int recvX1 = mainGameScreenController.getX();
-                                            int recvY1 = mainGameScreenController.getY();
-                                            System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
-                                            // display move on pane ??
-                                            addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
-                                            if (mainGameScreenController.isFinal()) {
-                                            	System.out.println("Result from listen: Win player: " + mainGameScreenController.getFinalMovePlayer());
-                                            	this.cancel();
+                                                // release lock move
+                                                isLockMove = false;
+                                                isSuccessfull = true;
+                                            } else {
+                                                // TODO: handle send failed here
+                                                isSuccessfull = false;
                                             }
-                                            mainGameScreenController.setTurn(true);
-
-                                            // release lock move
-                                            isLockMove = false;
-                                            isSuccessfull = true;
-                                        } else {
-                                            // TODO: handle send failed here
-                                            isSuccessfull = false;
                                         }
                                     } else {
                                         isSuccessfull = false;
                                     }
-
-
                                 } catch (Exception e1) {
                                     // TODO Auto-generated catch block
                                     e1.printStackTrace();
