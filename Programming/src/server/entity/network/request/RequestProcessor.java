@@ -312,17 +312,19 @@ public class RequestProcessor {
         String errMsg = "";
 
         if(isOK) {
-            statCode = StatusCode.SUCCESS;
+            ReadCompletionHandler joinQueueHandler = handlerController.getHandlerByCommand(Command.JOIN_QUEUE);
+            if (joinQueueHandler == null) {
+                statCode = StatusCode.ERROR;
+                errMsg = "Player doesn't exist in match queue";
+            } else {
+                joinQueueHandler.cancelHandler();
+                statCode = StatusCode.SUCCESS;
+            }
         } else {
             statCode = StatusCode.ERROR;
             errMsg = "An error occured when quiting queue";
         }
-        
-        ReadCompletionHandler joinQueueHandler = handlerController.getHandlerByCommand(Command.JOIN_QUEUE);
-        joinQueueHandler.cancelHandler();
-        
         // wait a minute so that the previous message is sent back appropiately...
-        
         for(int i = 0; i < 3; i++) {
         	try {
 				Thread.sleep(500);
@@ -331,9 +333,7 @@ public class RequestProcessor {
 				e.printStackTrace();
 			}
         }
-
         QuitQueueServerMessage response = new QuitQueueServerMessage(quitQueueMsg.getMessageCommandID(), quitQueueMsg.getUsername(), statCode, errMsg);
-
         return response.toString();
     }
 
