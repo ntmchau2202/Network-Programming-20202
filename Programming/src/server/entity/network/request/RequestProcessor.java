@@ -1,6 +1,7 @@
 package server.entity.network.request;
 
 import entity.Player.GuestPlayer;
+import message.logout.LogoutClientMessage;
 import server.entity.match.Match;
 import entity.Move.Move;
 import entity.Player.Player;
@@ -496,8 +497,27 @@ public class RequestProcessor {
         return serverResponse;
     }
 
-    private void processLogoutRequest() throws Exception {
-
+    private void processLogoutRequest(String input) throws Exception {
+//        LoginServerMessage serverResponse = null;
+//
+//        LogoutClientMessage clientRequest = new LogoutClientMessage(input);
+//        String username = clientRequest.getUsername();
+//        String sessionID = clientRequest.getSessionID();
+//
+//        // get logged player
+//        RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+//        if (loggedPlayer == null) {
+//            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
+//                    "Username / Password is not valid Or this username has already been logged in");
+//        } else {
+////            loggedPlayer.setUserSocket(sock);
+//            queueController.pushToHall(loggedPlayer);
+//            serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
+//                    loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
+//                    loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+//        }
+//
+//        return serverResponse.toString();
     }
 
     private String notifyMatchFound() throws Exception {
