@@ -104,11 +104,13 @@ public class ResponseBody {
 		this.responseBody.put("acceptance", acceptance);
 	}
 	
-	public void createLeaderBoardBody(JSONArray username, JSONArray elo, JSONArray rank) throws JSONException {
+	public void createLeaderBoardBody(JSONArray username, JSONArray elo, JSONArray rank, JSONArray noMatchPlayed, JSONArray noMatchWon) throws JSONException {
 		this.responseBody.clear();
 		this.responseBody.put("username", username);
 		this.responseBody.put("elo", elo);
 		this.responseBody.put("rank", rank);
+		this.responseBody.put("no_match_played", noMatchPlayed);
+		this.responseBody.put("no_match_won", noMatchWon);
 	}
 	
 	public void createChatBody(String from_user, String to_user, String message, String message_id, int match_id) throws JSONException {

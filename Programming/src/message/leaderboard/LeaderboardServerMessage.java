@@ -11,19 +11,23 @@ import protocol.StatusCode;
 
 public class LeaderboardServerMessage extends ServerMessage {
 	private List<String> listUsername;
-	private List<Integer> listElo, listRank;
+	private List<Integer> listElo, listRank, listNoMatchPlayed, listNoMatchWon;
 	
-	public LeaderboardServerMessage(int messageCommandID, List<String> listUsr, List<Integer> listElo, List<Integer> listRank, StatusCode statCode, String errMsg) {
+	public LeaderboardServerMessage(int messageCommandID, List<String> listUsr, List<Integer> listElo, List<Integer> listRank, List<Integer> listNoMatchPlayed, List<Integer> listNoMatchWon, StatusCode statCode, String errMsg) {
 		super(statCode, errMsg, messageCommandID);
 		this.listUsername = listUsr;
 		this.listElo = listElo;
 		this.listRank = listRank;
+		this.listNoMatchPlayed = listNoMatchPlayed;
+		this.listNoMatchWon = listNoMatchWon;
 		
 		JSONArray jsArrayUser = new JSONArray(listUsr);
 		JSONArray jsArrayElo = new JSONArray(listElo);
 		JSONArray jsArrayRank = new JSONArray(listRank);
+		JSONArray jsArrayNoMatchPlayed = new JSONArray(listNoMatchPlayed);
+		JSONArray jsArrayNoMatchWon = new JSONArray(listNoMatchWon);
 		this.setCommand(Command.LEADERBOARD);
-		this.responseBody.createLeaderBoardBody(jsArrayUser, jsArrayElo, jsArrayRank);
+		this.responseBody.createLeaderBoardBody(jsArrayUser, jsArrayElo, jsArrayRank, jsArrayNoMatchPlayed, jsArrayNoMatchWon);
 		this.finalizeMessageObject();
 	}
 	
@@ -50,6 +54,18 @@ public class LeaderboardServerMessage extends ServerMessage {
 		
 		for (Object r : tmp) {
 			this.listRank.add((int)r);
+		}
+
+		tmp = this.responseBody.getBody().getJSONArray("no_match_played").toList();
+
+		for (Object r : tmp) {
+			this.listNoMatchPlayed.add((int)r);
+		}
+
+		tmp = this.responseBody.getBody().getJSONArray("no_match_won").toList();
+
+		for (Object r : tmp) {
+			this.listNoMatchWon.add((int)r);
 		}
 		
 	}
