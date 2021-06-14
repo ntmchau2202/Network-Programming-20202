@@ -2,6 +2,7 @@ package server.entity.match;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import entity.Move.Move;
 import entity.Player.Player;
@@ -12,6 +13,8 @@ public class Match {
 	private final int matchID;
 	private final ArrayList<Move> moveRecord;
 	private final ArrayList<ChatMessage> chatMsgRecord;
+	private String winner; // sorry I dont know how to best place a winner as a Player in this case ; _ ;
+	private AtomicBoolean isEnded;
 	
 	public Match(Player player1, Player player2) {
 		// TODO: think about duplicated match ID here
@@ -21,6 +24,8 @@ public class Match {
 		this.matchID = random.nextInt(9216);
 		moveRecord = new ArrayList<>();
 		chatMsgRecord = new ArrayList<>();
+		winner = "";
+		isEnded = new AtomicBoolean(false);
 	}
 	
 	public Player getPlayer1() {
@@ -33,6 +38,22 @@ public class Match {
 	
 	public int getMatchID() {
 		return this.matchID;
+	}
+	
+	public String getWinner() {
+		return this.winner;
+	}
+	
+	public void setWinner(String winner) {
+		this.winner = winner;
+	}
+	
+	public void setEnd(boolean state) {
+		this.isEnded.set(state);
+	}
+	
+	public boolean isEnded() {
+		return this.isEnded.get();
 	}
 	
 	public boolean isPlayerOfMatch(Player player) {

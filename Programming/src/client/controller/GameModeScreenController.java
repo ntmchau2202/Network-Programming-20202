@@ -11,7 +11,6 @@ import entity.Player.RankPlayer;
 
 public class GameModeScreenController extends BaseController {
     private RankPlayer curPlayer;
-//    private JoinQueueServerMessage response;
     private int matchID, opponentElo;
     private String opponentName;
     private String firstPlayer;
@@ -54,6 +53,35 @@ public class GameModeScreenController extends BaseController {
        
     }
     
+    // note: duplicate code, must refactor!!!
+    public int findRankedGame() {
+        System.out.println("Waiting for a game...");
+
+        // TODO: make an interactive pop up here for waiting for server response
+        try {
+		String result = ClientSocketChannel.getSocketInstance().joinQueue(curPlayer.getSessionId(), "ranked");
+		System.out.println("Returned message to findPracticeGame: " + result);
+		 JoinQueueServerMessage response = new JoinQueueServerMessage(result);
+	        if (response.getStatusCode().compareTo(StatusCode.ERROR) == 0) {
+	            if(response.getErrorMessage().contains("QUIT_QUEUE")) {
+	            	return -1;
+	            } else {
+	            	return 1;
+	            }
+	        }
+	        matchID = response.getMatchID();
+	        opponentName = response.getOpponent();
+	        opponentElo = response.getOpponentELO();
+	        sessionID = response.getSessionID();
+	        firstPlayer = response.getFirstPlayer();
+	        return 0;
+        } catch (Exception e) {
+        	System.out.println("============= Error from join queue");
+        	e.printStackTrace();
+        	return 1;
+        }
+    }
+    
     public boolean quitQueue() {
         try {
     		String result =  ClientSocketChannel.getSocketInstance().quitQueue(curPlayer.getUsername(), curPlayer.getSessionId());
@@ -89,15 +117,5 @@ public class GameModeScreenController extends BaseController {
 
     public String getSessionID() {
         return this.sessionID;
-    }
-
-    public boolean findRankGame() throws Exception {
-//        String result = ClientSocketChannel.getSocketInstance().joinQueue("ranked");
-//        JoinQueueServerMessage response = new JoinQueueServerMessage(result);
-//        if (response.getStatusCode().compareTo(StatusCode.ERROR) == 0) {
-//        	return false;
-//        }
-        return true;
-//    	return true;
     }
 }

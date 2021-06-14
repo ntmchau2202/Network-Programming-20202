@@ -8,6 +8,7 @@ import client.network.ClientSocketChannel;
 import client.views.screen.MainGameScreenHandler;
 import entity.Player.Player;
 import javafx.application.Platform;
+import javafx.util.Pair;
 import message.ServerMessage;
 import message.chat.ChatServerMessage;
 import message.chatack.ChatACKServerMessage;
@@ -17,6 +18,7 @@ import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
 import protocol.Command;
 import protocol.StatusCode;
+import server.entity.match.ChatMessage;
 
 public class MainGameScreenController extends BaseController {
 
@@ -62,6 +64,10 @@ public class MainGameScreenController extends BaseController {
 
 	public void setMatchID(int matchID) {
 		this.matchID = matchID;
+	}
+	
+	public int getMatchID() {
+		return this.matchID;
 	}
 
 	public boolean isMyTurn() {
@@ -125,15 +131,16 @@ public class MainGameScreenController extends BaseController {
 		}
 	}
 	
-	public String listenChat() throws Exception {
+	public ChatMessage listenChat() throws Exception {
 		System.out.println("=====================listening chat");
 		String result = ClientSocketChannel.getSocketInstance().listenChat(currentPlayer.getUsername(), this.matchID);
 		ChatServerMessage chat = new ChatServerMessage(result);
 
 		if (chat.getStatusCode().compareTo(StatusCode.SUCCESS) == 0) {
-			return chat.getChatMessage();
+			//(int matchID, String sendPlayerName, String recvPlayerName, String messageID, String message)
+			return new ChatMessage(chat.getMatchID(), chat.getSendUser(), chat.getReceiveUser(), chat.getChatMessageID(), chat.getChatMessage());
 		} else {
-			return "";
+			return null;
 		}
 	}
 
@@ -153,16 +160,16 @@ public class MainGameScreenController extends BaseController {
 		return this.movePlayer;
 	}
 	
-	public boolean sendChatMessage(String chatMsg) throws Exception{
+	public ChatMessage sendChatMessage(String chatMsg) throws Exception{
 		//(String fromUsr, String toUsr, String msg, int matchID)
 		System.out.println("Gotta send msg: " + chatMsg);
 		String result = ClientSocketChannel.getSocketInstance().chat(currentPlayer.getUsername(), opponentPlayerName, chatMsg, matchID);
 		ChatServerMessage ret = new ChatServerMessage(result);
 		if(ret.getStatusCode().compareTo(StatusCode.ERROR)==0) {
 			this.errMsg = ret.getErrorMessage();
-			return false;
+			return null;
 		} else {
-			return true;
+			return new ChatMessage(ret.getMatchID(), ret.getSendUser(), ret.getReceiveUser(), ret.getChatMessageID(), ret.getChatMessage());
 		}
 	}
 	

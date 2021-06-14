@@ -317,11 +317,16 @@ public class RequestProcessor {
                 statCode = StatusCode.ERROR;
             }
         }
+        
+        if(moveMsg.getResult().compareToIgnoreCase("win")==0) {
+        	if (!queueController.endGame(movePlayer, matchID)) {
+        		statCode = StatusCode.ERROR;
+        		errMsg = "Cannot end the game...";
+        	}
+        }
 
         MoveServerMessage fwdMsg = new MoveServerMessage(moveMsg.getMessageCommandID(), matchID, movePlayer, x, y, state, result, statCode, errMsg);
-
-//        listResponse.put(sock, fwdMsg.toString());
-
+        
         return fwdMsg.toString();
     }
 
