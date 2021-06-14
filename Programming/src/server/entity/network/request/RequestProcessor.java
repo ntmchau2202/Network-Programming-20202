@@ -203,7 +203,7 @@ public class RequestProcessor {
                 } else {
                     // push guest player to hall
                     queueController.pushToHall(guestPlayer);
-                    
+
                     loggedPlayer = guestPlayer;
                 }
             } else if (mode.compareToIgnoreCase("ranked") == 0) {
