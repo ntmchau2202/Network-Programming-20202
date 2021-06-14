@@ -1,5 +1,6 @@
 package server.core.authentication;
 
+import entity.Player.GuestPlayer;
 import entity.Player.RankPlayer;
 import server.entity.database.T3DB;
 
@@ -7,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class T3Authenticator {
     public RankPlayer login(String username, String password) throws SQLException {
@@ -116,9 +119,36 @@ public class T3Authenticator {
         return foundSessionID.equals(sessionID);
     }
 
-//    public GuestPlayer createGuestPlayer() {
-//
-//    }
+    public GuestPlayer createGuestPlayer() throws SQLException {
+        String lastDisplayName = "";
+        String newGuestDisplayName = "";
+        PreparedStatement stm = T3DB.getConnection().prepareStatement(
+                "select * from GuestPlayer order by displayname desc limit 1");
+        ResultSet res = stm.executeQuery();
+        // TODO: throw exception if multiple results
+        while (res.next()) {
+            lastDisplayName = res.getString("displayname");
+        }
+        if (!lastDisplayName.isEmpty()) {
+            String result = "";
+            Pattern p = Pattern.compile("[0-9]+$");
+            Matcher m = p.matcher(lastDisplayName);
+            if(m.find()) {
+                result = m.group();
+            }
+            int anonID = Integer.parseInt(result);
+            newGuestDisplayName = "anon" + Integer.toString(anonID + 1);
+        } else {
+            newGuestDisplayName = "anon1";
+        }
+
+        // gen sessionID
+        String sessionID = genSessionID();
+        // store sessionID
+        storeSessionID(newGuestDisplayName, sessionID);
+
+        return new GuestPlayer(newGuestDisplayName, sessionID);
+    }
     
 //    public Player getOnlinePlayer(String sessionID) throws Exception {
 //    	Player player = null;
