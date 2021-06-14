@@ -136,7 +136,7 @@ public class RequestProcessor {
         RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
         if (loggedPlayer == null) {
             serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
-                    "Username / Password is not valid");
+                    "Username / Password is not valid Or this username has already been logged in");
         } else {
 //            loggedPlayer.setUserSocket(sock);
             queueController.pushToHall(loggedPlayer);
