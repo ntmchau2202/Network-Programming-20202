@@ -143,7 +143,7 @@ public class QueueController {
 				}
 				// just for sure
 				System.out.println("List of player in hall after remove game " + matchID);
-				for(RankPlayer rp : hall) {
+				for(Player rp : hall) {
 					System.out.print(rp.getUsername() + "; ");
 				}
 				endgameMutex.release();

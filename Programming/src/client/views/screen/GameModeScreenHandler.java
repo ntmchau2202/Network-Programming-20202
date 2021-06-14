@@ -182,17 +182,70 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
 				quitQueue.setDisable(false);
-				System.out.println("rank play");
+				Task<Integer> findGameTask = new Task<Integer>() {
+					protected Integer call() {
+						Integer isFound = 1;
+						try {
+							isFound = gameModeScreenController.findPracticeGame();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return isFound;
+					}
+				};
 
-				boolean isFound = gameModeScreenController.findRankGame();
-				if (isFound) {
-					// TODO: may need other analyze here
-					notifySuccess("Yeah! Found a rank match! Hope you win");
-					mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+				findGameTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
-				} else {
-					notifyError("Can not find rank play match");
-				}
+					public void handle(WorkerStateEvent t) {
+						Integer isFound = (Integer) t.getSource().getValue();
+						System.out.println("done:" + isFound);
+						if (isFound == 0) {
+							mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
+									gameModeScreenController.getOpponentElo());
+							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
+							System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
+							mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
+							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+							try {
+								notifySuccess("Yeah! Found a match! Let's practice");
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							BaseScreenHandler mainGameScreenHandler = null;
+							try {
+								mainGameScreenHandler = new MainGameScreenHandler(currentHandler.stage,
+										Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
+								mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+								mainGameScreenHandler.setPreviousScreen(currentHandler);
+								mainGameScreenHandler.show();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+						} else if (isFound == 1) {
+							try {
+								notifyError("Can not find practice play match, please try again later");
+								practicePlay.setDisable(false);
+								rankPlay.setDisable(false);
+								quitQueue.setDisable(true);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else if (isFound == -1) {
+							// join queue interrupted by user
+							practicePlay.setDisable(false);
+							rankPlay.setDisable(false);
+							quitQueue.setDisable(true);
+						}
+					}
+				});
+
+				findGameThread = new Thread(findGameTask);
+				findGameThread.start();
 
 			}
 		} catch (Exception e) {
