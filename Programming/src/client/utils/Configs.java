@@ -16,6 +16,7 @@ public class Configs {
     public static final String LEADERBOARD_SCREEN_PATH  = "/client/views/fxml/Leaderboard.fxml";
     public static final String MAINGAME_SCREEN_PATH = "/client/views/fxml/MainGameScreen.fxml";
     public static final String POPUP_PATH = "/client/views/fxml/popup.fxml";
+    public static final String WAITING_PATH = "/client/views/fxml/WaitingScreen.fxml";
 
     // image path
     public static final String IMAGE_PATH = "icon/";

@@ -53,9 +53,11 @@ public class HomeScreenHandler extends BaseScreenHandler
     }
 
     @FXML
-    private void handleHomeAction(javafx.event.Event evt) {
+    private void handleHomeAction(javafx.event.Event evt) throws IOException {
         if (evt.getSource() == guestPlayBtn) {
             System.out.println("guest player");
+            WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(this.stage);
+            waitingScreenHandler.show();
             // TODO: log guest player here
         } else if (evt.getSource() == returnPlayerBtn) {
             System.out.println("back to player");

@@ -10,6 +10,7 @@ import message.drawconfirm.DrawConfirmServerMessage;
 import message.drawrequest.DrawRequestServerMessage;
 import message.joinqueue.JoinQueueClientMessage;
 import message.login.LoginClientMessage;
+import message.logout.LogoutClientMessage;
 import message.matchfound.MatchFoundServerMessage;
 import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
@@ -146,6 +147,11 @@ public class ClientSocketChannel {
 		
 	}
 
+	public String logout(String username, String sessionID) throws Exception {
+		LogoutClientMessage logoutRequest = new LogoutClientMessage(username, sessionID);
+		return sendRequest(logoutRequest.toString(), logoutRequest.getMessageCommandID());
+	}
+
 	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
 			throws Exception {
 		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
@@ -195,10 +201,6 @@ public class ClientSocketChannel {
 //		return sendRequest("");
 //	}
 //
-//	public String logout() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
 
 	public ServerMessage listenIngameMessage() {
 
