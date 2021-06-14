@@ -1,5 +1,6 @@
 package server.core.authentication;
 
+import entity.Player.GuestPlayer;
 import entity.Player.RankPlayer;
 import server.entity.database.T3DB;
 
@@ -73,6 +74,10 @@ public class T3Authenticator {
         }
         return loggedPlayer;
     }
+
+//    public GuestPlayer createGuestPlayer() {
+//
+//    }
     
 //    public Player getOnlinePlayer(String sessionID) throws Exception {
 //    	Player player = null;

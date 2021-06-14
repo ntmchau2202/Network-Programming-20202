@@ -251,8 +251,22 @@ public class RequestProcessor {
                 serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
             }
         } else {
-            // if it is not ranked user, call to create a new guest player account
-
+            // if it is not ranked user, call to create a new guest player account ONLY if mode is normal
+            if (mode.compareToIgnoreCase("normal") == 0) {
+//                RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+//                if (loggedPlayer == null) {
+//                    serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
+//                            "Username / Password is not valid");
+//                } else {
+////            loggedPlayer.setUserSocket(sock);
+//                    queueController.pushToHall(loggedPlayer);
+//                    serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
+//                            loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
+//                            loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+//                }
+            } else {
+                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "You must login to play in ranked mode. Please try again");
+            }
         }
 
         queueController.viewHall();
