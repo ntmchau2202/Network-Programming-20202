@@ -27,6 +27,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import message.ServerMessage;
+import server.entity.match.ChatMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +35,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javafx.util.Pair;
 
 public class MainGameScreenHandler extends BaseScreenHandler implements Initializable {
     @FXML
@@ -205,10 +208,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			protected Void call() throws Exception {
 				while(true) {
 					System.out.println("================================= Start listening to chatttttttttttt");
-					String recvMsg = mainGameScreenController.listenChat();
-					if(recvMsg.length() != 0) {
+					ChatMessage recvMsg = mainGameScreenController.listenChat();
+					if(recvMsg!= null && recvMsg.getMessage().length() != 0) {
 						System.out.println("Message length !=0: " + recvMsg);
-						updateChatAfterListen(recvMsg);
+						updateChat(recvMsg);
 					} else {
 						System.out.println("Empty message :(");
 					}
@@ -233,7 +236,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         });
     }
 
-    private void updateChatAfterListen(String recvMsg) {
+    private void updateChat(ChatMessage recvMsg) {
     	Platform.runLater(new Runnable() {
 
 			@Override
@@ -455,9 +458,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     	String msgToSend = chatTextField.getText();
     	chatTextField.setText("");
     	sendButton.setDisable(true);
-        Task<Boolean> sendChatTask = new Task<Boolean>() {
+        Task<ChatMessage> sendChatTask = new Task<ChatMessage>() {
 			@Override
-			protected Boolean call() throws Exception {
+			protected ChatMessage call() throws Exception {
 				// TODO Auto-generated method stub
 				System.out.println("Gotta send something...: " + msgToSend);
 				return mainGameScreenController.sendChatMessage(msgToSend);
@@ -468,15 +471,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         sendChatTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent arg0) {
-				Boolean isOK = (Boolean) arg0.getSource().getValue();
-				if(isOK) {
-//					chatVbox.getChildren().add(addMessage(msgToSend));
-//					System.out.println("Send msg ok <3: " + msgToSend);
-					updateChatAfterListen(msgToSend);
-				} else {
-//					chatVbox.getChildren().add(addMessage(mainGameScreenController.getFinalErrorMessage()));
-					updateChatAfterListen(mainGameScreenController.getFinalErrorMessage());
-				}
+				ChatMessage ret = (ChatMessage) arg0.getSource().getValue();
+				updateChat(ret);
 				sendButton.setDisable(false);
 			}
         });
@@ -484,26 +480,41 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         sendChatThread.start();
     }
 
-    public HBox addMessage(String message)
+    public HBox addMessage(ChatMessage recvMsg)
     {
-        // chat name set
-        chatName = new Label();
-        chatName.setText(mainGameScreenController.getCurrentPlayer().getUsername()+": ");
-        chatName.setTextFill(Color.web(this.mainGameScreenController.amIFirstPlayer() ? "#FF4A05" : "#0082ec"));
-        chatName.setPrefWidth(80);
-        chatName.setStyle("-fx-font-size: 20px");
-        chatName.setWrapText(true);
+    	Label msg = null;
+    	chatName = new Label();
+    	
+    	if (recvMsg == null) {
+    		chatName.setText("[Server]: ");
+    		chatName.setTextFill(Color.web("#ff0000"));
+    		chatName.setPrefWidth(120);
+            chatName.setStyle("-fx-font-size: 20px");
+            chatName.setWrapText(true);
+            
+            msg = new Label(mainGameScreenController.getFinalErrorMessage());
+            msg.setWrapText(true);
+            msg.setPrefWidth(400);
+            msg.setMaxWidth(500);
+            msg.setStyle("-fx-font-size: 20px");
+    	} else {
+    		// chat name set
+           
+            chatName.setText(recvMsg.getSendPlayerName() +": ");
+            chatName.setTextFill(Color.web(this.mainGameScreenController.getCurrentPlayer().getUsername().compareToIgnoreCase(recvMsg.getSendPlayerName()) == 0 ? "#FF4A05" : "#0082ec"));
+            chatName.setPrefWidth(120);
+            chatName.setStyle("-fx-font-size: 20px");
+            chatName.setWrapText(true);
 
-        // message HBox set
+        	msg = new Label(recvMsg.getMessage());
+            msg.setWrapText(true);
+            msg.setPrefWidth(400);
+            msg.setMaxWidth(500);
+            msg.setStyle("-fx-font-size: 20px");
+    	}
+        
         HBox hbox = new HBox();
         hbox.setPrefWidth(600);
-
-        // msg set
-        Label msg = new Label(message);
-        msg.setWrapText(true);
-        msg.setPrefWidth(400);
-        msg.setMaxWidth(500);
-        msg.setStyle("-fx-font-size: 20px");
         hbox.getChildren().addAll(chatName,msg);
         return hbox;
     }
