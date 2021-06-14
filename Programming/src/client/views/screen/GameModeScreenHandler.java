@@ -186,7 +186,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 					protected Integer call() {
 						Integer isFound = 1;
 						try {
-							isFound = gameModeScreenController.findPracticeGame();
+							isFound = gameModeScreenController.findRankedGame();
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

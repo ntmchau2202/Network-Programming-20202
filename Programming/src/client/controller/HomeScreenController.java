@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.network.ClientSocketChannel;
+import entity.Player.GuestPlayer;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
 import message.joinqueue.JoinQueueServerMessage;
@@ -36,7 +37,7 @@ public class HomeScreenController extends BaseController{
 		        opponentElo = response.getOpponentELO();
 		        sessionID = response.getSessionID();
 		        firstPlayer = response.getFirstPlayer();
-		        curPlayer = new Player(response.getUsername(), response.getSessionID());
+		        curPlayer = new GuestPlayer(response.getUsername(), response.getSessionID());
 //		        curPlayer.setUserSocket(ClientSocketChannel.getSocketInstance());
 		        return 0;
 	        } catch (Exception e) {

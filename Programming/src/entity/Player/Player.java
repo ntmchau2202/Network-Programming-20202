@@ -2,7 +2,7 @@ package entity.Player;
 
 import java.nio.channels.AsynchronousSocketChannel;
 
-public class Player {
+public abstract class Player {
     private final String username;
     private final String sessionId;
     private AsynchronousSocketChannel userSocket;
