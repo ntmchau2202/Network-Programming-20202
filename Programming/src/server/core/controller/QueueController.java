@@ -3,7 +3,7 @@ package server.core.controller;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
-import entity.Match.Match;
+import server.entity.match.Match;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
 

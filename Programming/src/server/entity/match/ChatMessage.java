@@ -1,13 +1,11 @@
-package server.entity.chat;
-
-import entity.Player.Player;
+package server.entity.match;
 
 public class ChatMessage {
-    private String sendPlayerName;
-    private String recvPlayerName;
-    private String message;
-    private String messageID;
-    private int matchID;
+    private final String sendPlayerName;
+    private final String recvPlayerName;
+    private final String message;
+    private final String messageID;
+    private final int matchID;
     private boolean isRead = false;
 
     public ChatMessage(int matchID, String sendPlayerName, String recvPlayerName, String messageID, String message) {

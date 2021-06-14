@@ -1,6 +1,6 @@
 package server.entity.network.request;
 
-import entity.Match.Match;
+import server.entity.match.Match;
 import entity.Move.Move;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
@@ -24,7 +24,7 @@ import protocol.StatusCode;
 import server.core.authentication.T3Authenticator;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
-import server.entity.chat.ChatMessage;
+import server.entity.match.ChatMessage;
 import server.entity.network.completionHandler.ReadCompletionHandler;
 
 public class RequestProcessor {
@@ -447,7 +447,7 @@ public class RequestProcessor {
             while (true) {
                 try {
                     Thread.sleep(500);
-                    chatMsg = match.getUnreadMsg();
+                    chatMsg = match.getUnreadMsg(username);
                     if (chatMsg == null) {
                         // if no message, just continue
                         continue;

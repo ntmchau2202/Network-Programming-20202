@@ -91,7 +91,6 @@ public class RequestBody {
 		this.requestBody.put("message", message);
 		this.requestBody.put("message_id", message_id);
 		this.requestBody.put("match_id", match_id);
-		System.out.println("createChatBody: done: " + this.requestBody.toString());
 	}
 	
 	public void createChatACKBody(String message_id, int match_id, StatusCode status_code ,String error) throws JSONException {

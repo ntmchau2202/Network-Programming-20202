@@ -3,7 +3,7 @@ package message.chat;
 import message.ServerMessage;
 import protocol.Command;
 import protocol.StatusCode;
-import server.entity.chat.ChatMessage;
+import server.entity.match.ChatMessage;
 
 public class ChatServerMessage extends ServerMessage {
 	private String fromUser, toUser, message, messageID;

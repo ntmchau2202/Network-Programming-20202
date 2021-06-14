@@ -102,7 +102,6 @@ public class ClientSocketChannel {
 //		}
 //		System.out.println("This is printed from client: " + attachment.getReturnMessage());
 //		return attachment.getReturnMessage();
-		System.out.println("Gotta send: " + strMsgToSend);
 		int msgID = messageQueue.pushMessageToSendQueue(strMsgToSend, msgCmdID);
 		
 		while(true) {
@@ -180,9 +179,7 @@ public class ClientSocketChannel {
 
 	public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
 		// TODO: Finish function
-		System.out.println("Got into here ~~~ chat!! 1234567986532");
-		ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID); // ??????????????????????????
-		System.out.println("Gotta send: " + msg.toString());
+		ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID);
 		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
 		
 		while(true) {
