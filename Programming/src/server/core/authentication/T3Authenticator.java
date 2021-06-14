@@ -30,7 +30,7 @@ public class T3Authenticator {
         // TODO: throw exception if multiple results
         while (res.next()) {
             // TODO: get rank
-            loggedPlayer = new RankPlayer(res.getString("username"), sessionID , res.getInt("elo"),res.getInt("no_match_played"), res.getInt("no_match_won"));
+            loggedPlayer = new RankPlayer(res.getString("username"), sessionID, res.getInt("elo"), res.getInt("no_match_played"), res.getInt("no_match_won"));
         }
         if (loggedPlayer != null) {
             storeSessionID(username, sessionID);
@@ -39,7 +39,7 @@ public class T3Authenticator {
     }
 
     public String genSessionID() {
-        return String.valueOf(System.currentTimeMillis()).substring(8, 13) + UUID.randomUUID().toString().substring(1,10);
+        return String.valueOf(System.currentTimeMillis()).substring(8, 13) + UUID.randomUUID().toString().substring(1, 10);
     }
 
     public String getHashedPwd(String rawPwd) {
@@ -79,7 +79,7 @@ public class T3Authenticator {
         // TODO: throw exception if multiple results
         while (res.next()) {
             // TODO: get rank
-            loggedPlayer = new RankPlayer(res.getString("username"), sessionID, res.getInt("elo"),res.getInt("no_match_played"), res.getInt("no_match_won"));
+            loggedPlayer = new RankPlayer(res.getString("username"), sessionID, res.getInt("elo"), res.getInt("no_match_played"), res.getInt("no_match_won"));
         }
         if (loggedPlayer != null) {
             storeSessionID(username, sessionID);
@@ -133,7 +133,7 @@ public class T3Authenticator {
             String result = "";
             Pattern p = Pattern.compile("[0-9]+$");
             Matcher m = p.matcher(lastDisplayName);
-            if(m.find()) {
+            if (m.find()) {
                 result = m.group();
             }
             int anonID = Integer.parseInt(result);
@@ -157,24 +157,37 @@ public class T3Authenticator {
         return new GuestPlayer(newGuestDisplayName, sessionID);
     }
 
-//    public boolean logout(String username, String sessionID) {
-//        // return false if user has already logged in
-//        String foundSessionID = getSessionIDByUsername(username);
-//        if (foundSessionID != null && !foundSessionID.isEmpty()) {
-//            return false;
-//        }
-//
-//        PreparedStatement stm = T3DB.getConnection().prepareStatement(
-//                "insert into SessionID (username, session_id) values (?, ?)");
-//        stm.setString(1, username);
-//        stm.setString(2, sessionID);
-//        stm.executeUpdate();
-//
-//        // query again to get logged player
-//        foundSessionID = getSessionIDByUsername(username);
-//        return foundSessionID.equals(sessionID);
-//    }
-    
+    public boolean logout(String username, String sessionID) throws SQLException {
+        // return false if user hasn't logged in
+        String foundSessionID = getSessionIDByUsername(username);
+        if (foundSessionID == null || foundSessionID.isEmpty()) {
+            return false;
+        }
+        PreparedStatement stm;
+        // remove record in table SessionID
+        stm = T3DB.getConnection().prepareStatement(
+                "delete from SessionID where username=? and session_id=?");
+        stm.setString(1, username);
+        stm.setString(2, sessionID);
+        stm.executeUpdate();
+
+        // remove record in table GuestPlayer (case: user is anon
+        stm = T3DB.getConnection().prepareStatement(
+                "delete from GuestPlayer where displayname=?");
+        stm.setString(1, username);
+        stm.executeUpdate();
+
+        foundSessionID = getSessionIDByUsername(username);
+        // if record still exists in db -> false
+        if (foundSessionID != null && !foundSessionID.isEmpty()) {
+            return false;
+        }
+
+        // TODO: check if record exists in table GuestPlayer
+
+        return true;
+    }
+
 //    public Player getOnlinePlayer(String sessionID) throws Exception {
 //    	Player player = null;
 //    	PreparedStatement stm = T3DB.getConnection().prepareStatement(

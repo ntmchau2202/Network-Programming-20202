@@ -125,4 +125,10 @@ public class ResponseBody {
 		this.responseBody.put("message_id", message_id);
 		this.responseBody.put("match_id", match_id);
 	}
+
+	public void createLogoutBody(String username, String sessionID) throws JSONException {
+		this.responseBody.clear();
+		this.responseBody.put("username", username);
+		this.responseBody.put("session_id", sessionID);
+	}
 }
