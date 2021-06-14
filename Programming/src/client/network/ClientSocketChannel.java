@@ -16,6 +16,7 @@ import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
 import message.quitqueue.QuitQueueClientMessage;
 import message.register.RegisterClientMessage;
+import message.updateuser.UpdateUserClientMessage;
 import protocol.Attachment;
 import protocol.Command;
 
@@ -181,14 +182,12 @@ public class ClientSocketChannel {
 	public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
 		// TODO: Finish function
 		ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID);
-		int msgID = messageQueue.pushMessageToSendQueue(msg.toString(), msg.getMessageCommandID());
-		
-		while(true) {
-			Attachment attachment = messageQueue.getAttachmentByID(msgID);
-			if(attachment != null) {
-				return attachment.getReturnMessage();
-			}
-		}
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
+	
+	public String updateUser(String username, String sessionID) throws Exception {
+		UpdateUserClientMessage msg = new UpdateUserClientMessage(username, sessionID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 
 //	public String chatACK() throws Exception {

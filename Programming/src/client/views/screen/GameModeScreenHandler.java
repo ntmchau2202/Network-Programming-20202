@@ -102,12 +102,13 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	@FXML
 	private void handleFindGameAction(javafx.event.Event evt) {
 		try {
-			MainGameScreenController mainGameScreenController = new MainGameScreenController(
-					this.gameModeScreenController.getCurPlayer());
+			
 			GameModeScreenHandler currentHandler = this;
 			
 
 			if (evt.getSource() == practicePlay) {
+				MainGameScreenController mainGameScreenController = new MainGameScreenController(
+						this.gameModeScreenController.getCurPlayer(), "normal");
 				System.out.println("practice play");
 				// Boolean isFound = false;
 				practicePlay.setDisable(true);
@@ -182,6 +183,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
 				quitQueue.setDisable(false);
+				MainGameScreenController mainGameScreenController = new MainGameScreenController(
+						this.gameModeScreenController.getCurPlayer(), "ranked" );
 				Task<Integer> findGameTask = new Task<Integer>() {
 					protected Integer call() {
 						Integer isFound = 1;

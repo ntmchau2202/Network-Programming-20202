@@ -41,6 +41,15 @@ public class ResponseBody {
 		this.responseBody.put("elo", elo);
 	}
 	
+	public void createUpdateUserBody(String username, int noOfMatchPlayed, int noOfMatchWon, int elo, String winRate) {
+		this.responseBody.clear();
+		this.responseBody.put("username", username);
+		this.responseBody.put("no_of_match_played", noOfMatchPlayed);
+		this.responseBody.put("no_of_match_won", noOfMatchWon);
+		this.responseBody.put("elo", elo);
+		this.responseBody.put("win_rate", winRate);
+	}
+	
 	public void createJoinQueueBody(String username, String sessionID, String opponent, int elo, int matchID, String player1) throws JSONException {
 		this.responseBody.clear();
 		this.responseBody.put("session_id", sessionID);

@@ -376,10 +376,21 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 							public void handle(WorkerStateEvent arg0) {
 								try {
 									notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
-//									RankPlayer curPlayer = (RankPlayer)mainGameScreenController.getCurrentPlayer();
-                                    GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
-			                        gameModeHandler.setScreenTitle("Game mode");
-			                        gameModeHandler.show();
+									// send update_user msg here
+									if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
+										try {
+											mainGameScreenController.updateUserInformation();
+											GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+					                        gameModeHandler.setScreenTitle("Game mode");
+					                        gameModeHandler.show();
+										} catch (Exception e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+									} else {
+										
+									}
+									
 								} catch (IOException e) {
 									e.printStackTrace();
 								}

@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import client.network.ClientSocketChannel;
 import client.views.screen.MainGameScreenHandler;
 import entity.Player.Player;
+import entity.Player.RankPlayer;
 import javafx.application.Platform;
 import javafx.util.Pair;
 import message.ServerMessage;
@@ -16,6 +17,7 @@ import message.drawconfirm.DrawConfirmServerMessage;
 import message.drawrequest.DrawRequestServerMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
+import message.updateuser.UpdateUserServerMessage;
 import protocol.Command;
 import protocol.StatusCode;
 import server.entity.match.ChatMessage;
@@ -39,9 +41,15 @@ public class MainGameScreenController extends BaseController {
 	private String movePlayer;
 	private String moveResult, moveState;
 	private String errMsg;
+	private String mode;
 
-	public MainGameScreenController(Player currentPlayer) {
+	public MainGameScreenController(Player currentPlayer, String mode) {
 		this.currentPlayer = currentPlayer;
+		this.mode = mode;
+	}
+	
+	public String getCurrentGameMode() {
+		return this.mode;
 	}
 
 	public void setIsFirstPlayer(boolean isFirstPlayer) {
@@ -176,4 +184,22 @@ public class MainGameScreenController extends BaseController {
 	public String getFinalErrorMessage() {
 		return this.errMsg;
 	}
+	
+	public boolean updateUserInformation() throws Exception {
+		System.out.println("We gonna update ourselves here, not like the dumbass Windows :)");
+		String result = ClientSocketChannel.getSocketInstance().updateUser(currentPlayer.getUsername(), currentPlayer.getSessionId());
+		UpdateUserServerMessage ret = new UpdateUserServerMessage(result);
+		if(ret.getStatusCode().compareTo(StatusCode.ERROR)==0) {
+			return false;
+		} else {
+			// this only be called when it's ranked player, so cast
+			// however, still considering this is unsafe
+			// how to resolve this?
+			RankPlayer tmp = (RankPlayer)currentPlayer;
+			tmp.updatePlayerInfo(ret.getRank(), ret.getElo(), ret.getNoMatchPlayed(), ret.getNoMatchWon());
+			currentPlayer = tmp;
+			return true;
+		}
+	}
+	
 }

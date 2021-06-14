@@ -83,7 +83,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 					Integer isFound = (Integer) t.getSource().getValue();
 					System.out.println("done:" + isFound);
 					if (isFound == 0) {
-						MainGameScreenController mainGameScreenController = new MainGameScreenController(homeScreenController.getCurrentPlayer());
+						MainGameScreenController mainGameScreenController = new MainGameScreenController(homeScreenController.getCurrentPlayer(), "guest");
 						mainGameScreenController.setOpponent(homeScreenController.getOpponentName(),
 								homeScreenController.getOpponentElo());
 						mainGameScreenController.setMatchID(homeScreenController.getMatchID());
