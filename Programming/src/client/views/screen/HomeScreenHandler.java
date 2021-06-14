@@ -61,8 +61,7 @@ public class HomeScreenHandler extends BaseScreenHandler
         if (evt.getSource() == guestPlayBtn) {
             System.out.println("guest player");
             // TODO: log guest player here
-			MainGameScreenController mainGameScreenController = new MainGameScreenController(
-					null);
+			
 			HomeScreenHandler currentHandler = this;
             guestPlayBtn.setDisable(true);
 			Task<Integer> findGameTask = new Task<Integer>() {
@@ -84,6 +83,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 					Integer isFound = (Integer) t.getSource().getValue();
 					System.out.println("done:" + isFound);
 					if (isFound == 0) {
+						MainGameScreenController mainGameScreenController = new MainGameScreenController(homeScreenController.getCurrentPlayer());
 						mainGameScreenController.setOpponent(homeScreenController.getOpponentName(),
 								homeScreenController.getOpponentElo());
 						mainGameScreenController.setMatchID(homeScreenController.getMatchID());
@@ -102,6 +102,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 									Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
 							mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
 							mainGameScreenHandler.setPreviousScreen(currentHandler);
+							System.out.println("Pepare to show up!");
 							mainGameScreenHandler.show();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block

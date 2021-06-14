@@ -233,8 +233,8 @@ public class QueueController {
 					for (int i = 0; i < rankedQueue.size() - 1; i ++) {
 						if (rankedQueue.get(i).getElo() - 500 < rankedQueue.get(i + 1).getElo()) {
 							// remember that we remove ele at i + 1 , but after remove ele at i, ele at (i + 1) becomes ele at i
-							Player player1 = normalQueue.remove(i);
-							Player player2 = normalQueue.remove(i);
+							Player player1 = rankedQueue.remove(i);
+							Player player2 = rankedQueue.remove(i);
 							ingameList.add(new Match(player1, player2));
 							break;
 						}
@@ -255,7 +255,6 @@ public class QueueController {
 			while(true) {
 				try {
 					Thread.sleep(3000);
-					System.out.println("Number of game currently: " + ingameList.size());
 					Iterator<Match> ingameListIterator = ingameList.iterator();
 //					for(Match m : ingameList) {
 //						if (m.isEnded()) {
@@ -266,6 +265,7 @@ public class QueueController {
 						Match m = ingameListIterator.next();
 						if(m.isEnded()) {
 							ingameListIterator.remove();
+							System.out.println("Number of game currently: " + ingameList.size());
 						}
 					}
 

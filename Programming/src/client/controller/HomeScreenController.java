@@ -8,11 +8,12 @@ import message.joinqueue.JoinQueueServerMessage;
 import protocol.StatusCode;
 
 public class HomeScreenController extends BaseController{
-    private Player curPlayer;
+    private GuestPlayer curPlayer;
     private int matchID, opponentElo;
     private String opponentName;
     private String firstPlayer;
     private String sessionID;
+    
 	public HomeScreenController() {
 		
 	}
@@ -65,5 +66,9 @@ public class HomeScreenController extends BaseController{
     
     public boolean amIFirstPlayer() {
         return this.firstPlayer.equalsIgnoreCase(this.curPlayer.getUsername());
+    }
+    
+    public Player getCurrentPlayer() {
+    	return this.curPlayer;
     }
 }

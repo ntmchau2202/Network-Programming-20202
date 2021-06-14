@@ -103,8 +103,9 @@ public class ClientSocketChannel {
 //		System.out.println("This is printed from client: " + attachment.getReturnMessage());
 //		return attachment.getReturnMessage();
 		int msgID = messageQueue.pushMessageToSendQueue(strMsgToSend, msgCmdID);
-		
+		System.out.println("sendRequest: received msgID: " + msgID);
 		while(true) {
+			Thread.sleep(500);
 			Attachment attachment = messageQueue.getAttachmentByID(msgID);
 			if(attachment != null) {
 				return attachment.getReturnMessage();
