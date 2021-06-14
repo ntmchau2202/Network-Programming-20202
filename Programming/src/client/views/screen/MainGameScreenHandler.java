@@ -486,7 +486,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     	chatName = new Label();
     	
     	if (recvMsg == null) {
-    		chatName.setText("[Server]: ");
+    		chatName.setText("[SERVER]: ");
     		chatName.setTextFill(Color.web("#ff0000"));
     		chatName.setPrefWidth(120);
             chatName.setStyle("-fx-font-size: 20px");
