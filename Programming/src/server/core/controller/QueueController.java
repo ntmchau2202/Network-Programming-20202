@@ -9,7 +9,7 @@ import entity.Player.Player;
 import entity.Player.RankPlayer;
 
 public class QueueController {
-	private  ArrayList<RankPlayer> hall;
+	private  ArrayList<Player> hall;
 	private  ArrayList<Player> normalQueue;
 	private  ArrayList<RankPlayer> rankedQueue;
 	private  ArrayList<Match> ingameList;
@@ -17,10 +17,10 @@ public class QueueController {
 	private Semaphore mutex, endgameMutex;
 	
 	public QueueController() {
-		hall = new ArrayList<RankPlayer>();
-		normalQueue = new ArrayList<Player>();
-		rankedQueue = new ArrayList<RankPlayer>();
-		ingameList = new ArrayList<Match>();
+		hall = new ArrayList<>();
+		normalQueue = new ArrayList<>();
+		rankedQueue = new ArrayList<>();
+		ingameList = new ArrayList<>();
 		mutex = new Semaphore(1);
 		endgameMutex = new Semaphore(1);
 	}
@@ -31,7 +31,7 @@ public class QueueController {
 		cleanUpThread.start();
 	}
 	
-	public  ArrayList<RankPlayer> getHall() {
+	public  ArrayList<Player> getHall() {
 		return hall;
 	}
 	
@@ -67,7 +67,7 @@ public class QueueController {
 
 	public void viewHall() {
 		System.out.println("///////// list of players in hall");
-		for(RankPlayer rankPlayer: hall) {
+		for(Player rankPlayer: hall) {
 			System.out.println(">>> Hall Player " + rankPlayer.getUsername());
 		}
 	}
@@ -89,7 +89,7 @@ public class QueueController {
 		}
 	}
 	
-	public void pushToHall(RankPlayer player) {
+	public void pushToHall(Player player) {
 		try {
 			mutex.acquire();
 			hall.add(player);

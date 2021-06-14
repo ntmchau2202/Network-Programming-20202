@@ -1,5 +1,6 @@
 package server.entity.network.request;
 
+import entity.Player.GuestPlayer;
 import server.entity.match.Match;
 import entity.Move.Move;
 import entity.Player.Player;
@@ -136,7 +137,7 @@ public class RequestProcessor {
         RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
         if (loggedPlayer == null) {
             serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
-                    "Username / Password is not valid");
+                    "Username / Password is not valid Or this username has already been logged in");
         } else {
 //            loggedPlayer.setUserSocket(sock);
             queueController.pushToHall(loggedPlayer);
@@ -184,34 +185,53 @@ public class RequestProcessor {
 
         // check if this is ranked user
         System.out.println("Normal request!");
-        RankPlayer loggedPlayer = null;
-        for (RankPlayer player : queueController.getHall()) {
+        Player loggedPlayer = null;
+        for (Player player : queueController.getHall()) {
             if (sessionID.compareTo(player.getSessionId()) == 0) {
                 loggedPlayer = player;
                 break;
             }
         }
 
-        if (loggedPlayer != null) {
+        // if it is not ranked user, call to create a new guest player account ONLY if mode is normal
+        if (loggedPlayer == null) {
+            if (mode.compareToIgnoreCase("normal") == 0) {
+                GuestPlayer guestPlayer = new T3Authenticator().createGuestPlayer();
+                if (guestPlayer == null) {
+                    serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR,
+                            "Username / Password is not valid");
+                } else {
+                    // push guest player to hall
+                    queueController.pushToHall(guestPlayer);
+                    
+                    loggedPlayer = guestPlayer;
+                }
+            } else if (mode.compareToIgnoreCase("ranked") == 0) {
+                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "You must login to play in ranked mode. Please try again");
+            } else {
+                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
+            }
+
+        }
+
+        // if no error, continue join queue
+        if (serverResponse == null) {
             if (mode.compareToIgnoreCase("normal") == 0 || mode.compareToIgnoreCase("ranked") == 0) {
                 System.out.println("requested username: " + loggedPlayer.getUsername());
                 queueController.viewHall();
                 queueController.viewNormalQueue();
                 // remove player from hall
                 queueController.removeFromHall(loggedPlayer);
-                System.out.println("remove player from hall successfully");
                 // add player to normal / ranked queue
                 queueController.pushToQueue(loggedPlayer, mode);
-                System.out.println("push player to queue successfully");
 
-                queueController.viewHall();
-                queueController.viewNormalQueue();
+//                queueController.viewHall();
+//                queueController.viewNormalQueue();
 
                 // prepare message according to each player
                 Match match = null;
 
                 for (int i = 0; i < 100; i++) {
-                    System.out.println("- in the loop: " + i);
                     if (!isCancel) {
                         match = queueController.getMatchByPlayer(loggedPlayer);
                         if (match != null) {
@@ -245,30 +265,11 @@ public class RequestProcessor {
                     // and remove player from normal/ranked queue
                     queueController.removeFromQueue(loggedPlayer.getUsername());
                 }
-//                listResponse.put(sock, serverResponse.toString());
             } else {
                 // error
                 serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
             }
-        } else {
-            // if it is not ranked user, call to create a new guest player account ONLY if mode is normal
-            if (mode.compareToIgnoreCase("normal") == 0) {
-//                RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
-//                if (loggedPlayer == null) {
-//                    serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
-//                            "Username / Password is not valid");
-//                } else {
-////            loggedPlayer.setUserSocket(sock);
-//                    queueController.pushToHall(loggedPlayer);
-//                    serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
-//                            loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
-//                            loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
-//                }
-            } else {
-                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "You must login to play in ranked mode. Please try again");
-            }
         }
-
         queueController.viewHall();
         queueController.viewNormalQueue();
         return serverResponse.toString();
@@ -471,7 +472,7 @@ public class RequestProcessor {
                         // if no message, just continue
                         continue;
                     } else {
-                    	statCode = StatusCode.SUCCESS;
+                        statCode = StatusCode.SUCCESS;
                         break;
                     }
                 } catch (InterruptedException e) {
