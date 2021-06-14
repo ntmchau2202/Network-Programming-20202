@@ -144,11 +144,36 @@ public class T3Authenticator {
 
         // gen sessionID
         String sessionID = genSessionID();
+
+        // store guest player
+        stm = T3DB.getConnection().prepareStatement(
+                "insert into GuestPlayer (displayname) values (?)");
+        stm.setString(1, newGuestDisplayName);
+        stm.executeUpdate();
+
         // store sessionID
         storeSessionID(newGuestDisplayName, sessionID);
 
         return new GuestPlayer(newGuestDisplayName, sessionID);
     }
+
+//    public boolean logout(String username, String sessionID) {
+//        // return false if user has already logged in
+//        String foundSessionID = getSessionIDByUsername(username);
+//        if (foundSessionID != null && !foundSessionID.isEmpty()) {
+//            return false;
+//        }
+//
+//        PreparedStatement stm = T3DB.getConnection().prepareStatement(
+//                "insert into SessionID (username, session_id) values (?, ?)");
+//        stm.setString(1, username);
+//        stm.setString(2, sessionID);
+//        stm.executeUpdate();
+//
+//        // query again to get logged player
+//        foundSessionID = getSessionIDByUsername(username);
+//        return foundSessionID.equals(sessionID);
+//    }
     
 //    public Player getOnlinePlayer(String sessionID) throws Exception {
 //    	Player player = null;
