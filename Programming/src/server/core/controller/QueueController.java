@@ -3,6 +3,7 @@ package server.core.controller;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
+import javafx.util.Pair;
 import server.entity.match.Match;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
@@ -74,6 +75,13 @@ public class QueueController {
 			System.out.println(">>> Normal Queue Player " + player.getUsername());
 		}
 	}
+
+	public void viewRankedQueue() {
+		System.out.println("///////// list of players in ranked queue");
+		for(Player player: rankedQueue) {
+			System.out.println(">>> Ranked Queue Player " + player.getUsername());
+		}
+	}
 	
 	public void removeFromHall(Player player) {
 		try {
@@ -108,7 +116,17 @@ public class QueueController {
 				}
 				case "ranked":{
 					mutex.acquire();
-					rankedQueue.add((RankPlayer)player);
+					if (rankedQueue.size() <= 0) {
+						rankedQueue.add((RankPlayer)player);
+					} else {
+						for (int i = 0; i < rankedQueue.size(); i ++) {
+							if (rankedQueue.get(i).getElo() < ((RankPlayer)player).getElo()) {
+								rankedQueue.add(i, (RankPlayer)player);
+								break;
+							}
+						}
+					}
+//					rankedQueue.add((RankPlayer)player);
 					mutex.release();
 					break;
 				}
@@ -162,16 +180,25 @@ public class QueueController {
 			while(true) {
 				try {
 					Thread.sleep(1000);
+
+					// normal queue
 					if(normalQueue.size() > 1) {
 						Player player1 = normalQueue.remove(0);
 						Player player2 = normalQueue.remove(0);
-						
 						ingameList.add(new Match(player1, player2));
-						// ingameList.add(new Pair<Integer, Player>(matchID, player2));
-						
-						// ingameList.
 					}
-					// other queues here
+
+					// rank queue
+					for (int i = 0; i < rankedQueue.size() - 1; i ++) {
+						if (rankedQueue.get(i).getElo() - 500 < rankedQueue.get(i + 1).getElo()) {
+							// remember that we remove ele at i + 1 , but after remove ele at i, ele at (i + 1) becomes ele at i
+							Player player1 = normalQueue.remove(i);
+							Player player2 = normalQueue.remove(i);
+							ingameList.add(new Match(player1, player2));
+							break;
+						}
+					}
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
