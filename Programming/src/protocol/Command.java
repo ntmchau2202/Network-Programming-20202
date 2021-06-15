@@ -17,7 +17,8 @@ public enum Command {
 	CHATACK("CHATACK", Command.Priority.NORMAL),
 	LOGOUT("LOGOUT", Command.Priority.HIGH),
 	LISTEN_MOVE("LISTEN_MOVE", Command.Priority.NORMAL),
-	QUIT_QUEUE("QUIT_QUEUE", Command.Priority.CRITICAL);
+	QUIT_QUEUE("QUIT_QUEUE", Command.Priority.CRITICAL),
+	UPDATE_USER("UPDATE_USER", Command.Priority.NORMAL);
 	
 	public enum Priority {
 		CRITICAL(0),

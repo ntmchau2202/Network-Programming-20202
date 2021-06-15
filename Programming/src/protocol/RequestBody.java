@@ -31,6 +31,12 @@ public class RequestBody {
 		this.requestBody.put("password", password);
 	}
 	
+	public void createUpdateUserBody(String username, String sessionID) {
+		this.requestBody.clear();
+		this.requestBody.put("username", username);
+		this.requestBody.put("session_id", sessionID);
+	}
+	
 	public void createJoinQueueBody(String mode, String session_id) throws JSONException {
 		this.requestBody.clear();
 		this.requestBody.put("mode", mode);

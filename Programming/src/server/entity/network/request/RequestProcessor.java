@@ -21,6 +21,9 @@ import message.quitqueue.QuitQueueClientMessage;
 import message.quitqueue.QuitQueueServerMessage;
 import message.register.RegisterClientMessage;
 import message.register.RegisterServerMessage;
+import message.updateuser.UpdateUserClientMessage;
+import message.updateuser.UpdateUserServerMessage;
+
 import org.json.JSONObject;
 import protocol.Command;
 import protocol.StatusCode;
@@ -110,6 +113,11 @@ public class RequestProcessor {
             case CHAT: {
                 resMsg = this.processChatRequest(recvMsg);
                 break;
+            }
+            
+            case UPDATE_USER: {
+            	resMsg = this.processUpdateUserRequest(recvMsg);
+            	break;
             }
 //            case CHATACK: {
 //                resMsg = this.processChatACKRequest();
@@ -402,6 +410,20 @@ public class RequestProcessor {
         MoveServerMessage fwdMsg = new MoveServerMessage(listenMsg.getMessageCommandID(), matchID, movePlayer, latestMove.getX(), latestMove.getY(), latestMove.getState(), latestMove.getResult(), StatusCode.SUCCESS, "");
 //        listResponse.put(sock, fwdMsg.toString());
         return fwdMsg.toString();
+    }
+    
+    private String processUpdateUserRequest(String recvMsg) throws Exception {
+    	UpdateUserClientMessage req = new UpdateUserClientMessage(recvMsg);
+    	String username = req.getUsername();
+    	RankPlayer loggedPlayer = new T3Authenticator().getPlayerInfo(username);
+    	UpdateUserServerMessage res = null;
+    	//int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon,
+    	if (loggedPlayer!=null) {
+    		res = new UpdateUserServerMessage(req.getMessageCommandID(), loggedPlayer.getUsername(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+    	} else {
+    		res = new UpdateUserServerMessage(req.getMessageCommandID(), loggedPlayer.getUsername(), -1, -1, -1, -1, -1, StatusCode.ERROR, "Cannot find user");
+    	}
+    	return res.toString();
     }
 
     private String processRequestDrawRequest() throws Exception {

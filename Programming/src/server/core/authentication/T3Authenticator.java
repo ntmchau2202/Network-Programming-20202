@@ -37,6 +37,22 @@ public class T3Authenticator {
         }
         return loggedPlayer;
     }
+    
+    public RankPlayer getPlayerInfo(String username) throws SQLException {
+    	RankPlayer loggedPlayer = null;
+
+        PreparedStatement stm = T3DB.getConnection().prepareStatement(
+                "select * from RankPlayer where username = ?");
+        stm.setString(1, username);
+        ResultSet res = stm.executeQuery();
+//        String sessionID = genSessionID();
+        // TODO: throw exception if multiple results
+        while (res.next()) {
+            // TODO: get rank
+            loggedPlayer = new RankPlayer(res.getString("username"), "" /*no need here, so tmp obmit*/ , res.getInt("elo"),res.getInt("no_match_played"), res.getInt("no_match_won"));
+        }
+        return loggedPlayer;
+    }
 
     public String genSessionID() {
         return String.valueOf(System.currentTimeMillis()).substring(8, 13) + UUID.randomUUID().toString().substring(1, 10);
