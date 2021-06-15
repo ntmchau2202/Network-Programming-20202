@@ -65,6 +65,7 @@ public class ClientSocketChannel {
 		// how to implement close socket when object is destroyed?
 	}
 
+	// TODO: implement thread-safe singleton
 	public static ClientSocketChannel getSocketInstance() throws IOException {
 		if (socketChannelInstance == null)
 			socketChannelInstance = new ClientSocketChannel();

@@ -144,7 +144,7 @@ public class RequestProcessor {
         String username = clientRequest.getUsername();
         String password = clientRequest.getPassword();
         // get logged player
-        RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+        RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().login(username, password);
         if (loggedPlayer == null) {
             serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
                     "Username / Password is not valid Or this username has already been logged in");
@@ -168,7 +168,7 @@ public class RequestProcessor {
 
         String password = clientRequest.getPassword();
         // register new player
-        RankPlayer loggedPlayer = new T3Authenticator().register(username, password);
+        RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().register(username, password);
         if (loggedPlayer == null) {
             serverResponse = new RegisterServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
                     "Username / Password is not valid");
@@ -206,7 +206,7 @@ public class RequestProcessor {
         // if it is not ranked user, call to create a new guest player account ONLY if mode is normal
         if (loggedPlayer == null) {
             if (mode.compareToIgnoreCase("normal") == 0) {
-                GuestPlayer guestPlayer = new T3Authenticator().createGuestPlayer();
+                GuestPlayer guestPlayer = T3Authenticator.getT3AuthenticatorInstance().createGuestPlayer();
                 if (guestPlayer == null) {
                     serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR,
                             "Username / Password is not valid");
@@ -415,7 +415,7 @@ public class RequestProcessor {
     private String processUpdateUserRequest(String recvMsg) throws Exception {
     	UpdateUserClientMessage req = new UpdateUserClientMessage(recvMsg);
     	String username = req.getUsername();
-    	RankPlayer loggedPlayer = new T3Authenticator().getPlayerInfo(username);
+    	RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().getPlayerInfo(username);
     	UpdateUserServerMessage res = null;
     	//int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon,
     	if (loggedPlayer!=null) {
@@ -525,7 +525,7 @@ public class RequestProcessor {
         LogoutClientMessage clientRequest = new LogoutClientMessage(input);
         String username = clientRequest.getUsername();
         String sessionID = clientRequest.getSessionID();
-        if (new T3Authenticator().logout(username, sessionID)) {
+        if (T3Authenticator.getT3AuthenticatorInstance().logout(username, sessionID)) {
             serverResponse = new LogoutServerMessage(clientRequest, StatusCode.SUCCESS, "");
         } else {
             serverResponse = new LogoutServerMessage(clientRequest.getMessageCommandID(), "", "", StatusCode.ERROR, "cannot logout");

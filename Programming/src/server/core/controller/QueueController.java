@@ -140,13 +140,13 @@ public class QueueController {
 		}
 	}
 	
-	public boolean endGame(String winner, int matchID) {
+	public boolean endGame(String winnerUserName, int matchID) {
 		try {
 		endgameMutex.acquire();
 		for (Match m: ingameList ) {
 			if (m.getMatchID() == matchID) {
 				// mark as end
-				m.setWinner(winner);
+				m.setWinner(winnerUserName);
 				m.setEnd(true);
 				
 				// pop players back to the hall, but do not delete immediately

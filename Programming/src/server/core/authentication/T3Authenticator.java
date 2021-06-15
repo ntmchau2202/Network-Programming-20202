@@ -8,10 +8,27 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// BILL PUGH SINGLETON IMPLEMENTATION: big brain
 public class T3Authenticator {
+    private AtomicInteger lastGuestID;
+
+    private T3Authenticator() {
+        lastGuestID = new AtomicInteger(0);
+    }
+
+    private static class T3AuthenticatorSingleton
+    {
+        private static final T3Authenticator INSTANCE = new T3Authenticator();
+    }
+
+    public static T3Authenticator getT3AuthenticatorInstance() {
+        return T3AuthenticatorSingleton.INSTANCE;
+    }
+
     public RankPlayer login(String username, String password) throws SQLException {
         RankPlayer loggedPlayer = null;
 
@@ -145,6 +162,7 @@ public class T3Authenticator {
         while (res.next()) {
             lastDisplayName = res.getString("displayname");
         }
+        int newAnonID;
         if (!lastDisplayName.isEmpty()) {
             String result = "";
             Pattern p = Pattern.compile("[0-9]+$");
@@ -153,10 +171,12 @@ public class T3Authenticator {
                 result = m.group();
             }
             int anonID = Integer.parseInt(result);
-            newGuestDisplayName = "anon" + Integer.toString(anonID + 1);
-        } else {
-            newGuestDisplayName = "anon1";
+            if (lastGuestID.get() < anonID) {
+                lastGuestID.set(anonID);
+            }
         }
+        newAnonID = lastGuestID.incrementAndGet();
+        newGuestDisplayName = "anon" + Integer.toString(newAnonID);
 
         // gen sessionID
         String sessionID = genSessionID();
