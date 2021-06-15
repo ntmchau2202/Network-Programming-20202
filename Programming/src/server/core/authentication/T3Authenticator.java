@@ -156,7 +156,7 @@ public class T3Authenticator {
         String lastDisplayName = "";
         String newGuestDisplayName = "";
         PreparedStatement stm = T3DB.getConnection().prepareStatement(
-                "select * from GuestPlayer order by displayname desc limit 1");
+                "select * from GuestPlayer order by ID desc limit 1;");
         ResultSet res = stm.executeQuery();
         // TODO: throw exception if multiple results
         while (res.next()) {
@@ -171,12 +171,13 @@ public class T3Authenticator {
                 result = m.group();
             }
             int anonID = Integer.parseInt(result);
+            System.out.println(">>> last id : (" + lastDisplayName + " - " + anonID + ")");
             if (lastGuestID.get() < anonID) {
                 lastGuestID.set(anonID);
             }
         }
         newAnonID = lastGuestID.incrementAndGet();
-        newGuestDisplayName = "anon" + Integer.toString(newAnonID);
+        newGuestDisplayName = "anon" + newAnonID;
 
         // gen sessionID
         String sessionID = genSessionID();

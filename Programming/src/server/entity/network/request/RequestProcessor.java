@@ -235,13 +235,13 @@ public class RequestProcessor {
                 // add player to normal / ranked queue
                 queueController.pushToQueue(loggedPlayer, mode);
 
-//                queueController.viewHall();
-//                queueController.viewNormalQueue();
+                queueController.viewHall();
+                queueController.viewNormalQueue();
 
                 // prepare message according to each player
                 Match match = null;
 
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 5; i++) {
                     if (!isCancel) {
                         match = queueController.getMatchByPlayer(loggedPlayer);
                         if (match != null) {
@@ -270,10 +270,21 @@ public class RequestProcessor {
                     } else {
                         serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropriate match. Please try again later");
                     }
-                    // when join queue meets error or cancelation, push player back to hall
-                    queueController.pushToHall(loggedPlayer);
+                    // when join queue meets error or cancelation
+                    // push only ranked player back to hall
+                    if (loggedPlayer instanceof RankPlayer) {
+                        System.out.println("<<< Im a ranked player");
+                        queueController.pushToHall(loggedPlayer);
+                    } else {
+                        System.out.println("<<< Im a guest player");
+                    }
+
                     // and remove player from normal/ranked queue
-                    queueController.removeFromQueue(loggedPlayer.getUsername());
+                    if (queueController.removeFromQueue(loggedPlayer.getUsername())) {
+                        System.out.println("====== remove " + loggedPlayer.getUsername() + " from queue successfully");
+                    } else {
+                        System.out.println("====== remove " + loggedPlayer.getUsername() + " from queue faileddddddd");
+                    }
                 }
             } else {
                 // error
