@@ -33,7 +33,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	
 	public void cancelHandler() {
 		System.out.println("Canceling request");
-		this.reqProc.stopProcessingRequest();
+		this.reqProc.cancelProcessingRequest();
 	}
 
 	public String getHandlerID() {
@@ -103,16 +103,16 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		}
 
 	}
+
 	@Override
 	public void failed(Throwable exc, Attachment attachment) {
+		// this is when connection is shutdown expectedly
+
+
 		exc.printStackTrace();
 	}
 	
 	public CompletionHandlerController getHandlerController() {
 		return this.completionHandlerController;
-	}
-	
-	public void stopHandler() {
-		reqProc.stopProcessingRequest();
 	}
 }

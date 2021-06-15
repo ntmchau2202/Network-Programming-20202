@@ -1,8 +1,10 @@
 package server.entity.network.request;
 
 import entity.Player.GuestPlayer;
+import message.ClientMessage;
 import message.logout.LogoutClientMessage;
 import message.logout.LogoutServerMessage;
+import protocol.RequestBody;
 import server.entity.match.Match;
 import entity.Move.Move;
 import entity.Player.Player;
@@ -31,14 +33,16 @@ import server.core.authentication.T3Authenticator;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
 import server.entity.match.ChatMessage;
+import server.entity.network.IProcessor;
 import server.entity.network.completionHandler.ReadCompletionHandler;
 
-public class RequestProcessor {
+public class RequestProcessor implements IProcessor {
 
     private final QueueController queueController;
-    private boolean isCancel;
     private Command cmd;
     private CompletionHandlerController handlerController;
+    private boolean isCancel;
+    private boolean isStop;
 
     public RequestProcessor(QueueController queueController, CompletionHandlerController handlerController) {
         this.queueController = queueController;
@@ -46,14 +50,27 @@ public class RequestProcessor {
         this.isCancel = false;
     }
 
-    public void stopProcessingRequest() {
+    @Override
+    public void cancelProcessingRequest() {
         this.isCancel = true;
+    }
+
+    @Override
+    public void stopAll() {
+        this.isStop = true;
     }
 
     public void storeCurrentCommand(String recvMsg) {
         JSONObject clientMsg = new JSONObject(recvMsg);
         this.cmd = Command.toCommand(clientMsg.getString("command_code"));
         // TODO: check cmd if it's null
+    }
+
+    public String getClientUsername(String recvMsg) {
+        JSONObject clientMsg = new JSONObject(recvMsg);
+        RequestBody requestBody = new RequestBody();
+        requestBody.setBody(clientMsg.getJSONObject("info"));
+        return requestBody.getBody().getString("username");
     }
 
     public Command getCommand() {
@@ -114,10 +131,10 @@ public class RequestProcessor {
                 resMsg = this.processChatRequest(recvMsg);
                 break;
             }
-            
+
             case UPDATE_USER: {
-            	resMsg = this.processUpdateUserRequest(recvMsg);
-            	break;
+                resMsg = this.processUpdateUserRequest(recvMsg);
+                break;
             }
 //            case CHATACK: {
 //                resMsg = this.processChatACKRequest();
@@ -241,7 +258,7 @@ public class RequestProcessor {
                 // prepare message according to each player
                 Match match = null;
 
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 200; i++) {
                     if (!isCancel) {
                         match = queueController.getMatchByPlayer(loggedPlayer);
                         if (match != null) {
@@ -336,16 +353,16 @@ public class RequestProcessor {
                 statCode = StatusCode.ERROR;
             }
         }
-        
-        if(moveMsg.getResult().compareToIgnoreCase("win")==0) {
-        	if (!queueController.endGame(movePlayer, matchID)) {
-        		statCode = StatusCode.ERROR;
-        		errMsg = "Cannot end the game...";
-        	}
+
+        if (moveMsg.getResult().compareToIgnoreCase("win") == 0) {
+            if (!queueController.endGame(movePlayer, matchID)) {
+                statCode = StatusCode.ERROR;
+                errMsg = "Cannot end the game...";
+            }
         }
 
         MoveServerMessage fwdMsg = new MoveServerMessage(moveMsg.getMessageCommandID(), matchID, movePlayer, x, y, state, result, statCode, errMsg);
-        
+
         return fwdMsg.toString();
     }
 
@@ -422,19 +439,19 @@ public class RequestProcessor {
 //        listResponse.put(sock, fwdMsg.toString());
         return fwdMsg.toString();
     }
-    
+
     private String processUpdateUserRequest(String recvMsg) throws Exception {
-    	UpdateUserClientMessage req = new UpdateUserClientMessage(recvMsg);
-    	String username = req.getUsername();
-    	RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().getPlayerInfo(username);
-    	UpdateUserServerMessage res = null;
-    	//int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon,
-    	if (loggedPlayer!=null) {
-    		res = new UpdateUserServerMessage(req.getMessageCommandID(), loggedPlayer.getUsername(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
-    	} else {
-    		res = new UpdateUserServerMessage(req.getMessageCommandID(), loggedPlayer.getUsername(), -1, -1, -1, -1, -1, StatusCode.ERROR, "Cannot find user");
-    	}
-    	return res.toString();
+        UpdateUserClientMessage req = new UpdateUserClientMessage(recvMsg);
+        String username = req.getUsername();
+        RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().getPlayerInfo(username);
+        UpdateUserServerMessage res = null;
+        //int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon,
+        if (loggedPlayer != null) {
+            res = new UpdateUserServerMessage(req.getMessageCommandID(), loggedPlayer.getUsername(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+        } else {
+            res = new UpdateUserServerMessage(req.getMessageCommandID(), loggedPlayer.getUsername(), -1, -1, -1, -1, -1, StatusCode.ERROR, "Cannot find user");
+        }
+        return res.toString();
     }
 
     private String processRequestDrawRequest() throws Exception {

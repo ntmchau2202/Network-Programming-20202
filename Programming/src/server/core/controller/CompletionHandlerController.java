@@ -34,7 +34,7 @@ public class CompletionHandlerController {
 		for(ReadCompletionHandler h : listReadHandler) {
 			if(h.getCommand().getCommandPriority().getPriorityOrder() < cmd.getCommandPriority().getPriorityOrder()) {
 				// cancel low priority handler
-				h.stopHandler();
+				h.cancelHandler();
 
 				// remove priority handler from list
 				if (this.removeHandlerFromList(h)) {
