@@ -50,12 +50,13 @@ public class TestClientB extends Application {
             fadeIn.setOnFinished((e) -> {
                 fadeOut.play();
                 // connect client
-                try {
-
-                    ClientSocketChannel.getSocketInstance();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
+//                ClientSocketChannel.getSocketInstance();
+//                try {
+//
+//                    ClientSocketChannel.getSocketInstance();
+//                } catch (IOException ioException) {
+//                    ioException.printStackTrace();
+//                }
             });
 
             // After fade out, load actual content

@@ -52,7 +52,7 @@ public class ClientApp extends Application {
                 	ClientSocketChannel.getSocketInstance();
                     LeaderboardPlayerList.getLeaderboardPlayerListInstance().synchronizeLeaderboardPlayerWithDb();
                     System.out.println("synchronize done");
-                } catch (IOException | SQLException ioException) {
+                } catch (SQLException ioException) {
                     ioException.printStackTrace();
                 }
             });
