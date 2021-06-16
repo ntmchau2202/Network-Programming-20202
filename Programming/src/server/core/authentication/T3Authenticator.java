@@ -62,7 +62,6 @@ public class T3Authenticator {
                 "select * from RankPlayer where username = ?");
         stm.setString(1, username);
         ResultSet res = stm.executeQuery();
-//        String sessionID = genSessionID();
         // TODO: throw exception if multiple results
         while (res.next()) {
             // TODO: get rank

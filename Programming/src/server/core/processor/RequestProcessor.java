@@ -1,4 +1,4 @@
-package server.entity.network.request;
+package server.core.processor;
 
 import entity.Player.GuestPlayer;
 import message.logout.LogoutClientMessage;
