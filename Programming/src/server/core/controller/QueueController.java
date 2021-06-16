@@ -124,11 +124,17 @@ public class QueueController {
                     if (rankedQueue.size() <= 0) {
                         rankedQueue.add((RankPlayer) player);
                     } else {
+                        boolean isAdded = false;
+
                         for (int i = 0; i < rankedQueue.size(); i++) {
                             if (rankedQueue.get(i).getElo() < ((RankPlayer) player).getElo()) {
                                 rankedQueue.add(i, (RankPlayer) player);
+                                isAdded = true;
                                 break;
                             }
+                        }
+                        if (!isAdded) {
+                            rankedQueue.add((RankPlayer) player);
                         }
                     }
 //					rankedQueue.add((RankPlayer)player);
@@ -149,6 +155,8 @@ public class QueueController {
                     // mark as end
                     m.setWinner(winnerUserName);
                     m.setEnd(true);
+
+                    // TODO: update match into leaderboard
 
                     // pop players back to the hall, but do not delete immediately
                     // let the thread do that shiet
@@ -226,7 +234,7 @@ public class QueueController {
                     if (normalQueue.size() > 1) {
                         Player player1 = normalQueue.remove(0);
                         Player player2 = normalQueue.remove(0);
-                        ingameList.add(new Match(player1, player2));
+                        ingameList.add(new Match(player1, player2, false));
                     }
 
                     // rank queue
@@ -235,7 +243,7 @@ public class QueueController {
                             // remember that we remove ele at i + 1 , but after remove ele at i, ele at (i + 1) becomes ele at i
                             Player player1 = rankedQueue.remove(i);
                             Player player2 = rankedQueue.remove(i);
-                            ingameList.add(new Match(player1, player2));
+                            ingameList.add(new Match(player1, player2, true));
                             break;
                         }
                     }

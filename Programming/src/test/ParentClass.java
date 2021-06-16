@@ -25,19 +25,24 @@ public class ParentClass {
         if (magicList.size() <= 0) {
             magicList.add(num);
         } else {
-            for (int i = 0; i < magicList.size(); i ++) {
+            boolean isAdded = false;
+            for (int i = 0; i < magicList.size(); i++) {
                 if (magicList.get(i) < num) {
                     magicList.add(i, num);
+                    isAdded = true;
                     break;
                 }
+            }
+            if (!isAdded) {
+                magicList.add(num);
             }
         }
     }
 
     public Pair<Integer, Integer> getMagicPair() {
         Pair<Integer, Integer> magicPair = null;
-        for (int i = 0; i < magicList.size() - 1; i ++) {
-            if (magicList.get(i) - 5 < magicList.get(i + 1)) {
+        for (int i = 0; i < magicList.size() - 1; i++) {
+            if (magicList.get(i) - 500 < magicList.get(i + 1)) {
                 magicPair = new Pair<>(magicList.get(i), magicList.get(i + 1));
                 magicList.remove(i);
                 // remember that we remove ele at i + 1 , but after remove ele at i, ele at (i + 1) becomes ele at i
@@ -50,16 +55,16 @@ public class ParentClass {
 
     public void viewList() {
         System.out.println("Magic list: ");
-        for(int i: magicList) {
+        for (int i : magicList) {
             System.out.print(i + ", ");
         }
         System.out.println();
     }
 
     public ParentClass(String test) {
-    	this.test = test;
+        this.test = test;
     }
-   
+
     public static void main(String[] args) {
 //        ChildClass cc = new ChildClass("hello", "world");
 //
@@ -75,28 +80,31 @@ public class ParentClass {
 //        System.out.println(cc2.getTest());
 //        System.out.println(cc2.getVal2());
         ParentClass pc = new ParentClass();
-        pc.addBadEle(23);
-        pc.addBadEle(20);
-        pc.addBadEle(16);
-        pc.addBadEle(12);
-        pc.addBadEle(5);
+//        pc.addBadEle(23);
+//        pc.addBadEle(20);
+//        pc.addBadEle(16);
+//        pc.addBadEle(12);
+//        pc.addBadEle(5);
         pc.viewList();
-        pc.addEle(12);
-        pc.addEle(50);
-        pc.addEle(4);
-        pc.addEle(17);
+        pc.addEle(1600);
+        pc.addEle(1390);
+
         pc.viewList();
         Pair<Integer, Integer> myPair = pc.getMagicPair();
-        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+        if (myPair == null) {
+            System.out.println("no pair yet");
+        } else {
+            System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+        }
         pc.viewList();
-        myPair = pc.getMagicPair();
-        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
-        pc.viewList();
-        myPair = pc.getMagicPair();
-        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
-        pc.viewList();
-        myPair = pc.getMagicPair();
-        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
-        pc.viewList();
+//        myPair = pc.getMagicPair();
+//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+//        pc.viewList();
+//        myPair = pc.getMagicPair();
+//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+//        pc.viewList();
+//        myPair = pc.getMagicPair();
+//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+//        pc.viewList();
     }
 }

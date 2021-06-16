@@ -224,6 +224,23 @@ public class T3Authenticator {
         return true;
     }
 
+    // TODO: move this method to more suitable class: RankPlayerModel?
+    public boolean updateRankPlayerInfo(RankPlayer rankPlayer) throws SQLException {
+        // update into RankPlayer table
+        PreparedStatement stm = T3DB.getConnection().prepareStatement(
+                "UPDATE RankPlayer SET no_match_played = ?, no_match_won = ?, elo = ? WHERE username=?");
+        stm.setInt(1, rankPlayer.getNoPlayedMatch());
+        stm.setInt(2, rankPlayer.getNoWonMatch());
+        stm.setInt(3, rankPlayer.getElo());
+        stm.setString(4, rankPlayer.getUsername());
+        stm.executeUpdate();
+
+        // update ranked player's rank into leaderboard
+
+        // TODO: check if player info has been updated successfully: query again and compare result
+        return true;
+    }
+
 //    public Player getOnlinePlayer(String sessionID) throws Exception {
 //    	Player player = null;
 //    	PreparedStatement stm = T3DB.getConnection().prepareStatement(

@@ -211,7 +211,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
 							try {
-								notifySuccess("Yeah! Found a match! Let's practice");
+								notifySuccess("Yeah! Found a match! Let's solo");
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -230,7 +230,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							
 						} else if (isFound == 1) {
 							try {
-								notifyError("Can not find practice play match, please try again later");
+								notifyError("Can not find ranked play match, please try again later");
 								practicePlay.setDisable(false);
 								rankPlay.setDisable(false);
 								quitQueue.setDisable(true);
