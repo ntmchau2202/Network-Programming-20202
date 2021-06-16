@@ -350,19 +350,13 @@ public class RequestProcessor {
                 RankPlayer wonPlayer = (RankPlayer) match.getPlayerByName(movePlayer);
                 RankPlayer lostPlayer =  (RankPlayer) match.getAnotherPlayer(movePlayer);
 
-                // rule: win + 100, lose - 100
+                // update player info into both obj and db
+                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
+                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
 
-                // update winner info
-                // TODO: UPDATE RANK FOR WONPLAYER
-                wonPlayer.updatePlayerInfo(wonPlayer.getRank(), wonPlayer.getElo() + 100, wonPlayer.getNoPlayedMatch() + 1, wonPlayer.getNoWonMatch() + 1);
-
-                // update loser info
-                // TODO: UPDATE RANK FOR LOSTPLAYER
-                lostPlayer.updatePlayerInfo(lostPlayer.getRank(), lostPlayer.getElo() - 100, lostPlayer.getNoPlayedMatch() + 1, lostPlayer.getNoWonMatch());
-
-                // update player info into db
-                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer);
-                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer);
+                // update player rank in both obj and db
+                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(wonPlayer);
+                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(lostPlayer);
             }
         }
 

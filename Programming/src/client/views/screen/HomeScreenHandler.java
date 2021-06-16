@@ -102,7 +102,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 									Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
 							mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
 							mainGameScreenHandler.setPreviousScreen(currentHandler);
-							System.out.println("Pepare to show up!");
+							System.out.println("Prepare to show up!");
 							mainGameScreenHandler.show();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block

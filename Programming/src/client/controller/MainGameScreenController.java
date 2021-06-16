@@ -1,24 +1,11 @@
 package client.controller;
 
-import java.io.IOException;
-
-import org.json.JSONObject;
-
 import client.network.ClientSocketChannel;
-import client.views.screen.MainGameScreenHandler;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
-import javafx.application.Platform;
-import javafx.util.Pair;
-import message.ServerMessage;
 import message.chat.ChatServerMessage;
-import message.chatack.ChatACKServerMessage;
-import message.drawconfirm.DrawConfirmServerMessage;
-import message.drawrequest.DrawRequestServerMessage;
-import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
 import message.updateuser.UpdateUserServerMessage;
-import protocol.Command;
 import protocol.StatusCode;
 import server.entity.match.ChatMessage;
 

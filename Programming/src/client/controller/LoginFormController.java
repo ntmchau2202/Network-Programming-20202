@@ -24,6 +24,7 @@ public class LoginFormController extends BaseController {
                     rank = player.getRank();
                 }
             }
+            System.out.println("The rank is: " + rank);
         	loggedPlayer = new RankPlayer(returnedUsername, sessionID, rank ,serverResponse.getELO(),serverResponse.getNumberOfMatchPlayed(),serverResponse.getNumberOfMatchWon());
         	return true;
         }

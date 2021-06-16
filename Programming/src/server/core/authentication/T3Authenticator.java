@@ -1,12 +1,16 @@
 package server.core.authentication;
 
 import entity.Player.GuestPlayer;
+import entity.Player.LeaderboardPlayer;
+import entity.Player.LeaderboardPlayerList;
 import entity.Player.RankPlayer;
 import server.entity.database.T3DB;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -225,7 +229,15 @@ public class T3Authenticator {
     }
 
     // TODO: move this method to more suitable class: RankPlayerModel?
-    public boolean updateRankPlayerInfo(RankPlayer rankPlayer) throws SQLException {
+    public boolean updateRankPlayerInfo(RankPlayer rankPlayer, boolean isWon) throws SQLException {
+        // rule: win + 100, lose - 100
+
+        int modifyElo = isWon ? 100 : -100;
+        int modifyNoWonMatch = isWon ? 1 : -1;
+
+        // update into obj
+        rankPlayer.updatePlayerInfo(rankPlayer.getRank(), rankPlayer.getElo() + modifyElo, rankPlayer.getNoPlayedMatch() + 1, rankPlayer.getNoWonMatch() + modifyNoWonMatch);
+
         // update into RankPlayer table
         PreparedStatement stm = T3DB.getConnection().prepareStatement(
                 "UPDATE RankPlayer SET no_match_played = ?, no_match_won = ?, elo = ? WHERE username=?");
@@ -235,9 +247,26 @@ public class T3Authenticator {
         stm.setString(4, rankPlayer.getUsername());
         stm.executeUpdate();
 
+        // TODO: check if player info has been updated successfully: query again and compare result
+        return true;
+    }
+
+    public boolean updateRankPlayerRank(RankPlayer rankPlayer) throws SQLException {
         // update ranked player's rank into leaderboard
 
-        // TODO: check if player info has been updated successfully: query again and compare result
+        // PSEUDO get rank of player
+        int newRank = 0;
+        LeaderboardPlayerList.getLeaderboardPlayerListInstance().synchronizeLeaderboardPlayerWithDb();
+        List<LeaderboardPlayer> lstPlayer = new ArrayList<>();
+        lstPlayer = (List<LeaderboardPlayer>) LeaderboardPlayerList.getLeaderboardPlayerListInstance().getLeaderboardPlayerList();
+        for (LeaderboardPlayer player : lstPlayer) {
+            if (rankPlayer.getUsername().equals(player.getUsername())) {
+                newRank = player.getRank();
+            }
+        }
+
+        // update rank for current player
+        rankPlayer.updatePlayerRank(newRank);
         return true;
     }
 
