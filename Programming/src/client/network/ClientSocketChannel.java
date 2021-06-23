@@ -157,7 +157,16 @@ public class ClientSocketChannel {
 //		return sendRequestAsync(quitQueueRequest.toString());
         return sendRequest(quitQueueRequest.toString(), quitQueueRequest.getMessageCommandID());
 
-    }
+	public String logout(String username, String sessionID) throws Exception {
+		LogoutClientMessage logoutRequest = new LogoutClientMessage(username, sessionID);
+		return sendRequest(logoutRequest.toString(), logoutRequest.getMessageCommandID());
+	}
+
+	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
+			throws Exception {
+		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
 
     public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
             throws Exception {
@@ -202,11 +211,6 @@ public class ClientSocketChannel {
 
     public String listenDrawRequest(String username, int matchID) throws Exception {
     	ListenDrawClientMessage msg = new ListenDrawClientMessage(username, matchID);
-    	return sendRequest(msg.toString(), msg.getMessageCommandID());
-    }
-    
-    public String logout(String username, String sessionID) throws Exception {
-    	LogoutClientMessage msg = new LogoutClientMessage(username, sessionID);
     	return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 }

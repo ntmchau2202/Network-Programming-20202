@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
@@ -42,7 +43,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	@FXML
 	private Button rankPlay;
 	@FXML
-	private ImageView prevScreenImageView;
+	private ImageView logoutImageView;
 	@FXML
 	private ImageView homeScreenImageView;
 	@FXML
@@ -73,28 +74,29 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		this.winningRate.setText(Float.toString(this.gameModeScreenController.getCurPlayer().getWinningRate()*100));
 		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
 				new HomeScreenController());
-		prevScreenImageView.setOnMouseClicked(e -> {
-			// TODO: gotta rethink ab this...
-			homeHandler.show();
-			homeHandler.setScreenTitle("Home Screen");
-		});
 		homeScreenImageView.setOnMouseClicked(e -> {
 			// TODO: gotta rethink ab this...
 			homeHandler.show();
 			homeHandler.setScreenTitle("Home Screen");
 		});
-//		leaderboardImageView.setOnMouseClicked(ev -> {
-//			System.out.println("leaderboard");
-//			try {
-//				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-//						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
-//				leaderboardHandler.setScreenTitle("Leaderboard");
-//				leaderboardHandler.setPreviousScreen(this);
-//				leaderboardHandler.show();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		});
+
+		logoutImageView.setOnMouseClicked(e -> {
+			// logout
+		});
+		Tooltip.install(homeScreenImageView, new Tooltip("Home"));
+		Tooltip.install(logoutImageView, new Tooltip("Logout"));
+		leaderboardImageView.setOnMouseClicked(ev -> {
+			System.out.println("leaderboard");
+			try {
+				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+				leaderboardHandler.setScreenTitle("Leaderboard");
+				leaderboardHandler.setPreviousScreen(this);
+				leaderboardHandler.show();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 		quitQueue.setDisable(true);
 	}
 
@@ -108,8 +110,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		try {
 			
 			GameModeScreenHandler currentHandler = this;
-			
-
+			WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(currentHandler.stage);
+			waitingScreenHandler.show();
 			if (evt.getSource() == practicePlay) {
 				MainGameScreenController mainGameScreenController = new MainGameScreenController(
 						this.gameModeScreenController.getCurPlayer(), "normal");
