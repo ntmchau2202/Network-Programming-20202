@@ -317,10 +317,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		System.out.println("leaderboard");
         try {
         	LeaderBoardController leaderboardController = new LeaderBoardController(this.gameModeScreenController.getCurPlayer().getUsername(), this.gameModeScreenController.getCurPlayer().getSessionId());
-            BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-                    Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
-            leaderboardHandler.setScreenTitle("Leaderboard");
-            leaderboardHandler.setPreviousScreen(this);
+            GameModeScreenHandler curScreen = this;
             
             Task<Boolean> leaderboardTask = new Task<Boolean>() {
 
@@ -340,6 +337,10 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 						if(!isSuccess) {
 							notifyError("Cannot get leaderboard. Please try again later");
 						} else {
+							BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(curScreen.stage,
+				                    Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
+				            leaderboardHandler.setScreenTitle("Leaderboard");
+				            leaderboardHandler.setPreviousScreen(curScreen);
 							leaderboardHandler.show();
 						}
 					} catch (Exception e) {
@@ -348,10 +349,10 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				}
             	
             });
-            
-            
-            leaderboardHandler.show();
-        } catch (IOException e) {
+            Thread leaderboardThread = new Thread(leaderboardTask);
+            leaderboardThread.start();
+        
+        } catch (Exception e) {
             e.printStackTrace();
         }
 	}

@@ -52,4 +52,8 @@ public class LeaderBoardController extends BaseController{
     	}
     	
     }
+    
+    public ArrayList<LeaderboardPlayer> getLeaderboardList(){
+    	return this.listLeaderboard;
+    }
 }
