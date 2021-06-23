@@ -27,6 +27,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import message.ServerMessage;
+import message.drawconfirm.DrawConfirmServerMessage;
+import message.drawrequest.DrawRequestServerMessage;
 import server.entity.match.ChatMessage;
 
 import java.io.File;
@@ -69,6 +71,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private TextField chatTextField;
     @FXML
     private Button sendButton;
+    @FXML
+    private ImageView drawBtn;
 
     private VBox chatVbox;
     private Label chatName;
@@ -234,6 +238,57 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         chatTextField.setOnKeyTyped(e -> {
             sendButton.setDisable(chatTextField.getText().isEmpty());
         });
+        
+        Task<Void> listenDrawTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				while(true) {
+					ServerMessage request = mainGameScreenController.listenDrawRequest();
+					if (request != null) {
+						if (request instanceof DrawRequestServerMessage) {
+							DrawRequestServerMessage realReq = (DrawRequestServerMessage)request;
+							// display dialog box for confirming draw here
+							// how to connect this dialog with the current controller?
+							// yes will send a confirm yes
+							// no will send a reject	
+						} else if (request instanceof DrawConfirmServerMessage) {
+							DrawConfirmServerMessage realReq = (DrawConfirmServerMessage)request;
+							if(realReq.getAcceptance()) {
+								// both accept
+								// display draw dialog box here
+								// then end the game
+								isGameEnded.set(true);
+								notifySuccess("Game draw!");
+								// return to main screen
+								if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
+									try {
+										mainGameScreenController.updateUserInformation();
+										GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+				                        gameModeHandler.setScreenTitle("Game mode");
+				                        gameModeHandler.show();
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								} else {
+									// guest mode
+								}
+								break;
+							} else {
+								// notify request refused
+								notifyError("Sorry, your opponent " + realReq.getPlayer() + " does not accept your draw request :(");
+							}
+						}
+					}
+					
+				}
+	        return null;
+			}
+        };
+        
+        Thread listenDrawThread = new Thread(listenDrawTask);
+        listenDrawThread.start();
     }
 
     private void updateChat(ChatMessage recvMsg) {
@@ -388,7 +443,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 											e.printStackTrace();
 										}
 									} else {
-										
+										// guest mode
 									}
 									
 								} catch (IOException e) {
@@ -529,4 +584,11 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         hbox.getChildren().addAll(chatName,msg);
         return hbox;
     }
+    
+//    @FXML
+//    public void handleResign() {
+//    	// TODO: freeze the table and show a message dialog here
+//    	Task<Boolean> resignTask;
+//    }
+    
 }

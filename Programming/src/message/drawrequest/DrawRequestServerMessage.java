@@ -8,6 +8,7 @@ public class DrawRequestServerMessage extends ServerMessage {
 
 	private int matchID;
 	private String movePlayer, sessionID;
+	//	should we add a field of draw msg id here?
 	
 	public DrawRequestServerMessage(int messageCommandID, int matchID, String player, String sessionID, StatusCode statCode, String errMsg) {
 		super(statCode, errMsg, messageCommandID);

@@ -7,10 +7,13 @@ import message.chat.ChatServerMessage;
 import message.chat.ListenChatClientMessage;
 import message.chatack.ChatACKServerMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
+import message.drawrequest.DrawRequestClientMessage;
 import message.drawrequest.DrawRequestServerMessage;
+import message.drawrequest.ListenDrawClientMessage;
 import message.joinqueue.JoinQueueClientMessage;
 import message.leaderboard.LeaderboardClientMessage;
 import message.login.LoginClientMessage;
+import message.logout.LogoutClientMessage;
 import message.matchfound.MatchFoundServerMessage;
 import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
@@ -172,10 +175,10 @@ public class ClientSocketChannel {
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 
-//	public String requestDraw() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
+	public String requestDraw(int matchID, String username, String sessionID) throws Exception {
+		DrawRequestClientMessage msg = new DrawRequestClientMessage(matchID, username, sessionID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
 //
 //	public String confirmDraw() throws Exception {
 //		// TODO: Finish function
@@ -183,13 +186,11 @@ public class ClientSocketChannel {
 //	}
 //
 	public String getLeaderBoard(String usr, String sesID) throws Exception {
-		// TODO: Finish function
 		LeaderboardClientMessage msg = new LeaderboardClientMessage(usr, sesID);
 		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 
     public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
-        // TODO: Finish function
         ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID);
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
@@ -199,5 +200,13 @@ public class ClientSocketChannel {
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 
-
+    public String listenDrawRequest(String username, int matchID) throws Exception {
+    	ListenDrawClientMessage msg = new ListenDrawClientMessage(username, matchID);
+    	return sendRequest(msg.toString(), msg.getMessageCommandID());
+    }
+    
+    public String logout(String username, String sessionID) throws Exception {
+    	LogoutClientMessage msg = new LogoutClientMessage(username, sessionID);
+    	return sendRequest(msg.toString(), msg.getMessageCommandID());
+    }
 }
