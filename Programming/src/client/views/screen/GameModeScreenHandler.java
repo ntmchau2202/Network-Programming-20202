@@ -53,6 +53,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	
 	private final GameModeScreenController gameModeScreenController;
 
+
 	private Thread findGameThread, quitQueueThread;
 	/**
 	 * @param stage      stage of screen.
@@ -62,6 +63,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	public GameModeScreenHandler(Stage stage, String screenPath, GameModeScreenController gameModeScreenController)
 			throws IOException {
 		super(stage, screenPath);
+
 		this.gameModeScreenController = gameModeScreenController;
 		this.username.setText(this.gameModeScreenController.getCurPlayer().getUsername());
 		this.elo.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getElo()));
@@ -72,25 +74,27 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
 				new HomeScreenController());
 		prevScreenImageView.setOnMouseClicked(e -> {
+			// TODO: gotta rethink ab this...
 			homeHandler.show();
 			homeHandler.setScreenTitle("Home Screen");
 		});
 		homeScreenImageView.setOnMouseClicked(e -> {
+			// TODO: gotta rethink ab this...
 			homeHandler.show();
 			homeHandler.setScreenTitle("Home Screen");
 		});
-		leaderboardImageView.setOnMouseClicked(ev -> {
-			System.out.println("leaderboard");
-			try {
-				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
-				leaderboardHandler.setScreenTitle("Leaderboard");
-				leaderboardHandler.setPreviousScreen(this);
-				leaderboardHandler.show();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
+//		leaderboardImageView.setOnMouseClicked(ev -> {
+//			System.out.println("leaderboard");
+//			try {
+//				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+//						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+//				leaderboardHandler.setScreenTitle("Leaderboard");
+//				leaderboardHandler.setPreviousScreen(this);
+//				leaderboardHandler.show();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		});
 		quitQueue.setDisable(true);
 	}
 
@@ -250,7 +254,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				findGameThread = new Thread(findGameTask);
 				findGameThread.start();
 
-			}
+			} 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -306,5 +310,49 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			quitQueue.setDisable(false);
 			System.out.println("Cannot quit queue properly");
 		}
+	}
+	
+	@FXML
+	public void handlerGetLeaderboardAction() {
+		System.out.println("leaderboard");
+        try {
+        	LeaderBoardController leaderboardController = new LeaderBoardController(this.gameModeScreenController.getCurPlayer().getUsername(), this.gameModeScreenController.getCurPlayer().getSessionId());
+            BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+                    Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
+            leaderboardHandler.setScreenTitle("Leaderboard");
+            leaderboardHandler.setPreviousScreen(this);
+            
+            Task<Boolean> leaderboardTask = new Task<Boolean>() {
+
+				@Override
+				protected Boolean call() throws Exception {
+					return leaderboardController.getLeaderboard();
+				}
+            	
+            };
+            
+            leaderboardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					Boolean isSuccess = (Boolean) arg0.getSource().getValue();
+					try {
+						if(!isSuccess) {
+							notifyError("Cannot get leaderboard. Please try again later");
+						} else {
+							leaderboardHandler.show();
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+            	
+            });
+            
+            
+            leaderboardHandler.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 }

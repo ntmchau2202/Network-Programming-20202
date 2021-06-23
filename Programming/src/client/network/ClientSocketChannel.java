@@ -9,6 +9,7 @@ import message.chatack.ChatACKServerMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
 import message.drawrequest.DrawRequestServerMessage;
 import message.joinqueue.JoinQueueClientMessage;
+import message.leaderboard.LeaderboardClientMessage;
 import message.login.LoginClientMessage;
 import message.matchfound.MatchFoundServerMessage;
 import message.move.ListenMoveClientMessage;
@@ -181,10 +182,11 @@ public class ClientSocketChannel {
 //		return sendRequest("");
 //	}
 //
-//	public String getLeaderBoard() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
+	public String getLeaderBoard(String usr, String sesID) throws Exception {
+		// TODO: Finish function
+		LeaderboardClientMessage msg = new LeaderboardClientMessage(usr, sesID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
 
     public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
         // TODO: Finish function
@@ -197,67 +199,5 @@ public class ClientSocketChannel {
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 
-//	public String chatACK() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
-//
-//	public String logout() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
 
-    public ServerMessage listenIngameMessage() {
-
-        ByteBuffer inputBuffer = ByteBuffer.allocate(4096);
-        String returnMsg = "";
-
-        Future<Integer> result = this.socketChannel.read(inputBuffer);
-        try {
-            result.get();
-            inputBuffer.flip();
-            returnMsg = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
-            System.out.println("This is printed from client: " + returnMsg);
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        // analyze things here?
-
-        JSONObject jsMsg = new JSONObject(returnMsg);
-        Command cmd = Command.toCommand(jsMsg.getString("command_code"));
-
-        switch (cmd) {
-            case MATCH_FOUND: {
-                MatchFoundServerMessage matchFoundMsg = new MatchFoundServerMessage(returnMsg);
-                return matchFoundMsg;
-            }
-            case MOVE: {
-                MoveServerMessage moveMsg = new MoveServerMessage(returnMsg);
-                return moveMsg;
-            }
-            case CHAT: {
-                ChatServerMessage chatMsg = new ChatServerMessage(returnMsg);
-                return chatMsg;
-
-            }
-            case CHATACK: {
-                ChatACKServerMessage ack = new ChatACKServerMessage(returnMsg);
-                return ack;
-            }
-
-            case DRAW_REQUEST: {
-                DrawRequestServerMessage drawRequest = new DrawRequestServerMessage(returnMsg);
-                return drawRequest;
-            }
-            case DRAW_CONFIRM: {
-                DrawConfirmServerMessage drawConfirm = new DrawConfirmServerMessage(returnMsg);
-                return drawConfirm;
-
-            }
-        }
-
-        return null;
-    }
 }
