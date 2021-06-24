@@ -106,10 +106,10 @@ public class RequestProcessor {
 //                resMsg = this.notifyEndgame();
 //                break;
 //            }
-//            case LEADERBOARD: {
-//                resMsg = this.processGetLeaderBoardRequest();
-//                break;
-//            }
+            case LEADERBOARD: {
+                resMsg = this.processGetLeaderBoardRequest();
+                break;
+            }
             case CHAT: {
                 resMsg = this.processChatRequest(recvMsg);
                 break;
@@ -541,12 +541,6 @@ public class RequestProcessor {
         return fwdMsg.toString();
     }
 
-    private String processChatACKRequest() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
-    }
-
     private String processLogoutRequest(String input) throws Exception {
         LogoutServerMessage serverResponse;
         LogoutClientMessage clientRequest = new LogoutClientMessage(input);
@@ -558,18 +552,6 @@ public class RequestProcessor {
             serverResponse = new LogoutServerMessage(clientRequest.getMessageCommandID(), "", "", StatusCode.ERROR, "cannot logout");
         }
         return serverResponse.toString();
-    }
-
-    private String notifyMatchFound() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
-    }
-
-    private String notifyEndgame() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
     }
 
     private String notifyUnknownCommand() throws Exception {
