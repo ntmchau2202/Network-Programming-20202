@@ -3,11 +3,16 @@ package client.controller;
 import client.network.ClientSocketChannel;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
+import message.ServerMessage;
 import message.chat.ChatServerMessage;
+import message.drawconfirm.DrawConfirmServerMessage;
+import message.drawrequest.DrawRequestServerMessage;
 import message.move.MoveServerMessage;
 import message.updateuser.UpdateUserServerMessage;
+import protocol.Command;
 import protocol.StatusCode;
 import server.entity.match.ChatMessage;
+import org.json.JSONObject;
 
 public class MainGameScreenController extends BaseController {
 
@@ -194,6 +199,36 @@ public class MainGameScreenController extends BaseController {
                 return false;
             }
         }
+    }
+    
+    public ServerMessage listenDrawRequest() throws Exception {
+    	String result = ClientSocketChannel.getSocketInstance().listenDrawRequest(this.getCurrentPlayer().getUsername(), this.matchID);
+    	// parsing to get the command
+    	JSONObject jsRes = new JSONObject(result);
+    	Command cmd = Command.toCommand(jsRes.getString("command_code"));
+    	switch(cmd) {
+    	case DRAW_REQUEST:{
+    		DrawRequestServerMessage ret = new DrawRequestServerMessage(result);
+    		// only return if the response does not come from current user to avoid duplication
+    		if (ret.getStatusCode().compareTo(StatusCode.ERROR) != 0 && ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0) {
+    			return ret;	
+    		} else {
+    			return null;
+    		}
+    	}
+    	case DRAW_CONFIRM:{
+    		DrawConfirmServerMessage ret = new DrawConfirmServerMessage(result);
+    		// only return if the response does not come from current user to avoid duplication
+    		if (ret.getStatusCode().compareTo(StatusCode.ERROR) != 0 && ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0) {
+    			return ret;	
+    		} else {
+    			return null;
+    		}
+    	}
+    	default:
+    		return null;
+    	}
+    	
     }
 
 }

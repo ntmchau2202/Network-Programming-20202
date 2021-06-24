@@ -152,16 +152,16 @@ public class HomeScreenHandler extends BaseScreenHandler
                 e.printStackTrace();
             }
         } else if (evt.getSource() == leaderBoardImageView) {
-            System.out.println("leaderboard");
-            try {
-                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
-                leaderboardHandler.setScreenTitle("Leaderboard");
-                leaderboardHandler.setPreviousScreen(this);
-                leaderboardHandler.show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            System.out.println("leaderboard");
+//            try {
+//                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+//                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+//                leaderboardHandler.setScreenTitle("Leaderboard");
+//                leaderboardHandler.setPreviousScreen(this);
+//                leaderboardHandler.show();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
 
     }

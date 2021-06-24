@@ -37,6 +37,8 @@ public class LeaderboardServerMessage extends ServerMessage {
 		this.listUsername = new ArrayList<String>();
 		this.listElo = new ArrayList<Integer>();
 		this.listRank = new ArrayList<Integer>();
+		this.listNoMatchPlayed = new ArrayList<Integer>();
+		this.listNoMatchWon = new ArrayList<Integer>();
 		
 		List<Object> tmp = this.responseBody.getBody().getJSONArray("username").toList();
 		
@@ -80,6 +82,14 @@ public class LeaderboardServerMessage extends ServerMessage {
 	
 	public List<Integer> getListRank(){
 		return this.listRank;
+	}
+	
+	public List<Integer> getListMatchPlayed(){
+		return this.listNoMatchPlayed;
+	}
+	
+	public List<Integer> getListMatchWon(){
+		return this.listNoMatchWon;
 	}
 	
 }

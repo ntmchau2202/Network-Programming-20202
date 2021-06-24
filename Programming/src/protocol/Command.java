@@ -14,6 +14,7 @@ public enum Command {
 	LEADERBOARD("LEADERBOARD", Command.Priority.NORMAL),
 	CHAT("CHAT", Command.Priority.NORMAL),
 	LISTEN_CHAT("LISTEN_CHAT", Command.Priority.NORMAL),
+	LISTEN_DRAW("LISTEN_DRAW", Command.Priority.NORMAL),
 	CHATACK("CHATACK", Command.Priority.NORMAL),
 	LOGOUT("LOGOUT", Command.Priority.HIGH),
 	LISTEN_MOVE("LISTEN_MOVE", Command.Priority.NORMAL),

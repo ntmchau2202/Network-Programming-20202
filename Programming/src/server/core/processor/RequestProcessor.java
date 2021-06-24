@@ -94,14 +94,18 @@ public class RequestProcessor {
                 resMsg = this.processListenChat(recvMsg);
                 break;
             }
-//            case DRAW_REQUEST: {
-//                resMsg = this.processRequestDrawRequest();
-//                break;
-//            }
-//            case DRAW_CONFIRM: {
-//                resMsg = this.processConfirmDrawRequest();
-//                break;
-//            }
+            case DRAW_REQUEST: {
+                resMsg = this.processRequestDrawRequest(recvMsg);
+                break;
+            }
+            case DRAW_CONFIRM: {
+                resMsg = this.processConfirmDrawRequest(recvMsg);
+                break;
+            }
+            case LISTEN_DRAW: {
+            	resMsg = this.processListenDrawRequest(recvMsg);
+            	break;
+            }
 //            case ENDGAME: {
 //                resMsg = this.notifyEndgame();
 //                break;
@@ -453,16 +457,21 @@ public class RequestProcessor {
         return res.toString();
     }
 
-    private String processRequestDrawRequest() throws Exception {
+    private String processRequestDrawRequest(String recvMsg) throws Exception {
         // TODO: Finish the function here
         String serverResponse = "";
         return serverResponse;
     }
 
-    private String processConfirmDrawRequest() throws Exception {
+    private String processConfirmDrawRequest(String recvMsg) throws Exception {
         // TODO: Finish the function here
         String serverResponse = "";
         return serverResponse;
+    }
+    
+    private String processListenDrawRequest(String recvMsg) throws Exception {
+    	String serverResponse = "";
+    	return serverResponse;
     }
 
     private String processGetLeaderBoardRequest() throws Exception {
