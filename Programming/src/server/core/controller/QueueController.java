@@ -156,8 +156,6 @@ public class QueueController {
                     m.setWinner(winnerUserName);
                     m.setEnd(true);
 
-                    // TODO: update match into leaderboard
-
                     // pop players back to the hall, but do not delete immediately
                     // let the thread do that shiet
                     Player player1 = m.getPlayer1();

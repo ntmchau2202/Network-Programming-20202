@@ -1,6 +1,9 @@
 package server.core.processor;
 
 import entity.Player.GuestPlayer;
+import entity.Player.LeaderboardPlayer;
+import message.leaderboard.LeaderboardClientMessage;
+import message.leaderboard.LeaderboardServerMessage;
 import message.logout.LogoutClientMessage;
 import message.logout.LogoutServerMessage;
 import server.entity.match.Match;
@@ -32,6 +35,10 @@ import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
 import server.entity.match.ChatMessage;
 import server.entity.network.completionHandler.ReadCompletionHandler;
+import server.model.LeaderboardModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RequestProcessor {
 
@@ -111,7 +118,7 @@ public class RequestProcessor {
 //                break;
 //            }
             case LEADERBOARD: {
-                resMsg = this.processGetLeaderBoardRequest();
+                resMsg = this.processGetLeaderBoardRequest(recvMsg);
                 break;
             }
             case CHAT: {
@@ -359,8 +366,10 @@ public class RequestProcessor {
                 T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
 
                 // update player rank in both obj and db
-                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(wonPlayer);
-                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(lostPlayer);
+//                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(wonPlayer);
+//                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(lostPlayer);
+
+                // update info of player into leaderboard
             }
         }
 
@@ -443,8 +452,9 @@ public class RequestProcessor {
         return fwdMsg.toString();
     }
 
-    private String processUpdateUserRequest(String recvMsg) throws Exception {
-        UpdateUserClientMessage req = new UpdateUserClientMessage(recvMsg);
+    private String processUpdateUserRequest(String input) throws Exception {
+        // TODO: integrate this command with login command
+        UpdateUserClientMessage req = new UpdateUserClientMessage(input);
         String username = req.getUsername();
         RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().getPlayerInfo(username);
         UpdateUserServerMessage res;
@@ -457,27 +467,68 @@ public class RequestProcessor {
         return res.toString();
     }
 
-    private String processRequestDrawRequest(String recvMsg) throws Exception {
+    private String processRequestDrawRequest(String input) throws Exception {
         // TODO: Finish the function here
         String serverResponse = "";
         return serverResponse;
     }
 
-    private String processConfirmDrawRequest(String recvMsg) throws Exception {
+    private String processConfirmDrawRequest(String input) throws Exception {
         // TODO: Finish the function here
         String serverResponse = "";
         return serverResponse;
     }
     
-    private String processListenDrawRequest(String recvMsg) throws Exception {
+    private String processListenDrawRequest(String input) throws Exception {
     	String serverResponse = "";
     	return serverResponse;
     }
 
-    private String processGetLeaderBoardRequest() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
+    private String processGetLeaderBoardRequest(String input) throws Exception {
+        // parse client message to get requesting user
+        LeaderboardClientMessage clientRequest = new LeaderboardClientMessage(input);
+        String username = clientRequest.getUsername();
+        String sessionID = clientRequest.getSessionID();
+
+        // get leaderboard user
+        List<LeaderboardPlayer> leaderboardPlayerList = LeaderboardModel.getLeaderboardModelInstance().getLeaderBoardData(10);
+
+        // get current user rank
+        LeaderboardPlayer clientPlayer = LeaderboardModel.getLeaderboardModelInstance().getRankByUsername(username, leaderboardPlayerList);
+
+        List<String> listUsr = new ArrayList<String>();
+        List<Integer> listElo = new ArrayList<Integer>();
+        List<Integer> listRank = new ArrayList<Integer>();
+        List<Integer> listMatchPlayed = new ArrayList<Integer>();
+        List<Integer> listMatchWon = new ArrayList<Integer>();
+
+        // add requesting player to the first field of response
+        // if clientPlayer is null
+        if (clientPlayer == null) {
+            listUsr.add("");
+            listElo.add(-1);
+            listRank.add(-1);
+            listMatchPlayed.add(-1);
+            listMatchWon.add(-1);
+        } else {
+            listUsr.add(clientPlayer.getUsername());
+            listElo.add(clientPlayer.getElo());
+            listRank.add(clientPlayer.getRank());
+            listMatchPlayed.add(clientPlayer.getNoPlayedMatch());
+            listMatchWon.add(clientPlayer.getNoWonMatch());
+        }
+
+        // add each player from leaderboard to response
+        for (LeaderboardPlayer leaderboardPlayer: leaderboardPlayerList) {
+            listUsr.add(leaderboardPlayer.getUsername());
+            listElo.add(leaderboardPlayer.getElo());
+            listRank.add(leaderboardPlayer.getRank());
+            listMatchPlayed.add(leaderboardPlayer.getNoPlayedMatch());
+            listMatchWon.add(leaderboardPlayer.getNoWonMatch());
+        }
+
+        LeaderboardServerMessage leaderboardResponse = new LeaderboardServerMessage(clientRequest.getMessageCommandID(), listUsr, listElo, listRank, listMatchPlayed, listMatchWon, StatusCode.SUCCESS, "");
+        return leaderboardResponse.toString();
     }
 
     private String processChatRequest(String input) throws Exception {
