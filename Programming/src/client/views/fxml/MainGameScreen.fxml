@@ -103,7 +103,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <ImageView fitHeight="43.0" fitWidth="56.0" layoutX="843.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="drawRequestImageView" fitHeight="43.0" fitWidth="56.0" layoutX="843.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/flag.png" />
          </image>
@@ -116,7 +116,7 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <ImageView fitHeight="43.0" fitWidth="56.0" layoutX="992.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="quitRequestImageView" fitHeight="43.0" fitWidth="56.0" layoutX="992.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/quit.png" />
          </image>

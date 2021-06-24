@@ -43,6 +43,19 @@ public class PopupScreen extends BaseScreenHandler{
         popup(message, Misc.getImageByName(Configs.IMAGE_PATH) + "/" + "checked.png", false).show(true);
     }
 
+    public static void gameOver(String message) throws IOException{
+        popup(message, Misc.getImageByName(Configs.IMAGE_PATH) + "/" + "game-over.png", false).show(false);
+    }
+
+    public static void win(String message) throws IOException{
+        popup(message, Misc.getImageByName(Configs.IMAGE_PATH) + "/" + "winner.png", false).show(false);
+    }
+
+    public static void lose(String message) throws IOException{
+        popup(message, Misc.getImageByName(Configs.IMAGE_PATH) + "/" + "lose.png", false).show(false);
+    }
+
+
     public static void error(String message) throws IOException{
         popup(message, Misc.getImageByName(Configs.IMAGE_PATH) + "/" + "warn.png", false).show(false);
     }
