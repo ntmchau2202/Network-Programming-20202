@@ -8,6 +8,7 @@ import message.chat.ChatServerMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
 import message.drawrequest.DrawRequestServerMessage;
 import message.move.MoveServerMessage;
+import message.quitgame.QuitGameServerMessage;
 import message.updateuser.UpdateUserServerMessage;
 import protocol.Command;
 import protocol.StatusCode;
@@ -234,6 +235,16 @@ public class MainGameScreenController extends BaseController {
     public boolean sendDrawRequest() throws Exception {
         String result = ClientSocketChannel.getSocketInstance().requestDraw(this.matchID, this.getCurrentPlayer().getUsername(), this.getCurrentPlayer().getSessionId());
         DrawRequestServerMessage msg = new DrawRequestServerMessage(result);
+        if(msg.getStatusCode().compareTo(StatusCode.ERROR)==0) {
+        	return false;
+        } else {
+        	return true;
+        }
+    }
+    
+    public boolean sendQuitGameRequest() throws Exception {
+        String result = ClientSocketChannel.getSocketInstance().quitGame(this.matchID, this.getCurrentPlayer().getUsername(), this.getCurrentPlayer().getSessionId());
+        QuitGameServerMessage msg = new QuitGameServerMessage(result);
         if(msg.getStatusCode().compareTo(StatusCode.ERROR)==0) {
         	return false;
         } else {

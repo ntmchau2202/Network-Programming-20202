@@ -17,6 +17,7 @@ public enum Command {
 	LISTEN_DRAW("LISTEN_DRAW", Command.Priority.NORMAL),
 	CHATACK("CHATACK", Command.Priority.NORMAL),
 	LOGOUT("LOGOUT", Command.Priority.HIGH),
+	QUIT_GAME("QUIT_GAME", Command.Priority.HIGH),
 	LISTEN_MOVE("LISTEN_MOVE", Command.Priority.NORMAL),
 	QUIT_QUEUE("QUIT_QUEUE", Command.Priority.CRITICAL),
 	UPDATE_USER("UPDATE_USER", Command.Priority.NORMAL);

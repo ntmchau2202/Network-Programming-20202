@@ -20,6 +20,8 @@ import message.login.LoginServerMessage;
 import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
+import message.quitgame.QuitGameClientMessage;
+import message.quitgame.QuitGameServerMessage;
 import message.quitqueue.QuitQueueClientMessage;
 import message.quitqueue.QuitQueueServerMessage;
 import message.register.RegisterClientMessage;
@@ -113,10 +115,10 @@ public class RequestProcessor {
             	resMsg = this.processListenDrawRequest(recvMsg);
             	break;
             }
-//            case ENDGAME: {
-//                resMsg = this.notifyEndgame();
-//                break;
-//            }
+            case QUIT_GAME: {
+                resMsg = this.processQuitGameRequest(resMsg);
+                break;
+            }
             case LEADERBOARD: {
                 resMsg = this.processGetLeaderBoardRequest(recvMsg);
                 break;
@@ -616,5 +618,14 @@ public class RequestProcessor {
         // TODO: Finish the function here
         String serverResponse = "";
         return serverResponse;
+    }
+    
+    private String processQuitGameRequest(String input) throws Exception {
+    	QuitGameClientMessage request = new QuitGameClientMessage(input);
+    	
+    	// TODO: process smt here
+    	
+    	QuitGameServerMessage response = new QuitGameServerMessage(request, StatusCode.SUCCESS, "");
+    	return response.toString();
     }
 }

@@ -143,4 +143,10 @@ public class ResponseBody {
 		this.responseBody.put("username", username);
 		this.responseBody.put("session_id", sessionID);
 	}
+	
+	public void createQuitGameBody(String username, String sessionID) throws JSONException {
+		this.responseBody.clear();
+		this.responseBody.put("username", username);
+		this.responseBody.put("session_id", sessionID);
+	}
 }

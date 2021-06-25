@@ -19,6 +19,7 @@ import message.matchfound.MatchFoundServerMessage;
 import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
+import message.quitgame.QuitGameClientMessage;
 import message.quitqueue.QuitQueueClientMessage;
 import message.register.RegisterClientMessage;
 import message.updateuser.UpdateUserClientMessage;
@@ -202,6 +203,11 @@ public class ClientSocketChannel {
 
 	public String requestDraw(int matchID, String username, String sessionID) throws Exception {
 		DrawRequestClientMessage msg = new DrawRequestClientMessage(matchID, username, sessionID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
+	
+	public String quitGame(int matchID, String username, String sessionID) throws Exception {
+		QuitGameClientMessage msg = new QuitGameClientMessage(matchID, username, sessionID);
 		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
 

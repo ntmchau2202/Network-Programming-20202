@@ -118,4 +118,11 @@ public class RequestBody {
 		this.requestBody.put("username", username);
 		this.requestBody.put("session_id", session_id);
 	}
+	
+	public void createQuitGameBody(int matchID, String username, String sessionID) {
+		this.requestBody.clear();
+		this.requestBody.put("match_id", matchID);
+		this.requestBody.put("username", username);
+		this.requestBody.put("session_id", sessionID);
+	}
 }

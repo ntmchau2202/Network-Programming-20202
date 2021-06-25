@@ -450,6 +450,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 										}
 									} else {
 										// guest mode
+										HomeScreenHandler homeScreenHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
+										homeScreenHandler.setScreenTitle("Home Screen");
+										homeScreenHandler.show();
 									}
 									
 								} catch (IOException e) {
@@ -685,7 +688,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
 				@Override
 				protected Void call() throws Exception {
-					if(mainGameScreenController.sendDrawRequest()) {
+					if(mainGameScreenController.sendQuitGameRequest()) {
 						notifySuccess("Game quitted successfully");
 						// freeze the table here
 					} else {
