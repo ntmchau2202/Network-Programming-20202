@@ -39,6 +39,18 @@ public class LeaderboardModel {
                     res.getInt("usr_elo"));
             lstLeaderboardPlayer.add(leaderboardPlayer);
         }
+        // if leaderboard is empty -> insert new data
+        if (lstLeaderboardPlayer.size() <= 0) {
+            System.out.println("im here");
+            // get new top players
+            lstLeaderboardPlayer = getNewTopPlayers();
+
+            // insert new data to db
+            insertNewTopPlayers(lstLeaderboardPlayer);
+        } else {
+            System.out.println("hmm size is not zero: " + lstLeaderboardPlayer.size());
+        }
+
         return lstLeaderboardPlayer;
     }
 
@@ -75,13 +87,7 @@ public class LeaderboardModel {
     public boolean updateLeaderboard(RankPlayer rankPlayer) throws SQLException {
 
         // get number of top players
-        int noTopPlayers = 0;
-        String sql = "select count(usr_rank) as total from LeaderBoard;";
-        Statement stm = T3DB.getConnection().createStatement();
-        ResultSet res = stm.executeQuery(sql);
-        while(res.next()){
-            noTopPlayers = res.getInt("total");
-        }
+        int noTopPlayers = getNoOfTopPlayers();
 
         // if leaderboard is not full, shoot this player to the sky
         if (noTopPlayers < this.LIMITED_NUMBER_OF_TOP_PLAYER) {
@@ -97,48 +103,70 @@ public class LeaderboardModel {
             return true;
         }
 
-        sql = "select usr_elo from LeaderBoard order by usr_rank desc limit 1";
-        stm = T3DB.getConnection().createStatement();
-        res = stm.executeQuery(sql);
+        String sql = "select usr_elo from LeaderBoard order by usr_rank desc limit 1";
+        Statement stm = T3DB.getConnection().createStatement();
+        ResultSet res = stm.executeQuery(sql);
         while (res.next()) {
             // if last one smaller than current player -> update
-            if (res.getInt("usr_elo") < rankPlayer.getElo() ) {
+            if (res.getInt("usr_elo") < rankPlayer.getElo()) {
                 // get new top players
-                sql = "select username, no_match_played, no_match_won, elo from RankPlayer order by elo desc limit " + this.LIMITED_NUMBER_OF_TOP_PLAYER;
-                stm = T3DB.getConnection().createStatement();
-                res = stm.executeQuery(sql);
-                List<LeaderboardPlayer> lstLeaderboardPlayer = new ArrayList<>();
-                while (res.next()) {
-                    LeaderboardPlayer leaderboardPlayer = new LeaderboardPlayer(res.getRow(),res.getString("username"),
-                            res.getInt("no_match_played"), res.getInt("no_match_won"), res.getInt("elo"));
-                    lstLeaderboardPlayer.add(leaderboardPlayer);
-                }
-                
+                List<LeaderboardPlayer> lstLeaderboardPlayer = getNewTopPlayers();
+
                 // delete all data in leaderboard
                 PreparedStatement preStm = T3DB.getConnection().prepareStatement(
                         "delete from LeaderBoard");
                 preStm.executeUpdate();
 
                 // insert new data to leaderboard
-                int i;
-                for (i = 0; i < lstLeaderboardPlayer.size(); i++)
-                    preStm = T3DB.getConnection().prepareStatement(
-                            "insert into LeaderBoard (usr_rank, username, no_match_played, no_match_won, usr_elo) values (?, ?, ?, ?, ?)");
-                    preStm.setInt(1, i + 1);
-                    preStm.setString(2, lstLeaderboardPlayer.get(i).getUsername());
-                    preStm.setInt(3, lstLeaderboardPlayer.get(i).getNoPlayedMatch());
-                    preStm.setInt(4, lstLeaderboardPlayer.get(i).getNoWonMatch());
-                    preStm.setInt(5, lstLeaderboardPlayer.get(i).getElo());
-                    preStm.executeUpdate();
-                }
+                insertNewTopPlayers(lstLeaderboardPlayer);
 
                 // TODO: update rank for object of current player
                 break;
+            }
+
+            // if current player can't make to leaderboard so don't need to update
+
         }
-
-        // if current player can't make to leaderboard so don't need to update
-
         return true;
+    }
+
+    private int getNoOfTopPlayers() throws SQLException {
+        int noTopPlayers = 0;
+        String sql = "select count(usr_rank) as total from LeaderBoard;";
+        Statement stm = T3DB.getConnection().createStatement();
+        ResultSet res = stm.executeQuery(sql);
+        while(res.next()){
+            noTopPlayers = res.getInt("total");
+        }
+        return noTopPlayers;
+    }
+
+    private List<LeaderboardPlayer> getNewTopPlayers() throws SQLException {
+        String sql = "select username, no_match_played, no_match_won, elo from RankPlayer order by elo desc limit " + this.LIMITED_NUMBER_OF_TOP_PLAYER;
+        Statement stm = T3DB.getConnection().createStatement();
+        ResultSet res = stm.executeQuery(sql);
+        List<LeaderboardPlayer> lstLeaderboardPlayer = new ArrayList<>();
+        while (res.next()) {
+            LeaderboardPlayer leaderboardPlayer = new LeaderboardPlayer(res.getRow(),res.getString("username"),
+                    res.getInt("no_match_played"), res.getInt("no_match_won"), res.getInt("elo"));
+            lstLeaderboardPlayer.add(leaderboardPlayer);
+        }
+        return lstLeaderboardPlayer;
+    }
+
+    private void insertNewTopPlayers(List<LeaderboardPlayer> leaderboardPlayerList) throws SQLException {
+        int i;
+        PreparedStatement preStm;
+        for (i = 0; i < leaderboardPlayerList.size(); i++) {
+            preStm = T3DB.getConnection().prepareStatement(
+                    "insert into LeaderBoard (usr_rank, username, no_match_played, no_match_won, usr_elo) values (?, ?, ?, ?, ?)");
+            preStm.setInt(1, i + 1);
+            preStm.setString(2, leaderboardPlayerList.get(i).getUsername());
+            preStm.setInt(3, leaderboardPlayerList.get(i).getNoPlayedMatch());
+            preStm.setInt(4, leaderboardPlayerList.get(i).getNoWonMatch());
+            preStm.setInt(5, leaderboardPlayerList.get(i).getElo());
+            preStm.executeUpdate();
+        }
     }
 
 }
