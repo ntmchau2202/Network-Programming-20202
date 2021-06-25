@@ -97,16 +97,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             throws IOException {
         super(stage, screenPath);
         this.mainGameScreenController = mainGameScreenController;
-        HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
-                new HomeScreenController());
-        prevScreenImageView.setOnMouseClicked(e -> {
-            this.getPreviousScreen().show();
-            this.getPreviousScreen().setScreenTitle("Game Mode");
-        });
-        homeScreenImageView.setOnMouseClicked(e -> {
-            homeHandler.show();
-            homeHandler.setScreenTitle("Home Screen");
-        });
 
         drawRequestImageView.setOnMouseClicked(e -> {
             showDrawDialog();
