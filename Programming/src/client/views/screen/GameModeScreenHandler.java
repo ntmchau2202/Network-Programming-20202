@@ -242,6 +242,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 								notifyError("Can not find ranked play match, please try again later");
 								practicePlay.setDisable(false);
 								rankPlay.setDisable(false);
+								currentHandler.show();
 								//quitQueue.setDisable(true);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
