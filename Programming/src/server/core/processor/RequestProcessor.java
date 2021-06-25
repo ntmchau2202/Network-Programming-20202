@@ -365,11 +365,9 @@ public class RequestProcessor {
                 T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
                 T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
 
-                // update player rank in both obj and db
-//                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(wonPlayer);
-//                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerRank(lostPlayer);
-
                 // update info of player into leaderboard
+                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
+                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
             }
         }
 

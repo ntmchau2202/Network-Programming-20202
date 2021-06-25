@@ -72,7 +72,7 @@ public class LeaderboardModel {
         return foundPlayer;
     }
 
-    public boolean updateLeaderboard(RankPlayer rankPlayer, List<LeaderboardPlayer> leaderboardPlayerList) throws SQLException {
+    public boolean updateLeaderboard(RankPlayer rankPlayer) throws SQLException {
 
         // get number of top players
         int noTopPlayers = 0;
@@ -104,14 +104,36 @@ public class LeaderboardModel {
             // if last one smaller than current player -> update
             if (res.getInt("usr_elo") < rankPlayer.getElo() ) {
                 // get new top players
+                sql = "select username, no_match_played, no_match_won, elo from RankPlayer order by elo desc limit " + this.LIMITED_NUMBER_OF_TOP_PLAYER;
+                stm = T3DB.getConnection().createStatement();
+                res = stm.executeQuery(sql);
+                List<LeaderboardPlayer> lstLeaderboardPlayer = new ArrayList<>();
+                while (res.next()) {
+                    LeaderboardPlayer leaderboardPlayer = new LeaderboardPlayer(res.getRow(),res.getString("username"),
+                            res.getInt("no_match_played"), res.getInt("no_match_won"), res.getInt("elo"));
+                    lstLeaderboardPlayer.add(leaderboardPlayer);
+                }
                 
                 // delete all data in leaderboard
+                PreparedStatement preStm = T3DB.getConnection().prepareStatement(
+                        "delete from LeaderBoard");
+                preStm.executeUpdate();
 
                 // insert new data to leaderboard
+                int i;
+                for (i = 0; i < lstLeaderboardPlayer.size(); i++)
+                    preStm = T3DB.getConnection().prepareStatement(
+                            "insert into LeaderBoard (usr_rank, username, no_match_played, no_match_won, usr_elo) values (?, ?, ?, ?, ?)");
+                    preStm.setInt(1, i + 1);
+                    preStm.setString(2, lstLeaderboardPlayer.get(i).getUsername());
+                    preStm.setInt(3, lstLeaderboardPlayer.get(i).getNoPlayedMatch());
+                    preStm.setInt(4, lstLeaderboardPlayer.get(i).getNoWonMatch());
+                    preStm.setInt(5, lstLeaderboardPlayer.get(i).getElo());
+                    preStm.executeUpdate();
+                }
 
                 // TODO: update rank for object of current player
                 break;
-            }
         }
 
         // if current player can't make to leaderboard so don't need to update
