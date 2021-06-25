@@ -52,8 +52,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	@FXML
 	private ImageView leaderboardImageView;
 	
-	@FXML
-	private Button quitQueue;
+
 	
 	private final GameModeScreenController gameModeScreenController;
 
@@ -101,7 +100,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				e.printStackTrace();
 			}
 		});
-		quitQueue.setDisable(true);
+		//quitQueue.setDisable(true);
 	}
 
 	@Override
@@ -123,7 +122,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				// Boolean isFound = false;
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
-				quitQueue.setDisable(false);
+				//quitQueue.setDisable(false);
 				Task<Integer> findGameTask = new Task<Integer>() {
 					protected Integer call() {
 						Integer isFound = 1;
@@ -172,7 +171,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 								notifyError("Can not find practice play match, please try again later");
 								practicePlay.setDisable(false);
 								rankPlay.setDisable(false);
-								quitQueue.setDisable(true);
+								//quitQueue.setDisable(true);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -181,7 +180,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							// join queue interrupted by user
 							practicePlay.setDisable(false);
 							rankPlay.setDisable(false);
-							quitQueue.setDisable(true);
+							//quitQueue.setDisable(true);
 						}
 					}
 				});
@@ -192,7 +191,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			} else if (evt.getSource() == rankPlay) {
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
-				quitQueue.setDisable(false);
+				//quitQueue.setDisable(false);
 				MainGameScreenController mainGameScreenController = new MainGameScreenController(
 						this.gameModeScreenController.getCurPlayer(), "ranked" );
 				Task<Integer> findGameTask = new Task<Integer>() {
@@ -243,7 +242,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 								notifyError("Can not find ranked play match, please try again later");
 								practicePlay.setDisable(false);
 								rankPlay.setDisable(false);
-								quitQueue.setDisable(true);
+								//quitQueue.setDisable(true);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -252,7 +251,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							// join queue interrupted by user
 							practicePlay.setDisable(false);
 							rankPlay.setDisable(false);
-							quitQueue.setDisable(true);
+							//quitQueue.setDisable(true);
 						}
 					}
 				});
@@ -270,7 +269,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	private void handleQuitQueueAction(javafx.event.Event evt) {
 		try {
 			System.out.println("Requested quit queue");
-			quitQueue.setDisable(true);
+			//quitQueue.setDisable(true);
 			
 			Task<Boolean> quitQueueTask = new Task<Boolean>() {
 				protected Boolean call() {
@@ -313,7 +312,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			quitQueueThread.run();
 		} catch (Exception e) {
 			e.printStackTrace();
-			quitQueue.setDisable(false);
+			//quitQueue.setDisable(false);
 			System.out.println("Cannot quit queue properly");
 		}
 	}

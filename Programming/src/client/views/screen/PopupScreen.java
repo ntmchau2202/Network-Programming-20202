@@ -2,12 +2,14 @@ package client.views.screen;
 
 
 import javafx.animation.PauseTransition;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import client.utils.Configs;
 //import client.views.screen.BaseScreenHandler;
@@ -29,6 +31,12 @@ public class PopupScreen extends BaseScreenHandler{
     public PopupScreen(Stage stage) throws IOException{
         super(stage, Configs.POPUP_PATH);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                stage.close();
+            }
+        });
     }
 
     private static PopupScreen popup(String message, String imagePath, Boolean undecorated) throws IOException{
