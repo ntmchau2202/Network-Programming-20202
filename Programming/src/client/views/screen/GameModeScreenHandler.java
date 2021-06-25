@@ -7,7 +7,9 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -15,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class GameModeScreenHandler extends BaseScreenHandler implements Initializable {
@@ -44,8 +47,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	private Button rankPlay;
 	@FXML
 	private ImageView logoutImageView;
-	@FXML
-	private ImageView homeScreenImageView;
+//	@FXML
+//	private ImageView homeScreenImageView;
 	@FXML
 	private ImageView leaderboardImageView;
 	
@@ -72,18 +75,18 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		this.noPlayedMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoPlayedMatch()));
 		this.noWonMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoWonMatch()));
 		this.winningRate.setText(Float.toString(this.gameModeScreenController.getCurPlayer().getWinningRate()*100));
-		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
-				new HomeScreenController());
-		homeScreenImageView.setOnMouseClicked(e -> {
-			// TODO: gotta rethink ab this...
-			homeHandler.show();
-			homeHandler.setScreenTitle("Home Screen");
-		});
+//		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
+//				new HomeScreenController());
+//		homeScreenImageView.setOnMouseClicked(e -> {
+//			// TODO: gotta rethink ab this...
+//			homeHandler.show();
+//			homeHandler.setScreenTitle("Home Screen");
+//		});
 
 		logoutImageView.setOnMouseClicked(e -> {
 			// logout
+			showLogoutPrompt();
 		});
-		Tooltip.install(homeScreenImageView, new Tooltip("Home"));
 		Tooltip.install(logoutImageView, new Tooltip("Logout"));
 		leaderboardImageView.setOnMouseClicked(ev -> {
 			System.out.println("leaderboard");
@@ -358,5 +361,35 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
         } catch (Exception e) {
             e.printStackTrace();
         }
+	}
+	
+	private void showLogoutPrompt() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Log out");
+        alert.setHeaderText("Are you sure to log out?");
+        GameModeScreenHandler curHandler = this;
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+        if(option.get() == ButtonType.OK) {
+        	Task<Void> logoutTask = new Task<Void>() {
+
+				@Override
+				protected Void call() throws Exception {
+					if(gameModeScreenController.logout(gameModeScreenController.getCurPlayer().getUsername(), gameModeScreenController.getCurPlayer().getSessionId())) {
+						notifySuccess("Log out successfully");
+						// return to home screen
+						HomeScreenHandler homeHandler = new HomeScreenHandler(curHandler.stage, Configs.HOME_SCREEN_PATH,
+								new HomeScreenController());
+						homeHandler.setScreenTitle("Home Screen");
+						homeHandler.show();
+					} else {
+						notifyError("An error occured when logging out. Please try again");
+					}
+					return null;
+				}
+        	};
+        	Thread logoutThread = new Thread(logoutTask);
+        	logoutThread.start();
+        } 
 	}
 }
