@@ -230,5 +230,25 @@ public class MainGameScreenController extends BaseController {
     	}
     	
     }
+    
+    public boolean sendDrawRequest() throws Exception {
+        String result = ClientSocketChannel.getSocketInstance().requestDraw(this.matchID, this.getCurrentPlayer().getUsername(), this.getCurrentPlayer().getSessionId());
+        DrawRequestServerMessage msg = new DrawRequestServerMessage(result);
+        if(msg.getStatusCode().compareTo(StatusCode.ERROR)==0) {
+        	return false;
+        } else {
+        	return true;
+        }
+    }
+    
+    public boolean sendDrawConfirm(boolean acceptance) throws Exception {
+    	 String result = ClientSocketChannel.getSocketInstance().confirmDraw(matchID, this.getCurrentPlayer().getUsername(), this.getCurrentPlayer().getSessionId(), acceptance);
+         DrawConfirmServerMessage msg = new DrawConfirmServerMessage(result);
+         if(msg.getStatusCode().compareTo(StatusCode.ERROR)==0) {
+         	return false;
+         } else {
+         	return true;
+         }
+    }
 
 }

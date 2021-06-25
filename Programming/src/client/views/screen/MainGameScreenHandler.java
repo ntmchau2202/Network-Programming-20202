@@ -266,7 +266,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 							// display dialog box for confirming draw here
 							// how to connect this dialog with the current controller?
 							// yes will send a confirm yes
-							// no will send a reject	
+							// no will send a reject
+							showConfirmationDraw();
 						} else if (request instanceof DrawConfirmServerMessage) {
 							DrawConfirmServerMessage realReq = (DrawConfirmServerMessage)request;
 							if(realReq.getAcceptance()) {
@@ -591,20 +592,54 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Ask for Draw");
         alert.setHeaderText("Are you sure to accept draw request?");
-        alert.setContentText("'"+ this.mainGameScreenController.getCurrentPlayer().getUsername()+"' 've just asked for draw");
+        alert.setContentText("Your opponent have just asked for draw");
 
         // option != null.
         Optional<ButtonType> option = alert.showAndWait();
+        
+        Task<Void> acceptDrawTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				if(mainGameScreenController.sendDrawConfirm(true)) {
+					// show a dialog box here 
+					isGameEnded.set(true);
+					notifySuccess("Game draw!");
+				}
+				return null;
+			}
+        };
+        
+        Task<Void> rejectDrawTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				if(mainGameScreenController.sendDrawConfirm(true)) {
+					// show a dialog box here 
+					isGameEnded.set(true);
+					notifySuccess("Game draw!");
+				}
+				return null;
+			}
+        };
+    		
 
         if (option.get() == null) {
             System.out.println("No selection!");
+            Thread rejectDrawThread = new Thread(rejectDrawTask);
+            rejectDrawThread.start();
         } else if (option.get() == ButtonType.OK) {
             // handle action here
             System.out.println("Draw accepted!");
+        	Thread acceptDrawThread = new Thread(acceptDrawTask);
+        	acceptDrawThread.start();
+            
         } else if (option.get() == ButtonType.CANCEL) {
             System.out.println("Draw rejected!");
+            Thread rejectDrawThread = new Thread(rejectDrawTask);
+            rejectDrawThread.start();
         } else {
-            System.out.println("-");
+            System.out.println("-"); // ?
         }
     }
 
@@ -621,9 +656,25 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             System.out.println("No selection!");
         } else if (option.get() == ButtonType.OK) {
             // handle action here
-            System.out.println("Quit confirmed!");
+        	Task<Void> requestDrawTask = new Task<Void>() {
+
+				@Override
+				protected Void call() throws Exception {
+					if(mainGameScreenController.sendDrawRequest()) {
+						notifySuccess("Waiting for confirmation..");
+						// freeze the table here
+					} else {
+						notifyError("An error occured when requesting for a draw. Please try again later");
+					}
+					return null;
+				}
+        	};
+        	Thread requestDrawThread = new Thread(requestDrawTask);
+        	requestDrawThread.start();
+        	System.out.println("Quit confirmed!");
         } else if (option.get() == ButtonType.CANCEL) {
             System.out.println("Quit Cancelled!");
+            
         } else {
             System.out.println("-");
         }

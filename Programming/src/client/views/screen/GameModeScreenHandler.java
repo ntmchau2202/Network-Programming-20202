@@ -89,7 +89,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			System.out.println("leaderboard");
 			try {
 				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController(gameModeScreenController.getCurPlayer().getUsername(),
+								gameModeScreenController.getCurPlayer().getSessionId()));
 				leaderboardHandler.setScreenTitle("Leaderboard");
 				leaderboardHandler.setPreviousScreen(this);
 				leaderboardHandler.show();

@@ -6,6 +6,7 @@ import message.chat.ChatClientMessage;
 import message.chat.ChatServerMessage;
 import message.chat.ListenChatClientMessage;
 import message.chatack.ChatACKServerMessage;
+import message.drawconfirm.DrawConfirmClientMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
 import message.drawrequest.DrawRequestClientMessage;
 import message.drawrequest.DrawRequestServerMessage;
@@ -156,17 +157,18 @@ public class ClientSocketChannel {
         QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
 //		return sendRequestAsync(quitQueueRequest.toString());
         return sendRequest(quitQueueRequest.toString(), quitQueueRequest.getMessageCommandID());
+    }
 
 	public String logout(String username, String sessionID) throws Exception {
 		LogoutClientMessage logoutRequest = new LogoutClientMessage(username, sessionID);
 		return sendRequest(logoutRequest.toString(), logoutRequest.getMessageCommandID());
 	}
 
-	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
-			throws Exception {
-		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
-		return sendRequest(msg.toString(), msg.getMessageCommandID());
-	}
+//	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
+//			throws Exception {
+//		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
+//		return sendRequest(msg.toString(), msg.getMessageCommandID());
+//	}
 
     public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
             throws Exception {
@@ -188,12 +190,12 @@ public class ClientSocketChannel {
 		DrawRequestClientMessage msg = new DrawRequestClientMessage(matchID, username, sessionID);
 		return sendRequest(msg.toString(), msg.getMessageCommandID());
 	}
-//
-//	public String confirmDraw() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
-//
+
+	public String confirmDraw(int matchID, String player, String sessionID, boolean acceptance) throws Exception {
+		DrawConfirmClientMessage msg = new DrawConfirmClientMessage(matchID, player, sessionID, acceptance);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
+
 	public String getLeaderBoard(String usr, String sesID) throws Exception {
 		LeaderboardClientMessage msg = new LeaderboardClientMessage(usr, sesID);
 		return sendRequest(msg.toString(), msg.getMessageCommandID());
