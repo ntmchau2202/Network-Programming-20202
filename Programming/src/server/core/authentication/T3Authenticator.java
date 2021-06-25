@@ -251,25 +251,6 @@ public class T3Authenticator {
         return true;
     }
 
-    public boolean updateRankPlayerRank(RankPlayer rankPlayer) throws SQLException {
-        // update ranked player's rank into leaderboard
-
-        // PSEUDO get rank of player
-        int newRank = 0;
-        LeaderboardPlayerList.getLeaderboardPlayerListInstance().synchronizeLeaderboardPlayerWithDb();
-        List<LeaderboardPlayer> lstPlayer = new ArrayList<>();
-        lstPlayer = (List<LeaderboardPlayer>) LeaderboardPlayerList.getLeaderboardPlayerListInstance().getLeaderboardPlayerList();
-        for (LeaderboardPlayer player : lstPlayer) {
-            if (rankPlayer.getUsername().equals(player.getUsername())) {
-                newRank = player.getRank();
-            }
-        }
-
-        // update rank for current player
-        rankPlayer.updatePlayerRank(newRank);
-        return true;
-    }
-
 //    public Player getOnlinePlayer(String sessionID) throws Exception {
 //    	Player player = null;
 //    	PreparedStatement stm = T3DB.getConnection().prepareStatement(
