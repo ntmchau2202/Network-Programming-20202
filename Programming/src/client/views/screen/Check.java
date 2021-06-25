@@ -115,21 +115,24 @@ public class Check {
         return false;
     }
 
-    public boolean checkIt(int row, int col, int[][] status, int player) {
+    public int checkIt(int row, int col, int[][] status, int player) {
         if (rowCheck(row, col, status, player)) {
-            return true;
+            return 1;
         }
 
         if (columnCheck(row, col, status, player)) {
-            return true;
+            return 1;
         }
         if (leftCheck(row, col, status, player)) {
-            return true;
+            return 1;
         }
         if (rightCheck(row, col, status, player)) {
-            return true;
+            return 1;
         }
-        return false;
+        if (isDraw(status)) {
+            return 0;
+        }
+        return -1;
     }
 
 }

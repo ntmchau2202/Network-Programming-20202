@@ -11,14 +11,12 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -34,6 +32,7 @@ import server.entity.match.ChatMessage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -72,7 +71,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     @FXML
     private Button sendButton;
     @FXML
-    private ImageView drawBtn;
+    private ImageView drawRequestImageView;
+    @FXML
+    private ImageView quitRequestImageView;
 
     private VBox chatVbox;
     private Label chatName;
@@ -107,6 +108,20 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             homeHandler.setScreenTitle("Home Screen");
         });
 
+        drawRequestImageView.setOnMouseClicked(e -> {
+            showConfirmationDraw();
+        });
+
+        quitRequestImageView.setOnMouseClicked(e -> {
+            showConfirmationQuit();
+        });
+
+        for (int row = 0; row < 15; row++) {
+            for (int col = 0; col < 15; col++) {
+
+                this.status[row][col] = 0;
+            }
+        }
         // display player info
         xPlayerName.setText(mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
         oPlayerName.setText(!mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
@@ -354,10 +369,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                 Boolean isSuccessfull = false;
                                 try {
                                     // send move to server
-                                	Boolean isWin = hasWinner(rowIndex, colIndex);
+                                	int isWin = hasWinner(rowIndex, colIndex);
                                 	System.out.println(isWin);
                                 	String result = "";
-                                	if (isWin) {
+                                	if (isWin == 1) {
                                 		result = "win"; 
                                 	}
                                 	
@@ -492,31 +507,18 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
      *
      * Kiểm tra người chơi hiện tại có chiến thắng hay không?
      */
-    public boolean hasWinner(int row, int col) {
+    public int hasWinner(int row, int col) {
 
         Check myCheck = new Check(15, 15);
         int prePlayer = (this.mainGameScreenController.amIFirstPlayer() ? 1 : 2);
         System.out.println("Player " + prePlayer + "Win? " + myCheck.checkIt(row, col, this.status, prePlayer));
         return myCheck.checkIt(row, col, this.status, prePlayer);
-
-        /*
-         * Kiểm tra bảng có còn ô trống nào không ?
-         */
-        // public boolean boardFilledUp() {
-        // for (int row = 0; row < 16; row++) {
-        // for (int col = 0; col < 16; col++) {
-        // if (board[row][col] == null) {
-        // return false;
-        // }
-        // }
-        // }
-        // return true;
-        //
-        // }
-
-
     }
 
+    // lock/ unlock board, true: lock; false: unlock
+    public void setGameBoardGridPaneLock(boolean b) {
+        this.gameBoardGridPane.setDisable(b);
+    }
 
     @FXML
     void sendMessage(final MouseEvent event) {
@@ -584,11 +586,48 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         hbox.getChildren().addAll(chatName,msg);
         return hbox;
     }
-    
-//    @FXML
-//    public void handleResign() {
-//    	// TODO: freeze the table and show a message dialog here
-//    	Task<Boolean> resignTask;
-//    }
-    
+
+    private void showConfirmationDraw() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Ask for Draw");
+        alert.setHeaderText("Are you sure to accept draw request?");
+        alert.setContentText("'"+ this.mainGameScreenController.getCurrentPlayer().getUsername()+"' 've just asked for draw");
+
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+
+        if (option.get() == null) {
+            System.out.println("No selection!");
+        } else if (option.get() == ButtonType.OK) {
+            // handle action here
+            System.out.println("Draw accepted!");
+        } else if (option.get() == ButtonType.CANCEL) {
+            System.out.println("Draw rejected!");
+        } else {
+            System.out.println("-");
+        }
+    }
+
+    private void showConfirmationQuit() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Quit Game");
+        alert.setHeaderText("Are you sure to quit playing?");
+        alert.setContentText("You will lose if you quit");
+
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+
+        if (option.get() == null) {
+            System.out.println("No selection!");
+        } else if (option.get() == ButtonType.OK) {
+            // handle action here
+            System.out.println("Quit confirmed!");
+        } else if (option.get() == ButtonType.CANCEL) {
+            System.out.println("Quit Cancelled!");
+        } else {
+            System.out.println("-");
+        }
+    }
+
+
 }

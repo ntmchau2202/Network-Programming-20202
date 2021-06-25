@@ -77,4 +77,24 @@ public class BaseScreenHandler extends FXMLScreenHandler {
         System.out.println(success);
         PopupScreen.success(success);
     }
+
+    /**
+     * notifying game over
+     * @param gameResult success game over message
+     * @throws IOException io exception
+     */
+    void notifyGameOver(String gameResult) throws IOException {
+        System.out.println(gameResult);
+        PopupScreen.success(gameResult);
+    }
+
+    void notifyWin(String gameResult) throws IOException {
+        System.out.println(gameResult);
+        PopupScreen.success(gameResult);
+    }
+
+    void notifyLose(String gameResult) throws IOException {
+        System.out.println(gameResult);
+        PopupScreen.success(gameResult);
+    }
 }
