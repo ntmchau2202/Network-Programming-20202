@@ -1,16 +1,13 @@
 package server.core.authentication;
 
 import entity.Player.GuestPlayer;
-import entity.Player.LeaderboardPlayer;
-import entity.Player.LeaderboardPlayerList;
 import entity.Player.RankPlayer;
 import server.entity.database.T3DB;
+import server.model.GuestPlayerModel;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -212,10 +209,7 @@ public class T3Authenticator {
         stm.executeUpdate();
 
         // remove record in table GuestPlayer (case: user is anon
-        stm = T3DB.getConnection().prepareStatement(
-                "delete from GuestPlayer where displayname=?");
-        stm.setString(1, username);
-        stm.executeUpdate();
+        GuestPlayerModel.getGuestPlayerModelInstance().removeGuestPlayerFromDB(username);
 
         foundSessionID = getSessionIDByUsername(username);
         // if record still exists in db -> false

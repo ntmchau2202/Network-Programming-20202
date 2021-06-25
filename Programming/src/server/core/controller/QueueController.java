@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.Semaphore;
 
+import entity.Player.GuestPlayer;
 import javafx.util.Pair;
+import server.core.authentication.T3Authenticator;
 import server.entity.match.Match;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
@@ -156,16 +158,26 @@ public class QueueController {
                     m.setWinner(winnerUserName);
                     m.setEnd(true);
 
-                    // pop players back to the hall, but do not delete immediately
+                    // pop players back to the hall, but do not delete match immediately
                     // let the thread do that shiet
                     Player player1 = m.getPlayer1();
                     Player player2 = m.getPlayer2();
+
+                    // only RankPlayer back to hall
                     if (player1 instanceof RankPlayer) {
                         hall.add((RankPlayer) player1);
+                    } else if (player1 instanceof GuestPlayer) {
+                        // logout guest player
+                        T3Authenticator.getT3AuthenticatorInstance().logout(player1.getUsername(), player1.getSessionId());
                     }
+
                     if (player2 instanceof RankPlayer) {
                         hall.add((RankPlayer) player2);
+                    } else if (player2 instanceof  GuestPlayer) {
+                        // logout guest player
+                        T3Authenticator.getT3AuthenticatorInstance().logout(player2.getUsername(), player2.getSessionId());
                     }
+
                     // just for sure
                     System.out.println("List of player in hall after remove game " + matchID);
                     for (Player rp : hall) {
