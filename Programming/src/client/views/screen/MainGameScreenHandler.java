@@ -109,7 +109,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         });
 
         drawRequestImageView.setOnMouseClicked(e -> {
-            showConfirmationDraw();
+            showDrawDialog();
         });
 
         quitRequestImageView.setOnMouseClicked(e -> {
@@ -609,7 +609,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 				return null;
 			}
         };
-        
         Task<Void> rejectDrawTask = new Task<Void>() {
 
 			@Override
@@ -622,7 +621,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 				return null;
 			}
         };
-    		
 
         if (option.get() == null) {
             System.out.println("No selection!");
@@ -642,8 +640,45 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             System.out.println("-"); // ?
         }
     }
+    
+    @FXML
+    void showDrawDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Ask for Draw");
+        alert.setHeaderText("Are you sure to ask for a draw?");
 
-    private void showConfirmationQuit() {
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+        
+        Task<Void> acceptDrawTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				if(mainGameScreenController.sendDrawRequest()) {
+					// show a dialog box here 
+					isGameEnded.set(true);
+					notifySuccess("Waiting for confirmation...");
+					// freeze the table here
+				}
+				return null;
+			}
+        };
+        if (option.get() == null) {
+            System.out.println("No selection!");
+        } else if (option.get() == ButtonType.OK) {
+            // handle action here
+        	Thread acceptDrawThread = new Thread(acceptDrawTask);
+        	acceptDrawThread.start();
+            
+        } else if (option.get() == ButtonType.CANCEL) {
+            System.out.println("Draw rejected!");
+        } else {
+            System.out.println("-"); 
+        }
+    }
+
+    @FXML
+    void showConfirmationQuit() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Quit Game");
         alert.setHeaderText("Are you sure to quit playing?");
@@ -661,10 +696,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 				@Override
 				protected Void call() throws Exception {
 					if(mainGameScreenController.sendDrawRequest()) {
-						notifySuccess("Waiting for confirmation..");
+						notifySuccess("Game quitted successfully");
 						// freeze the table here
 					} else {
-						notifyError("An error occured when requesting for a draw. Please try again later");
+						notifyError("An error occured when quitting the game. Please try again later");
 					}
 					return null;
 				}

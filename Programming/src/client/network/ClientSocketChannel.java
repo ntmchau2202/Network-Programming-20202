@@ -82,6 +82,20 @@ public class ClientSocketChannel {
     public static ClientSocketChannel getSocketInstance() {
         return ClientSocketChannel.ClientSocketChannelSingleton.INSTANCE;
     }
+    
+    public static boolean isConnected() {
+    	if(socketChannelInstance!=null) {
+        	if(socketChannelInstance.socketChannel != null && socketChannelInstance.socketChannel.isOpen()) {
+        		return true;
+        	} 
+    	}
+    	
+    	return false;
+    }
+    
+   public static void closeConnection() throws Exception {
+	   socketChannelInstance.socketChannel.close();
+    }
 
     // =================== FUNCTIONS =======================
 
