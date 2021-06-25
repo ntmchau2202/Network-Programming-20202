@@ -25,6 +25,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import message.ServerMessage;
+import message.drawconfirm.DrawConfirmServerMessage;
+import message.drawrequest.DrawRequestServerMessage;
 import server.entity.match.ChatMessage;
 
 import java.io.File;
@@ -95,19 +97,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             throws IOException {
         super(stage, screenPath);
         this.mainGameScreenController = mainGameScreenController;
-        HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
-                new HomeScreenController());
-        prevScreenImageView.setOnMouseClicked(e -> {
-            this.getPreviousScreen().show();
-            this.getPreviousScreen().setScreenTitle("Game Mode");
-        });
-        homeScreenImageView.setOnMouseClicked(e -> {
-            homeHandler.show();
-            homeHandler.setScreenTitle("Home Screen");
-        });
 
         drawRequestImageView.setOnMouseClicked(e -> {
-            showConfirmationDraw();
+            showDrawDialog();
         });
 
         quitRequestImageView.setOnMouseClicked(e -> {
@@ -251,6 +243,58 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         chatTextField.setOnKeyTyped(e -> {
             sendButton.setDisable(chatTextField.getText().isEmpty());
         });
+        
+        Task<Void> listenDrawTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				while(true) {
+					ServerMessage request = mainGameScreenController.listenDrawRequest();
+					if (request != null) {
+						if (request instanceof DrawRequestServerMessage) {
+							DrawRequestServerMessage realReq = (DrawRequestServerMessage)request;
+							// display dialog box for confirming draw here
+							// how to connect this dialog with the current controller?
+							// yes will send a confirm yes
+							// no will send a reject
+							showConfirmationDraw();
+						} else if (request instanceof DrawConfirmServerMessage) {
+							DrawConfirmServerMessage realReq = (DrawConfirmServerMessage)request;
+							if(realReq.getAcceptance()) {
+								// both accept
+								// display draw dialog box here
+								// then end the game
+								isGameEnded.set(true);
+								notifySuccess("Game draw!");
+								// return to main screen
+								if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
+									try {
+										mainGameScreenController.updateUserInformation();
+										GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+				                        gameModeHandler.setScreenTitle("Game mode");
+				                        gameModeHandler.show();
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								} else {
+									// guest mode
+								}
+								break;
+							} else {
+								// notify request refused
+								notifyError("Sorry, your opponent " + realReq.getPlayer() + " does not accept your draw request :(");
+							}
+						}
+					}
+					
+				}
+	        return null;
+			}
+        };
+        
+        Thread listenDrawThread = new Thread(listenDrawTask);
+        listenDrawThread.start();
     }
 
     private void updateChat(ChatMessage recvMsg) {
@@ -392,11 +436,22 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 							@Override
 							public void handle(WorkerStateEvent arg0) {
 								try {
-									notifyGameOver("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
-//									RankPlayer curPlayer = (RankPlayer)mainGameScreenController.getCurrentPlayer();
-                                    GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
-			                        gameModeHandler.setScreenTitle("Game mode");
-			                        gameModeHandler.show();
+									notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
+									// send update_user msg here
+									if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
+										try {
+											mainGameScreenController.updateUserInformation();
+											GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+					                        gameModeHandler.setScreenTitle("Game mode");
+					                        gameModeHandler.show();
+										} catch (Exception e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+									} else {
+										// guest mode
+									}
+									
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -527,24 +582,93 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Ask for Draw");
         alert.setHeaderText("Are you sure to accept draw request?");
-        alert.setContentText("'"+ this.mainGameScreenController.getCurrentPlayer().getUsername()+"' 've just asked for draw");
+        alert.setContentText("Your opponent have just asked for draw");
 
         // option != null.
         Optional<ButtonType> option = alert.showAndWait();
+        
+        Task<Void> acceptDrawTask = new Task<Void>() {
 
+			@Override
+			protected Void call() throws Exception {
+				if(mainGameScreenController.sendDrawConfirm(true)) {
+					// show a dialog box here 
+					isGameEnded.set(true);
+					notifySuccess("Game draw!");
+				}
+				return null;
+			}
+        };
+        Task<Void> rejectDrawTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				if(mainGameScreenController.sendDrawConfirm(true)) {
+					// show a dialog box here 
+					isGameEnded.set(true);
+					notifySuccess("Game draw!");
+				}
+				return null;
+			}
+        };
+
+        if (option.get() == null) {
+            System.out.println("No selection!");
+            Thread rejectDrawThread = new Thread(rejectDrawTask);
+            rejectDrawThread.start();
+        } else if (option.get() == ButtonType.OK) {
+            // handle action here
+            System.out.println("Draw accepted!");
+        	Thread acceptDrawThread = new Thread(acceptDrawTask);
+        	acceptDrawThread.start();
+            
+        } else if (option.get() == ButtonType.CANCEL) {
+            System.out.println("Draw rejected!");
+            Thread rejectDrawThread = new Thread(rejectDrawTask);
+            rejectDrawThread.start();
+        } else {
+            System.out.println("-"); // ?
+        }
+    }
+    
+    @FXML
+    void showDrawDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Ask for Draw");
+        alert.setHeaderText("Are you sure to ask for a draw?");
+
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+        
+        Task<Void> acceptDrawTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				if(mainGameScreenController.sendDrawRequest()) {
+					// show a dialog box here 
+					isGameEnded.set(true);
+					notifySuccess("Waiting for confirmation...");
+					// freeze the table here
+				}
+				return null;
+			}
+        };
         if (option.get() == null) {
             System.out.println("No selection!");
         } else if (option.get() == ButtonType.OK) {
             // handle action here
-            System.out.println("Draw accepted!");
+        	Thread acceptDrawThread = new Thread(acceptDrawTask);
+        	acceptDrawThread.start();
+            
         } else if (option.get() == ButtonType.CANCEL) {
             System.out.println("Draw rejected!");
         } else {
-            System.out.println("-");
+            System.out.println("-"); 
         }
     }
 
-    private void showConfirmationQuit() {
+    @FXML
+    void showConfirmationQuit() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Quit Game");
         alert.setHeaderText("Are you sure to quit playing?");
@@ -557,9 +681,25 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             System.out.println("No selection!");
         } else if (option.get() == ButtonType.OK) {
             // handle action here
-            System.out.println("Quit confirmed!");
+        	Task<Void> requestDrawTask = new Task<Void>() {
+
+				@Override
+				protected Void call() throws Exception {
+					if(mainGameScreenController.sendDrawRequest()) {
+						notifySuccess("Game quitted successfully");
+						// freeze the table here
+					} else {
+						notifyError("An error occured when quitting the game. Please try again later");
+					}
+					return null;
+				}
+        	};
+        	Thread requestDrawThread = new Thread(requestDrawTask);
+        	requestDrawThread.start();
+        	System.out.println("Quit confirmed!");
         } else if (option.get() == ButtonType.CANCEL) {
             System.out.println("Quit Cancelled!");
+            
         } else {
             System.out.println("-");
         }

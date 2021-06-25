@@ -31,6 +31,12 @@ public class RequestBody {
 		this.requestBody.put("password", password);
 	}
 	
+	public void createUpdateUserBody(String username, String sessionID) {
+		this.requestBody.clear();
+		this.requestBody.put("username", username);
+		this.requestBody.put("session_id", sessionID);
+	}
+	
 	public void createJoinQueueBody(String mode, String session_id) throws JSONException {
 		this.requestBody.clear();
 		this.requestBody.put("mode", mode);
@@ -68,6 +74,12 @@ public class RequestBody {
 		this.requestBody.put("match_id", match_id);
 		this.requestBody.put("session_id", session_id);
 		this.requestBody.put("move_player", move_player);
+	}
+	
+	public void createListenDrawRequestBody(String username, int matchID) {
+		this.requestBody.clear();
+		this.requestBody.put("username", username);
+		this.requestBody.put("match_id", matchID);
 	}
 	
 	public void createDrawConfirmBody(int match_id, String session_id, String move_player, boolean acceptance) throws JSONException {

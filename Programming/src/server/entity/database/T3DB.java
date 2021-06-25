@@ -1,7 +1,6 @@
 package server.entity.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 
 public class T3DB {
     private static Connection connect;
@@ -32,5 +31,16 @@ public class T3DB {
 
     public static void main(String[] args) {
         T3DB.getConnection();
+        String sql = "select count(usr_rank) as total from LeaderBoard;";
+        Statement stm = null;
+        try {
+            stm = T3DB.getConnection().createStatement();
+            ResultSet res = stm.executeQuery(sql);
+            while(res.next()){
+                System.out.println(res.getInt("total"));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 }

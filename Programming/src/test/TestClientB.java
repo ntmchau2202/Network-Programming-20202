@@ -50,12 +50,13 @@ public class TestClientB extends Application {
             fadeIn.setOnFinished((e) -> {
                 fadeOut.play();
                 // connect client
-                try {
-
-                    ClientSocketChannel.getSocketInstance();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
+//                ClientSocketChannel.getSocketInstance();
+//                try {
+//
+//                    ClientSocketChannel.getSocketInstance();
+//                } catch (IOException ioException) {
+//                    ioException.printStackTrace();
+//                }
             });
 
             // After fade out, load actual content
@@ -67,7 +68,7 @@ public class TestClientB extends Application {
                         System.exit(-1);
                     }
                     GameModeScreenController gameModeScreenController = new GameModeScreenController(loginFormController.getLoggedPlayer());
-                    MainGameScreenController mainGameScreenController = new MainGameScreenController(gameModeScreenController.getCurPlayer());
+                    MainGameScreenController mainGameScreenController = new MainGameScreenController(gameModeScreenController.getCurPlayer(), "normal");
                     int foundResult = gameModeScreenController.findPracticeGame();
                     if (foundResult == 0) {
                         if (gameModeScreenController.amIFirstPlayer()) {

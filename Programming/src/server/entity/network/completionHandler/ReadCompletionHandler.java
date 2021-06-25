@@ -10,8 +10,8 @@ import protocol.Attachment;
 import protocol.Command;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
-import server.entity.network.request.RequestProcessor;
-import server.entity.network.response.ResponseProcessor;
+import server.core.processor.RequestProcessor;
+import server.core.processor.ResponseProcessor;
 
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{

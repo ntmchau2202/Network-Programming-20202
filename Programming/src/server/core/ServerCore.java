@@ -30,6 +30,7 @@ public class ServerCore {
 		
 
 		while (true) {
+			try {
 			serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
 
 				@Override
@@ -82,6 +83,10 @@ public class ServerCore {
 				}
 
 			});
+
+			} catch(Exception connException) {
+				System.out.println("this is my exception: " + connException.toString());
+			}
 			System.in.read();
 			serverSocketChannel.close();
 			System.out.println("Server done");

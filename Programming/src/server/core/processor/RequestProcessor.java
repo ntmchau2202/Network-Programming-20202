@@ -1,5 +1,11 @@
-package server.entity.network.request;
+package server.core.processor;
 
+import entity.Player.GuestPlayer;
+import entity.Player.LeaderboardPlayer;
+import message.leaderboard.LeaderboardClientMessage;
+import message.leaderboard.LeaderboardServerMessage;
+import message.logout.LogoutClientMessage;
+import message.logout.LogoutServerMessage;
 import server.entity.match.Match;
 import entity.Move.Move;
 import entity.Player.Player;
@@ -18,6 +24,9 @@ import message.quitqueue.QuitQueueClientMessage;
 import message.quitqueue.QuitQueueServerMessage;
 import message.register.RegisterClientMessage;
 import message.register.RegisterServerMessage;
+import message.updateuser.UpdateUserClientMessage;
+import message.updateuser.UpdateUserServerMessage;
+
 import org.json.JSONObject;
 import protocol.Command;
 import protocol.StatusCode;
@@ -26,13 +35,17 @@ import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
 import server.entity.match.ChatMessage;
 import server.entity.network.completionHandler.ReadCompletionHandler;
+import server.model.LeaderboardModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RequestProcessor {
 
     private final QueueController queueController;
     private boolean isCancel;
     private Command cmd;
-    private CompletionHandlerController handlerController;
+    private final CompletionHandlerController handlerController;
 
     public RequestProcessor(QueueController queueController, CompletionHandlerController handlerController) {
         this.queueController = queueController;
@@ -88,34 +101,43 @@ public class RequestProcessor {
                 resMsg = this.processListenChat(recvMsg);
                 break;
             }
-//            case DRAW_REQUEST: {
-//                resMsg = this.processRequestDrawRequest();
-//                break;
-//            }
-//            case DRAW_CONFIRM: {
-//                resMsg = this.processConfirmDrawRequest();
-//                break;
-//            }
+            case DRAW_REQUEST: {
+                resMsg = this.processRequestDrawRequest(recvMsg);
+                break;
+            }
+            case DRAW_CONFIRM: {
+                resMsg = this.processConfirmDrawRequest(recvMsg);
+                break;
+            }
+            case LISTEN_DRAW: {
+            	resMsg = this.processListenDrawRequest(recvMsg);
+            	break;
+            }
 //            case ENDGAME: {
 //                resMsg = this.notifyEndgame();
 //                break;
 //            }
-//            case LEADERBOARD: {
-//                resMsg = this.processGetLeaderBoardRequest();
-//                break;
-//            }
+            case LEADERBOARD: {
+                resMsg = this.processGetLeaderBoardRequest(recvMsg);
+                break;
+            }
             case CHAT: {
                 resMsg = this.processChatRequest(recvMsg);
+                break;
+            }
+
+            case UPDATE_USER: {
+                resMsg = this.processUpdateUserRequest(recvMsg);
                 break;
             }
 //            case CHATACK: {
 //                resMsg = this.processChatACKRequest();
 //                break;
 //            }
-//            case LOGOUT: {
-//                this.processLogoutRequest();
-//                break;
-//            }
+            case LOGOUT: {
+                this.processLogoutRequest(recvMsg);
+                break;
+            }
 //            default: {
 //                resMsg = this.notifyUnknownCommand();
 //                break;
@@ -127,16 +149,16 @@ public class RequestProcessor {
 
     private String processLoginRequest(String input)
             throws Exception {
-        LoginServerMessage serverResponse = null;
+        LoginServerMessage serverResponse;
 
         LoginClientMessage clientRequest = new LoginClientMessage(input);
         String username = clientRequest.getUsername();
         String password = clientRequest.getPassword();
         // get logged player
-        RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
+        RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().login(username, password);
         if (loggedPlayer == null) {
             serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
-                    "Username / Password is not valid");
+                    "Username / Password is not valid Or this username has already been logged in");
         } else {
 //            loggedPlayer.setUserSocket(sock);
             queueController.pushToHall(loggedPlayer);
@@ -150,14 +172,14 @@ public class RequestProcessor {
 
     private String processRegisterRequest(String input)
             throws Exception {
-        RegisterServerMessage serverResponse = null;
+        RegisterServerMessage serverResponse;
 
         RegisterClientMessage clientRequest = new RegisterClientMessage(input);
         String username = clientRequest.getUsername();
 
         String password = clientRequest.getPassword();
         // register new player
-        RankPlayer loggedPlayer = new T3Authenticator().register(username, password);
+        RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().register(username, password);
         if (loggedPlayer == null) {
             serverResponse = new RegisterServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
                     "Username / Password is not valid");
@@ -183,35 +205,55 @@ public class RequestProcessor {
         System.out.println("Starting process match request with mode: " + mode);
 
         // check if this is ranked user
-        System.out.println("Normal request!");
-        RankPlayer loggedPlayer = null;
-        for (RankPlayer player : queueController.getHall()) {
+        Player loggedPlayer = null;
+        for (Player player : queueController.getHall()) {
             if (sessionID.compareTo(player.getSessionId()) == 0) {
                 loggedPlayer = player;
                 break;
             }
         }
 
-        if (loggedPlayer != null) {
+        // if it is not ranked user, call to create a new guest player account ONLY if mode is normal
+        if (loggedPlayer == null) {
+            if (mode.compareToIgnoreCase("normal") == 0) {
+                GuestPlayer guestPlayer = T3Authenticator.getT3AuthenticatorInstance().createGuestPlayer();
+                if (guestPlayer == null) {
+                    serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR,
+                            "Username / Password is not valid");
+                } else {
+                    // push guest player to hall
+                    queueController.pushToHall(guestPlayer);
+
+                    loggedPlayer = guestPlayer;
+                }
+            } else if (mode.compareToIgnoreCase("ranked") == 0) {
+                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "You must login to play in ranked mode. Please try again");
+            } else {
+                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
+            }
+
+        }
+
+        // if no error, continue join queue
+        if (serverResponse == null) {
             if (mode.compareToIgnoreCase("normal") == 0 || mode.compareToIgnoreCase("ranked") == 0) {
                 System.out.println("requested username: " + loggedPlayer.getUsername());
                 queueController.viewHall();
                 queueController.viewNormalQueue();
+                queueController.viewRankedQueue();
                 // remove player from hall
                 queueController.removeFromHall(loggedPlayer);
-                System.out.println("remove player from hall successfully");
                 // add player to normal / ranked queue
                 queueController.pushToQueue(loggedPlayer, mode);
-                System.out.println("push player to queue successfully");
 
                 queueController.viewHall();
                 queueController.viewNormalQueue();
+                queueController.viewRankedQueue();
 
                 // prepare message according to each player
                 Match match = null;
 
                 for (int i = 0; i < 100; i++) {
-                    System.out.println("- in the loop: " + i);
                     if (!isCancel) {
                         match = queueController.getMatchByPlayer(loggedPlayer);
                         if (match != null) {
@@ -224,7 +266,7 @@ public class RequestProcessor {
                     }
                 }
 
-                Player opponent = null;
+                Player opponent;
                 if (match != null) {
                     if (loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())) {
                         // user is player 1
@@ -240,43 +282,35 @@ public class RequestProcessor {
                     } else {
                         serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Cannot find appropriate match. Please try again later");
                     }
-                    // when join queue meets error or cancelation, push player back to hall
-                    queueController.pushToHall(loggedPlayer);
+                    // when join queue meets error or cancelation
+                    // push only ranked player back to hall
+                    if (loggedPlayer instanceof RankPlayer) {
+                        System.out.println("<<< Im a ranked player");
+                        queueController.pushToHall(loggedPlayer);
+                    } else {
+                        System.out.println("<<< Im a guest player");
+                    }
+
                     // and remove player from normal/ranked queue
-                    queueController.removeFromQueue(loggedPlayer.getUsername());
+                    if (queueController.removeFromQueue(loggedPlayer.getUsername())) {
+                        System.out.println("====== remove " + loggedPlayer.getUsername() + " from queue successfully");
+                    } else {
+                        System.out.println("====== remove " + loggedPlayer.getUsername() + " from queue faileddddddd");
+                    }
                 }
-//                listResponse.put(sock, serverResponse.toString());
             } else {
                 // error
                 serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
             }
-        } else {
-            // if it is not ranked user, call to create a new guest player account ONLY if mode is normal
-            if (mode.compareToIgnoreCase("normal") == 0) {
-//                RankPlayer loggedPlayer = new T3Authenticator().login(username, password);
-//                if (loggedPlayer == null) {
-//                    serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", 0, 0, 0, 0, 0, StatusCode.ERROR,
-//                            "Username / Password is not valid");
-//                } else {
-////            loggedPlayer.setUserSocket(sock);
-//                    queueController.pushToHall(loggedPlayer);
-//                    serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
-//                            loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
-//                            loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
-//                }
-            } else {
-                serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "You must login to play in ranked mode. Please try again");
-            }
         }
-
         queueController.viewHall();
         queueController.viewNormalQueue();
+        queueController.viewRankedQueue();
         return serverResponse.toString();
     }
 
     private String processMoveRequest(String input)
             throws Exception {
-        // TODO: Finish the function here
         MoveClientMessage moveMsg = new MoveClientMessage(input);
 
         int matchID = moveMsg.getMatchID();
@@ -295,7 +329,7 @@ public class RequestProcessor {
         // but first, let's try to successfully send data to both clients
 
         String errMsg = "";
-        StatusCode statCode = null;
+        StatusCode statCode;
 
         if (movePlayer.equalsIgnoreCase(match.getPlayer1().getUsername())) {
             if ((match.getNumberOfMoves() % 2) == 0) {
@@ -314,16 +348,31 @@ public class RequestProcessor {
                 statCode = StatusCode.ERROR;
             }
         }
-        
-        if(moveMsg.getResult().compareToIgnoreCase("win")==0) {
-        	if (!queueController.endGame(movePlayer, matchID)) {
-        		statCode = StatusCode.ERROR;
-        		errMsg = "Cannot end the game...";
-        	}
+
+        if (moveMsg.getResult().compareToIgnoreCase("win") == 0) {
+            if (!queueController.endGame(movePlayer, matchID)) {
+                statCode = StatusCode.ERROR;
+                errMsg = "Cannot end the game...";
+            }
+
+            // process player info only when this is ranked match
+            if (match.isRanked()) {
+                // who send this move is the winner
+                RankPlayer wonPlayer = (RankPlayer) match.getPlayerByName(movePlayer);
+                RankPlayer lostPlayer =  (RankPlayer) match.getAnotherPlayer(movePlayer);
+
+                // update player info into both obj and db
+                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
+                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
+
+                // update info of player into leaderboard
+                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
+                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+            }
         }
 
         MoveServerMessage fwdMsg = new MoveServerMessage(moveMsg.getMessageCommandID(), matchID, movePlayer, x, y, state, result, statCode, errMsg);
-        
+
         return fwdMsg.toString();
     }
 
@@ -370,7 +419,7 @@ public class RequestProcessor {
         Match match = queueController.getMatchById(matchID);
 
         Move latestMove;
-        String movePlayer = "";
+        String movePlayer;
         while (true) {
             try {
                 Thread.sleep(500);
@@ -401,27 +450,88 @@ public class RequestProcessor {
         return fwdMsg.toString();
     }
 
-    private String processRequestDrawRequest() throws Exception {
+    private String processUpdateUserRequest(String input) throws Exception {
+        // TODO: integrate this command with login command
+        UpdateUserClientMessage req = new UpdateUserClientMessage(input);
+        String username = req.getUsername();
+        RankPlayer loggedPlayer = T3Authenticator.getT3AuthenticatorInstance().getPlayerInfo(username);
+        UpdateUserServerMessage res;
+        //int elo, int rank, float wRate, int nMatchPlayed, int nMatchWon,
+        if (loggedPlayer != null) {
+            res = new UpdateUserServerMessage(req.getMessageCommandID(), loggedPlayer.getUsername(), loggedPlayer.getElo(), loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(), loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
+        } else {
+            res = new UpdateUserServerMessage(req.getMessageCommandID(), username, -1, -1, -1, -1, -1, StatusCode.ERROR, "Cannot find user");
+        }
+        return res.toString();
+    }
+
+    private String processRequestDrawRequest(String input) throws Exception {
         // TODO: Finish the function here
         String serverResponse = "";
         return serverResponse;
     }
 
-    private String processConfirmDrawRequest() throws Exception {
+    private String processConfirmDrawRequest(String input) throws Exception {
         // TODO: Finish the function here
         String serverResponse = "";
         return serverResponse;
     }
+    
+    private String processListenDrawRequest(String input) throws Exception {
+    	String serverResponse = "";
+    	return serverResponse;
+    }
 
-    private String processGetLeaderBoardRequest() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
+    private String processGetLeaderBoardRequest(String input) throws Exception {
+        // parse client message to get requesting user
+        LeaderboardClientMessage clientRequest = new LeaderboardClientMessage(input);
+        String username = clientRequest.getUsername();
+        String sessionID = clientRequest.getSessionID();
+
+        // get leaderboard user
+        List<LeaderboardPlayer> leaderboardPlayerList = LeaderboardModel.getLeaderboardModelInstance().getLeaderBoardData(10);
+
+        // get current user rank
+        LeaderboardPlayer clientPlayer = LeaderboardModel.getLeaderboardModelInstance().getRankByUsername(username, leaderboardPlayerList);
+
+        List<String> listUsr = new ArrayList<String>();
+        List<Integer> listElo = new ArrayList<Integer>();
+        List<Integer> listRank = new ArrayList<Integer>();
+        List<Integer> listMatchPlayed = new ArrayList<Integer>();
+        List<Integer> listMatchWon = new ArrayList<Integer>();
+
+        // add requesting player to the first field of response
+        // if clientPlayer is null
+        if (clientPlayer == null) {
+            listUsr.add("");
+            listElo.add(-1);
+            listRank.add(-1);
+            listMatchPlayed.add(-1);
+            listMatchWon.add(-1);
+        } else {
+            listUsr.add(clientPlayer.getUsername());
+            listElo.add(clientPlayer.getElo());
+            listRank.add(clientPlayer.getRank());
+            listMatchPlayed.add(clientPlayer.getNoPlayedMatch());
+            listMatchWon.add(clientPlayer.getNoWonMatch());
+        }
+
+        // add each player from leaderboard to response
+        for (LeaderboardPlayer leaderboardPlayer: leaderboardPlayerList) {
+            listUsr.add(leaderboardPlayer.getUsername());
+            listElo.add(leaderboardPlayer.getElo());
+            listRank.add(leaderboardPlayer.getRank());
+            listMatchPlayed.add(leaderboardPlayer.getNoPlayedMatch());
+            listMatchWon.add(leaderboardPlayer.getNoWonMatch());
+        }
+
+        LeaderboardServerMessage leaderboardResponse = new LeaderboardServerMessage(clientRequest.getMessageCommandID(), listUsr, listElo, listRank, listMatchPlayed, listMatchWon, StatusCode.SUCCESS, "");
+        return leaderboardResponse.toString();
     }
 
     private String processChatRequest(String input) throws Exception {
         String errMsg = "";
-        StatusCode statCode = null;
+        StatusCode statCode;
 
         ChatClientMessage clientRequest = new ChatClientMessage(input);
         int matchID = clientRequest.getMatchID();
@@ -450,7 +560,7 @@ public class RequestProcessor {
         // strategy: polling until there is a new move
 
         String errMsg = "";
-        StatusCode statCode = null;
+        StatusCode statCode;
         ChatMessage chatMsg = null;
 
         ListenChatClientMessage listenMsg = new ListenChatClientMessage(input);
@@ -471,7 +581,7 @@ public class RequestProcessor {
                         // if no message, just continue
                         continue;
                     } else {
-                    	statCode = StatusCode.SUCCESS;
+                        statCode = StatusCode.SUCCESS;
                         break;
                     }
                 } catch (InterruptedException e) {
@@ -489,26 +599,17 @@ public class RequestProcessor {
         return fwdMsg.toString();
     }
 
-    private String processChatACKRequest() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
-    }
-
-    private void processLogoutRequest() throws Exception {
-
-    }
-
-    private String notifyMatchFound() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
-    }
-
-    private String notifyEndgame() throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
+    private String processLogoutRequest(String input) throws Exception {
+        LogoutServerMessage serverResponse;
+        LogoutClientMessage clientRequest = new LogoutClientMessage(input);
+        String username = clientRequest.getUsername();
+        String sessionID = clientRequest.getSessionID();
+        if (T3Authenticator.getT3AuthenticatorInstance().logout(username, sessionID)) {
+            serverResponse = new LogoutServerMessage(clientRequest, StatusCode.SUCCESS, "");
+        } else {
+            serverResponse = new LogoutServerMessage(clientRequest.getMessageCommandID(), "", "", StatusCode.ERROR, "cannot logout");
+        }
+        return serverResponse.toString();
     }
 
     private String notifyUnknownCommand() throws Exception {

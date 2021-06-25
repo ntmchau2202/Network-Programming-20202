@@ -11,17 +11,19 @@ public class Match {
 	private final Player player1;
 	private final Player player2;
 	private final int matchID;
+	private final boolean isRanked;
 	private final ArrayList<Move> moveRecord;
 	private final ArrayList<ChatMessage> chatMsgRecord;
 	private String winner; // sorry I dont know how to best place a winner as a Player in this case ; _ ;
 	private AtomicBoolean isEnded;
 	
-	public Match(Player player1, Player player2) {
+	public Match(Player player1, Player player2, boolean isRanked) {
 		// TODO: think about duplicated match ID here
 		Random random = new Random();
 		this.player1 = player1;
 		this.player2 = player2;
 		this.matchID = random.nextInt(9216);
+		this.isRanked = isRanked;
 		moveRecord = new ArrayList<>();
 		chatMsgRecord = new ArrayList<>();
 		winner = "";
@@ -55,6 +57,23 @@ public class Match {
 	public boolean isEnded() {
 		return this.isEnded.get();
 	}
+
+	public boolean isRanked() {
+		return isRanked;
+	}
+
+	public Player getPlayerByName(String username) {
+		if (player1.getUsername().equals(username)) return player1;
+		else if (player2.getUsername().equals(username)) return player2;
+		return null;
+	}
+
+	public Player getAnotherPlayer(String username) {
+		if (player1.getUsername().equals(username)) return player2;
+		else if (player2.getUsername().equals(username)) return player1;
+		return null;
+	}
+
 	
 	public boolean isPlayerOfMatch(Player player) {
 		return player.getSessionId().equalsIgnoreCase(player1.getSessionId()) || player.getSessionId().equalsIgnoreCase(player2.getSessionId());

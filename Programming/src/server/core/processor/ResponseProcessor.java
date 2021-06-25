@@ -1,4 +1,4 @@
-package server.entity.network.response;
+package server.core.processor;
 
 import protocol.Attachment;
 import server.entity.network.completionHandler.WriteCompletionHandler;

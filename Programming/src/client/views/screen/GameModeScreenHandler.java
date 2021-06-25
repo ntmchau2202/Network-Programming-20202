@@ -54,6 +54,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	
 	private final GameModeScreenController gameModeScreenController;
 
+
 	private Thread findGameThread, quitQueueThread;
 	/**
 	 * @param stage      stage of screen.
@@ -63,6 +64,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	public GameModeScreenHandler(Stage stage, String screenPath, GameModeScreenController gameModeScreenController)
 			throws IOException {
 		super(stage, screenPath);
+
 		this.gameModeScreenController = gameModeScreenController;
 		this.username.setText(this.gameModeScreenController.getCurPlayer().getUsername());
 		this.elo.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getElo()));
@@ -72,8 +74,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		this.winningRate.setText(Float.toString(this.gameModeScreenController.getCurPlayer().getWinningRate()*100));
 		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
 				new HomeScreenController());
-
 		homeScreenImageView.setOnMouseClicked(e -> {
+			// TODO: gotta rethink ab this...
 			homeHandler.show();
 			homeHandler.setScreenTitle("Home Screen");
 		});
@@ -87,7 +89,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			System.out.println("leaderboard");
 			try {
 				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController(gameModeScreenController.getCurPlayer().getUsername(),
+								gameModeScreenController.getCurPlayer().getSessionId()));
 				leaderboardHandler.setScreenTitle("Leaderboard");
 				leaderboardHandler.setPreviousScreen(this);
 				leaderboardHandler.show();
@@ -106,12 +109,13 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	@FXML
 	private void handleFindGameAction(javafx.event.Event evt) {
 		try {
-			MainGameScreenController mainGameScreenController = new MainGameScreenController(
-					this.gameModeScreenController.getCurPlayer());
+			
 			GameModeScreenHandler currentHandler = this;
 			WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(currentHandler.stage);
 			waitingScreenHandler.show();
 			if (evt.getSource() == practicePlay) {
+				MainGameScreenController mainGameScreenController = new MainGameScreenController(
+						this.gameModeScreenController.getCurPlayer(), "normal");
 				System.out.println("practice play");
 				// Boolean isFound = false;
 				practicePlay.setDisable(true);
@@ -186,19 +190,74 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
 				quitQueue.setDisable(false);
-				System.out.println("rank play");
+				MainGameScreenController mainGameScreenController = new MainGameScreenController(
+						this.gameModeScreenController.getCurPlayer(), "ranked" );
+				Task<Integer> findGameTask = new Task<Integer>() {
+					protected Integer call() {
+						Integer isFound = 1;
+						try {
+							isFound = gameModeScreenController.findRankedGame();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return isFound;
+					}
+				};
 
-				boolean isFound = gameModeScreenController.findRankGame();
-				if (isFound) {
-					// TODO: may need other analyze here
-					notifySuccess("Yeah! Found a rank match! Hope you win");
-					mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+				findGameTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
-				} else {
-					notifyError("Can not find rank play match");
-				}
+					public void handle(WorkerStateEvent t) {
+						Integer isFound = (Integer) t.getSource().getValue();
+						System.out.println("done:" + isFound);
+						if (isFound == 0) {
+							mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
+									gameModeScreenController.getOpponentElo());
+							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
+							System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
+							mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
+							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
+							try {
+								notifySuccess("Yeah! Found a match! Let's solo");
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							BaseScreenHandler mainGameScreenHandler = null;
+							try {
+								mainGameScreenHandler = new MainGameScreenHandler(currentHandler.stage,
+										Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
+								mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
+								mainGameScreenHandler.setPreviousScreen(currentHandler);
+								mainGameScreenHandler.show();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+						} else if (isFound == 1) {
+							try {
+								notifyError("Can not find ranked play match, please try again later");
+								practicePlay.setDisable(false);
+								rankPlay.setDisable(false);
+								quitQueue.setDisable(true);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else if (isFound == -1) {
+							// join queue interrupted by user
+							practicePlay.setDisable(false);
+							rankPlay.setDisable(false);
+							quitQueue.setDisable(true);
+						}
+					}
+				});
 
-			}
+				findGameThread = new Thread(findGameTask);
+				findGameThread.start();
+
+			} 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -254,5 +313,50 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			quitQueue.setDisable(false);
 			System.out.println("Cannot quit queue properly");
 		}
+	}
+	
+	@FXML
+	public void handlerGetLeaderboardAction() {
+		System.out.println("leaderboard");
+        try {
+        	LeaderBoardController leaderboardController = new LeaderBoardController(this.gameModeScreenController.getCurPlayer().getUsername(), this.gameModeScreenController.getCurPlayer().getSessionId());
+            GameModeScreenHandler curScreen = this;
+            
+            Task<Boolean> leaderboardTask = new Task<Boolean>() {
+
+				@Override
+				protected Boolean call() throws Exception {
+					return leaderboardController.getLeaderboard();
+				}
+            	
+            };
+            
+            leaderboardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					Boolean isSuccess = (Boolean) arg0.getSource().getValue();
+					try {
+						if(!isSuccess) {
+							notifyError("Cannot get leaderboard. Please try again later");
+						} else {
+							BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(curScreen.stage,
+				                    Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
+				            leaderboardHandler.setScreenTitle("Leaderboard");
+				            leaderboardHandler.setPreviousScreen(curScreen);
+							leaderboardHandler.show();
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+            	
+            });
+            Thread leaderboardThread = new Thread(leaderboardTask);
+            leaderboardThread.start();
+        
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 }

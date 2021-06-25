@@ -23,7 +23,7 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <ImageView fx:id="leaderboardImageView" fitHeight="74.0" fitWidth="78.0" layoutX="586.0" layoutY="471.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="leaderboardImageView" fitHeight="74.0" fitWidth="78.0" layoutX="586.0" layoutY="471.0" onMouseClicked="#handlerGetLeaderboardAction" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/podium2.png" />
          </image>

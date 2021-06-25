@@ -218,7 +218,9 @@
         "info": {
 	    "username": ["duongdz", "phuc", "einh", "lanhonglee"],
  	    "elo": [1390, 1490, 1470, 1460],
-	    "rank": [69, 1, 2, 3]
+	    "rank": [69, 1, 2, 3], 
+	    "no_match_played": [20, 340, 350, 400],
+	    "no_match_won": [10, 250, 230, 200],
         },
         "status_code": "success"/"error",
         "error": ""
