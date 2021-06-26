@@ -49,6 +49,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	private ImageView logoutImageView;
 //	@FXML
 //	private ImageView homeScreenImageView;
+	
 	@FXML
 	private ImageView leaderboardImageView;
 	
@@ -87,19 +88,50 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			showLogoutPrompt();
 		});
 		Tooltip.install(logoutImageView, new Tooltip("Logout"));
+		GameModeScreenHandler curHandler = this;
+		LeaderBoardController leaderboardController = new LeaderBoardController(gameModeScreenController.getCurPlayer().getUsername(),
+				gameModeScreenController.getCurPlayer().getSessionId());
 		leaderboardImageView.setOnMouseClicked(ev -> {
 			System.out.println("leaderboard");
 			try {
-				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController(gameModeScreenController.getCurPlayer().getUsername(),
-								gameModeScreenController.getCurPlayer().getSessionId()));
-				leaderboardHandler.setScreenTitle("Leaderboard");
-				leaderboardHandler.setPreviousScreen(this);
-				leaderboardHandler.show();
-			} catch (IOException e) {
+				
+				
+				Task<Boolean> getLeaderboardTask = new Task<Boolean>() {
+
+					@Override
+					protected Boolean call() throws Exception {
+						return leaderboardController.getLeaderboard();
+					}
+				};
+				
+				getLeaderboardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+					@Override
+					public void handle(WorkerStateEvent arg0) {
+						try {
+							Boolean isOK = (Boolean) arg0.getSource().getValue();
+							if(isOK) {
+								BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(curHandler.stage,
+										Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
+								leaderboardHandler.setScreenTitle("Leaderboard");
+								leaderboardHandler.setPreviousScreen(curHandler);
+								System.out.println("Preparing for showing");
+								leaderboardHandler.show();
+							} else {
+								notifyError("Cannot fetch leaderboard at the moment. Please try again later");
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				Thread leaderboardThread = new Thread(getLeaderboardTask);
+				leaderboardThread.start();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
+		
 		//quitQueue.setDisable(true);
 	}
 
