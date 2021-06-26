@@ -137,7 +137,7 @@ public class RequestProcessor {
 //                break;
 //            }
             case LOGOUT: {
-                this.processLogoutRequest(recvMsg);
+                resMsg = this.processLogoutRequest(recvMsg);
                 break;
             }
 //            default: {
@@ -491,10 +491,11 @@ public class RequestProcessor {
         String sessionID = clientRequest.getSessionID();
 
         // get leaderboard user
+        // TODO: add number of records into request field
         List<LeaderboardPlayer> leaderboardPlayerList = LeaderboardModel.getLeaderboardModelInstance().getLeaderBoardData(10);
 
         // get current user rank
-        LeaderboardPlayer clientPlayer = LeaderboardModel.getLeaderboardModelInstance().getRankByUsername(username, leaderboardPlayerList);
+        LeaderboardPlayer clientPlayer = LeaderboardModel.getLeaderboardModelInstance().getLeaderboardPlayerByUsername(username, leaderboardPlayerList);
 
         List<String> listUsr = new ArrayList<String>();
         List<Integer> listElo = new ArrayList<Integer>();

@@ -27,6 +27,10 @@ public class LeaderboardModel {
         return LeaderboardModel.LeaderboardModelSingleton.INSTANCE;
     }
 
+    public int getLIMITED_NUMBER_OF_TOP_PLAYER() {
+        return this.LIMITED_NUMBER_OF_TOP_PLAYER;
+    }
+
     public List<LeaderboardPlayer> getLeaderBoardData(int noRecord) throws SQLException {
         String sql = "select * from LeaderBoard limit " + noRecord;
         Statement stm = T3DB.getConnection().createStatement();
@@ -54,20 +58,26 @@ public class LeaderboardModel {
         return lstLeaderboardPlayer;
     }
 
-    public LeaderboardPlayer getRankByUsername(String username, List<LeaderboardPlayer> leaderboardPlayerList) throws SQLException {
+
+    // if passed list is null, this method will find passed player username in RankPlayer table in db
+    public LeaderboardPlayer getLeaderboardPlayerByUsername(String username, List<LeaderboardPlayer> leaderboardPlayerList) throws SQLException {
         // check username is null
         if (username == null || username.isEmpty()) {
             return null;
         }
 
         LeaderboardPlayer foundPlayer = null;
-        // check if target user exists from leaderboard list
-        for (LeaderboardPlayer leaderboardPlayer : leaderboardPlayerList) {
-            if (leaderboardPlayer.getUsername().equals(username)) {
-                foundPlayer = leaderboardPlayer;
-                break;
+
+        // check if target user exists from leaderboard list (only if lb is not null)
+        if (leaderboardPlayerList != null) {
+            for (LeaderboardPlayer leaderboardPlayer : leaderboardPlayerList) {
+                if (leaderboardPlayer.getUsername().equals(username)) {
+                    foundPlayer = leaderboardPlayer;
+                    break;
+                }
             }
         }
+
         // if target user doesn't show up in leaderboard list (cause he's fking weak), then find him in the RankPlayer table
         if (foundPlayer != null) {
             String sql = "select username, no_match_played, no_match_won, elo from RankPlayer order by elo desc";
@@ -84,50 +94,64 @@ public class LeaderboardModel {
         return foundPlayer;
     }
 
-    public boolean updateLeaderboard(RankPlayer rankPlayer) throws SQLException {
+    public void updateLeaderboard(RankPlayer rankPlayer) throws SQLException {
+        // flow:
+        // node 0:              check user in leaderboard (lb)
+        // node 0.yes:          update
+        // node 0.no:           check user's elo > the last in lb
+        // node 0.no.yes:       update
+        // node 0.no.no:        check # TopPlayer == 10
+        // node 0.no.no.yes:    do nothing
+        // node 0.no.no.no:     update
 
-        // get number of top players
-        int noTopPlayers = getNoOfTopPlayers();
+        // naive implementation
 
-        // if leaderboard is not full, shoot this player to the sky
-        if (noTopPlayers < this.LIMITED_NUMBER_OF_TOP_PLAYER) {
-            PreparedStatement preStm = T3DB.getConnection().prepareStatement(
-                    "insert into LeaderBoard (usr_rank, username, no_match_played, no_match_won, usr_elo) values (?, ?, ?, ?, ?)");
-            preStm.setInt(1, noTopPlayers + 1);
-            preStm.setString(2, rankPlayer.getUsername());
-            preStm.setInt(3, rankPlayer.getNoPlayedMatch());
-            preStm.setInt(4, rankPlayer.getNoWonMatch());
-            preStm.setInt(5, rankPlayer.getElo());
-            preStm.executeUpdate();
-            rankPlayer.updatePlayerRank(noTopPlayers + 1);
-            return true;
-        }
+        // node 0: check user exists in lb
+        // old rank in lb
+        LeaderboardPlayer oldLeaderboardPlayer = getLeaderboardPlayerByUsername(rankPlayer.getUsername(), getLeaderBoardData(10));
 
-        String sql = "select usr_elo from LeaderBoard order by usr_rank desc limit 1";
-        Statement stm = T3DB.getConnection().createStatement();
-        ResultSet res = stm.executeQuery(sql);
-        while (res.next()) {
-            // if last one smaller than current player -> update
-            if (res.getInt("usr_elo") < rankPlayer.getElo()) {
-                // get new top players
-                List<LeaderboardPlayer> lstLeaderboardPlayer = getNewTopPlayers();
+        // node 0.yes: user exists in lb -> update
+        if (oldLeaderboardPlayer != null) {
+            // new rank in current top players
+            LeaderboardPlayer newLeaderboardPlayer = getLeaderboardPlayerByUsername(rankPlayer.getUsername(), null);
 
-                // delete all data in leaderboard
-                PreparedStatement preStm = T3DB.getConnection().prepareStatement(
-                        "delete from LeaderBoard");
-                preStm.executeUpdate();
+            // no update only player exists in current top players and rank doesn't change
+            if (newLeaderboardPlayer != null && newLeaderboardPlayer.getRank() == oldLeaderboardPlayer.getRank()) {
+                // don't do anything
+            } else {
+                // update
+                updateLeaderboard();
+            }
+        } else {
+            // node 0.no: check user's elo > the last in db
+            String sql = "select usr_elo from LeaderBoard order by usr_rank desc limit 1";
+            Statement stm = T3DB.getConnection().createStatement();
+            ResultSet res = stm.executeQuery(sql);
+            while (res.next()) {
+                // node 0.no.yes: if last one smaller than current player -> update
+                if (res.getInt("usr_elo") < rankPlayer.getElo()) {
+                    updateLeaderboard();
+                    return;
+                }
 
-                // insert new data to leaderboard
-                insertNewTopPlayers(lstLeaderboardPlayer);
-
-                // TODO: update rank for object of current player
-                break;
+                // if current player can't make to leaderboard so don't need to update
             }
 
-            // if current player can't make to leaderboard so don't need to update
-
+            // node 0.no.no:        check # TopPlayer == 10
+            int noTopPlayers = getNoOfTopPlayers();
+            // node 0.no.no.no:     update
+            if (noTopPlayers < this.LIMITED_NUMBER_OF_TOP_PLAYER) {
+                PreparedStatement preStm = T3DB.getConnection().prepareStatement(
+                        "insert into LeaderBoard (usr_rank, username, no_match_played, no_match_won, usr_elo) values (?, ?, ?, ?, ?)");
+                preStm.setInt(1, noTopPlayers + 1);
+                preStm.setString(2, rankPlayer.getUsername());
+                preStm.setInt(3, rankPlayer.getNoPlayedMatch());
+                preStm.setInt(4, rankPlayer.getNoWonMatch());
+                preStm.setInt(5, rankPlayer.getElo());
+                preStm.executeUpdate();
+                rankPlayer.updatePlayerRank(noTopPlayers + 1);
+            }
         }
-        return true;
     }
 
     private int getNoOfTopPlayers() throws SQLException {
@@ -167,6 +191,22 @@ public class LeaderboardModel {
             preStm.setInt(5, leaderboardPlayerList.get(i).getElo());
             preStm.executeUpdate();
         }
+    }
+
+    // overload method
+    private void updateLeaderboard() throws SQLException {
+        // get new top players
+        List<LeaderboardPlayer> lstLeaderboardPlayer = getNewTopPlayers();
+
+        // delete all data in leaderboard
+        PreparedStatement preStm = T3DB.getConnection().prepareStatement(
+                "delete from LeaderBoard");
+        preStm.executeUpdate();
+
+        // insert new data to leaderboard
+        insertNewTopPlayers(lstLeaderboardPlayer);
+
+        // TODO: update rank for object of current player
     }
 
 }

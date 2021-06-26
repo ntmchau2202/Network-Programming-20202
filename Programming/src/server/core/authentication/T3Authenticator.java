@@ -51,6 +51,9 @@ public class T3Authenticator {
             loggedPlayer = new RankPlayer(res.getString("username"), sessionID, res.getInt("elo"), res.getInt("no_match_played"), res.getInt("no_match_won"));
         }
         if (loggedPlayer != null) {
+            // update rank for player
+            
+
             storeSessionID(username, sessionID);
         }
         return loggedPlayer;

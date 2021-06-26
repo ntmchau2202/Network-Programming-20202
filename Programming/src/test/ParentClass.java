@@ -1,9 +1,11 @@
 package test;
 
+import entity.Player.LeaderboardPlayer;
 import javafx.scene.Parent;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ParentClass {
     private ArrayList<Integer> magicList;
@@ -85,26 +87,45 @@ public class ParentClass {
 //        pc.addBadEle(16);
 //        pc.addBadEle(12);
 //        pc.addBadEle(5);
-        pc.viewList();
-        pc.addEle(1600);
-        pc.addEle(1390);
+//        pc.viewList();
+//        pc.addEle(1600);
+//        pc.addEle(1390);
+//
+//        pc.viewList();
+//        Pair<Integer, Integer> myPair = pc.getMagicPair();
+//        if (myPair == null) {
+//            System.out.println("no pair yet");
+//        } else {
+//            System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+//        }
+//        pc.viewList();
+//        myPair = pc.getMagicPair();
+//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+//        pc.viewList();
+//        myPair = pc.getMagicPair();
+//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+//        pc.viewList();
+//        myPair = pc.getMagicPair();
+//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+//        pc.viewList();
 
-        pc.viewList();
-        Pair<Integer, Integer> myPair = pc.getMagicPair();
-        if (myPair == null) {
-            System.out.println("no pair yet");
-        } else {
-            System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
+        LeaderboardPlayer foundPlayer = null;
+        List<LeaderboardPlayer> leaderboardPlayerList = null;
+        String username = "shiro";
+        // check if target user exists from leaderboard list
+        if (leaderboardPlayerList != null) {
+            for (LeaderboardPlayer leaderboardPlayer : leaderboardPlayerList) {
+                if (leaderboardPlayer.getUsername().equals(username)) {
+                    foundPlayer = leaderboardPlayer;
+                    break;
+                }
+            }
+
         }
-        pc.viewList();
-//        myPair = pc.getMagicPair();
-//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
-//        pc.viewList();
-//        myPair = pc.getMagicPair();
-//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
-//        pc.viewList();
-//        myPair = pc.getMagicPair();
-//        System.out.println("my pair: " + myPair.getKey() + "-" + myPair.getValue());
-//        pc.viewList();
+        if (foundPlayer != null) {
+            System.out.println("Found");
+        } else {
+            System.out.println("Not found");
+        }
     }
 }
