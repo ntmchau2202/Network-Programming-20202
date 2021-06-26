@@ -241,7 +241,7 @@ public class T3Authenticator {
         // rule: win + 100, lose - 100
 
         int modifyElo = isWon ? 100 : -100;
-        int modifyNoWonMatch = isWon ? 1 : -1;
+        int modifyNoWonMatch = isWon ? 1 : 0;
 
         // update into obj
         rankPlayer.updatePlayerInfo(rankPlayer.getRank(), rankPlayer.getElo() + modifyElo, rankPlayer.getNoPlayedMatch() + 1, rankPlayer.getNoWonMatch() + modifyNoWonMatch);

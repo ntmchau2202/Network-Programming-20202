@@ -79,7 +79,7 @@ public class LeaderboardModel {
         }
 
         // if target user doesn't show up in leaderboard list (cause he's fking weak), then find him in the RankPlayer table
-        if (foundPlayer != null) {
+        if (foundPlayer == null) {
             String sql = "select username, no_match_played, no_match_won, elo from RankPlayer order by elo desc";
             Statement stm = T3DB.getConnection().createStatement();
             ResultSet res = stm.executeQuery(sql);
