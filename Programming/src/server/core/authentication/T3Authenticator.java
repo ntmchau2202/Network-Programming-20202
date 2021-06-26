@@ -1,9 +1,11 @@
 package server.core.authentication;
 
 import entity.Player.GuestPlayer;
+import entity.Player.LeaderboardPlayer;
 import entity.Player.RankPlayer;
 import server.entity.database.T3DB;
 import server.model.GuestPlayerModel;
+import server.model.LeaderboardModel;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,13 +49,14 @@ public class T3Authenticator {
         String sessionID = genSessionID();
         // TODO: throw exception if multiple results
         while (res.next()) {
-            // TODO: get rank
             loggedPlayer = new RankPlayer(res.getString("username"), sessionID, res.getInt("elo"), res.getInt("no_match_played"), res.getInt("no_match_won"));
         }
         if (loggedPlayer != null) {
             // update rank for player
-            
-
+            LeaderboardPlayer newLeaderboardPlayer = LeaderboardModel.getLeaderboardModelInstance().getLeaderboardPlayerByUsername(
+                    loggedPlayer.getUsername(), null);
+            loggedPlayer.updatePlayerRank(newLeaderboardPlayer.getRank());
+            // store session id in db
             storeSessionID(username, sessionID);
         }
         return loggedPlayer;
@@ -68,8 +71,13 @@ public class T3Authenticator {
         ResultSet res = stm.executeQuery();
         // TODO: throw exception if multiple results
         while (res.next()) {
-            // TODO: get rank
             loggedPlayer = new RankPlayer(res.getString("username"), "" /*no need here, so tmp obmit*/ , res.getInt("elo"),res.getInt("no_match_played"), res.getInt("no_match_won"));
+        }
+        if (loggedPlayer != null) {
+            // update rank for player
+            LeaderboardPlayer newLeaderboardPlayer = LeaderboardModel.getLeaderboardModelInstance().getLeaderboardPlayerByUsername(
+                    loggedPlayer.getUsername(), null);
+            loggedPlayer.updatePlayerRank(newLeaderboardPlayer.getRank());
         }
         return loggedPlayer;
     }
@@ -114,10 +122,14 @@ public class T3Authenticator {
         String sessionID = genSessionID();
         // TODO: throw exception if multiple results
         while (res.next()) {
-            // TODO: get rank
             loggedPlayer = new RankPlayer(res.getString("username"), sessionID, res.getInt("elo"), res.getInt("no_match_played"), res.getInt("no_match_won"));
         }
         if (loggedPlayer != null) {
+            // update rank for player
+            LeaderboardPlayer newLeaderboardPlayer = LeaderboardModel.getLeaderboardModelInstance().getLeaderboardPlayerByUsername(
+                    loggedPlayer.getUsername(), null);
+            loggedPlayer.updatePlayerRank(newLeaderboardPlayer.getRank());
+            // store session id in db
             storeSessionID(username, sessionID);
         }
         return loggedPlayer;
@@ -131,7 +143,6 @@ public class T3Authenticator {
         ResultSet res = stm.executeQuery();
         // TODO: throw exception if multiple results
         while (res.next()) {
-            // TODO: get rank
             sessionID = res.getString("session_id");
         }
         return sessionID;
