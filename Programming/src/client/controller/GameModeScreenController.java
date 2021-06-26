@@ -1,12 +1,18 @@
 package client.controller;
 
+import java.util.ArrayList;
+
 import client.network.ClientSocketChannel;
+import entity.Player.LeaderboardPlayer;
 import message.joinqueue.JoinQueueServerMessage;
+import message.login.LoginServerMessage;
 import message.quitqueue.QuitQueueServerMessage;
 import protocol.Attachment;
 import protocol.StatusCode;
 import entity.Player.Player;
 import entity.Player.RankPlayer;
+
+import java.util.List;
 
 
 public class GameModeScreenController extends BaseController {
@@ -15,8 +21,11 @@ public class GameModeScreenController extends BaseController {
     private String opponentName;
     private String firstPlayer;
     private String sessionID;
+	private ArrayList<RankPlayer> listLeaderboardPlayer;
+
 
     public GameModeScreenController(RankPlayer curPlayer) {
+    	this.listLeaderboardPlayer = new ArrayList<RankPlayer>();
         this.curPlayer = curPlayer;
     }
 
@@ -98,6 +107,23 @@ public class GameModeScreenController extends BaseController {
         	return false;
         }
     }
+
+//    public boolean isLogoutSuccessfully(String username, String sessionID) throws Exception {
+//        try {
+//            String result = ClientSocketChannel.getSocketInstance().logout(username, sessionID);
+//            System.out.println("Returned message from Logout: "+ result);
+//           //LogoutServerMessage response = new LogoutServerMessage(result);
+//            if (response.getStatusCode().compareTo(StatusCode.ERROR) == 0) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        } catch (Exception e) {
+//            System.out.println("================== Error from logout");
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
 
     public boolean amIFirstPlayer() {
         return this.firstPlayer.equalsIgnoreCase(this.curPlayer.getUsername());

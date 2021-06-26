@@ -8,6 +8,7 @@ public class DrawConfirmServerMessage extends ServerMessage {
 	private int matchID;
 	private String movePlayer, sessionID;
 	private boolean acceptance;
+	// should we add a field of draw msg id here?
 	
 	public DrawConfirmServerMessage(int messageCommandID, int matchID, String player, String sessionID, boolean acceptance, StatusCode statCode, String errMsg) {
 		super(statCode, errMsg, messageCommandID);

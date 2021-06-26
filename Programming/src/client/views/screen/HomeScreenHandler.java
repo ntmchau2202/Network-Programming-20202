@@ -57,9 +57,11 @@ public class HomeScreenHandler extends BaseScreenHandler
     }
 
     @FXML
-    private void handleHomeAction(javafx.event.Event evt) {
+    private void handleHomeAction(javafx.event.Event evt) throws IOException {
         if (evt.getSource() == guestPlayBtn) {
             System.out.println("guest player");
+            WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(this.stage);
+            waitingScreenHandler.show();
             // TODO: log guest player here
 			
 			HomeScreenHandler currentHandler = this;
@@ -83,7 +85,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 					Integer isFound = (Integer) t.getSource().getValue();
 					System.out.println("done:" + isFound);
 					if (isFound == 0) {
-						MainGameScreenController mainGameScreenController = new MainGameScreenController(homeScreenController.getCurrentPlayer());
+						MainGameScreenController mainGameScreenController = new MainGameScreenController(homeScreenController.getCurrentPlayer(), "guest");
 						mainGameScreenController.setOpponent(homeScreenController.getOpponentName(),
 								homeScreenController.getOpponentElo());
 						mainGameScreenController.setMatchID(homeScreenController.getMatchID());
@@ -102,7 +104,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 									Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
 							mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
 							mainGameScreenHandler.setPreviousScreen(currentHandler);
-							System.out.println("Pepare to show up!");
+							System.out.println("Prepare to show up!");
 							mainGameScreenHandler.show();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -152,16 +154,16 @@ public class HomeScreenHandler extends BaseScreenHandler
                 e.printStackTrace();
             }
         } else if (evt.getSource() == leaderBoardImageView) {
-            System.out.println("leaderboard");
-            try {
-                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
-                leaderboardHandler.setScreenTitle("Leaderboard");
-                leaderboardHandler.setPreviousScreen(this);
-                leaderboardHandler.show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            System.out.println("leaderboard");
+//            try {
+//                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
+//                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+//                leaderboardHandler.setScreenTitle("Leaderboard");
+//                leaderboardHandler.setPreviousScreen(this);
+//                leaderboardHandler.show();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
 
     }

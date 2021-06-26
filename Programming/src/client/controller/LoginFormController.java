@@ -16,15 +16,16 @@ public class LoginFormController extends BaseController {
         if (serverResponse.getStatusCode().compareTo(StatusCode.SUCCESS) == 0) {
         	String sessionID = serverResponse.getSessionID();
         	String returnedUsername = serverResponse.getUsername();
-        	LeaderBoardController leaderBoardController = new LeaderBoardController();
-        	int rank = 0;
-            List<LeaderboardPlayer> players = leaderBoardController.getTopPlayers();
-            for (LeaderboardPlayer player : players) {
-                if (player.getUsername().equals(serverResponse.getUsername())) {
-                    rank = player.getRank();
-                }
-            }
-        	loggedPlayer = new RankPlayer(returnedUsername, sessionID, rank ,serverResponse.getELO(),serverResponse.getNumberOfMatchPlayed(),serverResponse.getNumberOfMatchWon());
+//        	LeaderBoardController leaderBoardController = new LeaderBoardController();
+//        	int rank = 0;
+//            List<LeaderboardPlayer> players = leaderBoardController.getTopPlayers();
+//            for (LeaderboardPlayer player : players) {
+//                if (player.getUsername().equals(serverResponse.getUsername())) {
+//                    rank = player.getRank();
+//                }
+//            }
+//            System.out.println("The rank is: " + rank);
+        	loggedPlayer = new RankPlayer(returnedUsername, sessionID, serverResponse.getRank() ,serverResponse.getELO(),serverResponse.getNumberOfMatchPlayed(),serverResponse.getNumberOfMatchWon());
         	return true;
         }
         

@@ -56,4 +56,8 @@ public class RankPlayer extends Player {
         this.noWonMatch = noWonMatch;
         this.winningRate = (float)noWonMatch / noPlayedMatch;
     }
+
+    public void updatePlayerRank(int rank) {
+        this.rank = rank;
+    }
 }
