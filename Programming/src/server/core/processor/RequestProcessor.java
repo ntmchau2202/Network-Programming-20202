@@ -371,6 +371,8 @@ public class RequestProcessor {
                 LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
                 LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
             }
+
+            // TODO: update number of played & won match for RankPlayer even in match is not ranked
         }
 
         MoveServerMessage fwdMsg = new MoveServerMessage(moveMsg.getMessageCommandID(), matchID, movePlayer, x, y, state, result, statCode, errMsg);
@@ -425,9 +427,9 @@ public class RequestProcessor {
         while (true) {
             try {
                 Thread.sleep(500);
+
                 if (match.getNumberOfMoves() > 0) {
                     if (username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
-
                         if ((match.getNumberOfMoves() % 2) == 0) {
                             latestMove = match.getLatestMove();
                             movePlayer = match.getPlayer2().getUsername();
@@ -441,6 +443,16 @@ public class RequestProcessor {
                         }
                     }
                 }
+
+                // check status of match: break if winner has been found (this case is for opponent quits the game)
+                if (match.isEnded()) {
+                    // assign the last move (logically is the last move from this listening user)
+                    latestMove = match.getLatestMove();
+                    movePlayer = match.getAnotherPlayer(username) != null ? match.getAnotherPlayer(username).getUsername() : "";
+                    match.addNewMoveRecord(latestMove.getX(), latestMove.getY(), movePlayer, "valid", "win");
+                    break;
+                }
+
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -623,8 +635,22 @@ public class RequestProcessor {
     
     private String processQuitGameRequest(String input) throws Exception {
     	QuitGameClientMessage request = new QuitGameClientMessage(input);
-    	
-    	// TODO: process smt here
+
+    	// parse info from request
+        String username = request.getUsername();
+        String sessionID = request.getSessionID();
+        int matchID = request.getMatchID();
+        Match match = queueController.getMatchById(matchID);
+
+    	// update info of match
+        Player opponent = match.getAnotherPlayer(username);
+        if (opponent != null) {
+            match.setWinner(opponent.getUsername());
+            match.setEnd(true);
+        } else {
+            // alert something here?
+            System.out.println("Cannot find opponent!!!");
+        }
     	
     	QuitGameServerMessage response = new QuitGameServerMessage(request, StatusCode.SUCCESS, "");
     	return response.toString();

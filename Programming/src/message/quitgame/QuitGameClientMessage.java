@@ -31,4 +31,8 @@ public class QuitGameClientMessage extends ClientMessage {
 	public String getSessionID() {
 		return this.sessionID;
 	}
+
+	public int getMatchID() {
+		return matchID;
+	}
 }
