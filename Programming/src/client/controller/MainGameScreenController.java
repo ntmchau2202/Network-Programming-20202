@@ -145,8 +145,8 @@ public class MainGameScreenController extends BaseController {
         }
     }
 
-    public boolean isFinal() {
-        return this.moveResult.compareToIgnoreCase("win") == 0;
+    public String getMoveResult() {
+        return this.moveResult;
     }
 
     public int getX() {

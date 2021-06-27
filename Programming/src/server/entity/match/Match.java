@@ -87,6 +87,7 @@ public class Match {
 	public void addNewMoveRecord(int x, int y, String movePlayer, String state, String result) {
 		Move newMove = new Move(x, y, movePlayer, state, result);
 		this.moveRecord.add(newMove);
+		System.out.println(this.moveRecord);
 	}
 	
 	public int getNumberOfMoves() {

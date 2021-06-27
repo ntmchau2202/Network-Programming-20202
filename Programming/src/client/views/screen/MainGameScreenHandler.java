@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainGameScreenHandler extends BaseScreenHandler implements Initializable {
     @FXML
@@ -81,7 +82,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
     private final MainGameScreenController mainGameScreenController;
     private Image MOVE_IMAGE;
 
-    private AtomicBoolean isGameEnded;
+    private AtomicInteger isGameEnded; // 0 = nothing, 1 = win, -1 = draw
     /**
      * @param stage      stage of screen.
      * @param screenPath path to screen fxml
@@ -154,7 +155,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // unlock move
         isLockMove = false;
-        isGameEnded = new AtomicBoolean(false);
+        isGameEnded = new AtomicInteger(0);
 
         // if not first player to play, listen move from opponent
         if (!this.mainGameScreenController.amIFirstPlayer()) {
@@ -164,14 +165,22 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                     try {
                         // send move to server
                         isSuccessfull = mainGameScreenController.listenMove();
-                        int recvX1 = mainGameScreenController.getX();
-                        int recvY1 = mainGameScreenController.getY();
-                        System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
-
-                        // display move on pane ??
-                        addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
-
-                        mainGameScreenController.setTurn(true);
+                        if (mainGameScreenController.getMoveResult().compareToIgnoreCase("")==0) {
+	                        int recvX1 = mainGameScreenController.getX();
+	                        int recvY1 = mainGameScreenController.getY();
+	                        System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+	
+	                        // display move on pane ??
+	                        addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+	
+	                        mainGameScreenController.setTurn(true);
+                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
+                        	isGameEnded.set(1);
+                        	this.cancel();
+                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("draw")==0) {
+                        	isGameEnded.set(-1);
+                        	this.cancel();
+                        }
 
                     } catch (Exception e1) {
                         // TODO Auto-generated catch block
@@ -199,6 +208,44 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                     }
                 }
             });
+            
+            listenMoveTask.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					try {
+						if(isGameEnded.get() == 1) {
+							notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
+						} else if(isGameEnded.get() == -1) {
+							notifySuccess("Game draw! You are awesome!");
+						}
+						// send update_user msg here
+						if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
+							try {
+								mainGameScreenController.updateUserInformation();
+								GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+		                        gameModeHandler.setScreenTitle("Game mode");
+		                        gameModeHandler.show();
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else {
+							// guest mode
+							HomeScreenHandler homeScreenHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
+							homeScreenHandler.setScreenTitle("Home Screen");
+							homeScreenHandler.show();
+						}
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+            	
+            });
+            
+            
+            
             Thread thread = new Thread(listenMoveTask);
             thread.start();
         };
@@ -258,8 +305,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 								// both accept
 								// display draw dialog box here
 								// then end the game
-								isGameEnded.set(true);
-								notifySuccess("Game draw!");
+								isGameEnded.set(-1);
+								notifySuccess("Game draw! You're awesome!");
 								// return to main screen
 								if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
 									try {
@@ -273,6 +320,9 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 									}
 								} else {
 									// guest mode
+									HomeScreenHandler homeScreenHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
+									homeScreenHandler.setScreenTitle("Home Screen");
+									homeScreenHandler.show();
 								}
 								break;
 							} else {
@@ -359,6 +409,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                 	String result = "";
                                 	if (isWin == 1) {
                                 		result = "win"; 
+                                	} else if (isWin == 0) {
+                                		result = "draw";
                                 	}
                                 	
                                     if (mainGameScreenController.sendMove(rowIndex, colIndex, result)) {
@@ -366,13 +418,17 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                         int recvY = mainGameScreenController.getY();
                                         System.out.printf("Successfully place move on coordinate [%d, %d]%n", recvX, recvY);
                                         
-                                        if (mainGameScreenController.isFinal()) {
-                                        	isGameEnded.set(true);
+                                        if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
+                                        	isGameEnded.set(1);
                                         	System.out.println("Result from send: Win player: " + mainGameScreenController.getFinalMovePlayer());
+                                        	this.cancel();
+                                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("draw")==0) {
+                                        	isGameEnded.set(-1);
+                                        	System.out.println("Result from send: draw");
                                         	this.cancel();
                                         }
 
-                                        if(!isGameEnded.get()) {
+                                        if(isGameEnded.get()==0) {
                                         	mainGameScreenController.setTurn(false);
                                             
                                             // start listening for opponent move
@@ -382,8 +438,13 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                                 System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
                                                 // display move on pane ??
                                                 addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
-                                                if (mainGameScreenController.isFinal()) {
+                                                if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
                                                 	System.out.println("Result from listen: Win player: " + mainGameScreenController.getFinalMovePlayer());
+                                                	isGameEnded.set(1);
+                                                	this.cancel();
+                                                } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("draw")==0) {
+                                                	System.out.println("Result from listen: draw");
+                                                	isGameEnded.set(-1);
                                                 	this.cancel();
                                                 }
                                                 mainGameScreenController.setTurn(true);
@@ -430,7 +491,11 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 							@Override
 							public void handle(WorkerStateEvent arg0) {
 								try {
-									notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
+									if(isGameEnded.get() == 1) {
+										notifySuccess("Game ended! The winner is " + mainGameScreenController.getFinalMovePlayer());
+									} else if(isGameEnded.get() == -1) {
+										notifySuccess("Game draw! You are awesome!");
+									}
 									// send update_user msg here
 									if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
 										try {
@@ -590,8 +655,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			protected Void call() throws Exception {
 				if(mainGameScreenController.sendDrawConfirm(true)) {
 					// show a dialog box here 
-					isGameEnded.set(true);
-					notifySuccess("Game draw!");
+					isGameEnded.set(-1);
+					notifySuccess("Game draw! You are awesome");
 				}
 				return null;
 			}
@@ -602,8 +667,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			protected Void call() throws Exception {
 				if(mainGameScreenController.sendDrawConfirm(true)) {
 					// show a dialog box here 
-					isGameEnded.set(true);
-					notifySuccess("Game draw!");
+					isGameEnded.set(0);
 				}
 				return null;
 			}
@@ -643,7 +707,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			protected Void call() throws Exception {
 				if(mainGameScreenController.sendDrawRequest()) {
 					// show a dialog box here 
-					isGameEnded.set(true);
 					notifySuccess("Waiting for confirmation...");
 					// freeze the table here
 				}
@@ -678,20 +741,47 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             System.out.println("No selection!");
         } else if (option.get() == ButtonType.OK) {
             // handle action here
-        	Task<Void> requestDrawTask = new Task<Void>() {
+        	Task<Boolean> requestQuitTask = new Task<Boolean>() {
 
 				@Override
-				protected Void call() throws Exception {
-					if(mainGameScreenController.sendQuitGameRequest()) {
-						notifySuccess("Game quitted successfully");
-						// freeze the table here
-					} else {
-						notifyError("An error occured when quitting the game. Please try again later");
-					}
-					return null;
+				protected Boolean call() throws Exception {
+					return mainGameScreenController.sendQuitGameRequest();
 				}
         	};
-        	Thread requestDrawThread = new Thread(requestDrawTask);
+        	
+        	requestQuitTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+	                try {
+	                	Boolean isOK = (Boolean) arg0.getSource().getValue();
+	    				if (isOK) {
+	    					notifySuccess("Game quitted successfully");
+	    					if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
+								try {
+									mainGameScreenController.updateUserInformation();
+									GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+			                        gameModeHandler.setScreenTitle("Game mode");
+			                        gameModeHandler.show();
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							} else {
+								// guest mode
+								HomeScreenHandler homeScreenHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
+								homeScreenHandler.setScreenTitle("Home Screen");
+								homeScreenHandler.show();
+							}
+	    				} else {
+	    					notifyError("An error occured when quitting the game. Please try again later");
+	    				}
+	                } catch (Exception e) {
+	                	e.printStackTrace();
+	                }
+				}
+        	});
+        	Thread requestDrawThread = new Thread(requestQuitTask);
         	requestDrawThread.start();
         	System.out.println("Quit confirmed!");
         } else if (option.get() == ButtonType.CANCEL) {
