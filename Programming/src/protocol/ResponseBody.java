@@ -107,10 +107,11 @@ public class ResponseBody {
 		this.responseBody.put("move_player", move_player);
 	}
 	
-	public void createDrawConfirmBody(int match_id, String move_player, boolean acceptance) throws JSONException {
+	public void createDrawConfirmBody(int match_id, String move_player, String session_id, boolean acceptance) throws JSONException {
 		this.responseBody.clear();
 		this.responseBody.put("match_id", match_id);
 		this.responseBody.put("move_player", move_player);
+		this.responseBody.put("session_id", session_id);
 		this.responseBody.put("acceptance", acceptance);
 	}
 	
