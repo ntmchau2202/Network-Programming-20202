@@ -635,6 +635,8 @@ public class RequestProcessor {
     
     private String processQuitGameRequest(String input) throws Exception {
     	QuitGameClientMessage request = new QuitGameClientMessage(input);
+        String errMsg = "";
+        StatusCode statCode;
 
     	// parse info from request
         String username = request.getUsername();
@@ -645,14 +647,19 @@ public class RequestProcessor {
     	// update info of match
         Player opponent = match.getAnotherPlayer(username);
         if (opponent != null) {
-            match.setWinner(opponent.getUsername());
-            match.setEnd(true);
+            if (!queueController.endGame(opponent.getUsername(), matchID)) {
+                statCode = StatusCode.ERROR;
+                errMsg = "Cannot end the game...";
+            } else {
+                statCode = StatusCode.SUCCESS;
+                errMsg = "";
+            }
         } else {
-            // alert something here?
-            System.out.println("Cannot find opponent!!!");
+            statCode = StatusCode.ERROR;
+            errMsg = "Cannot find opponent!!!";
         }
     	
-    	QuitGameServerMessage response = new QuitGameServerMessage(request, StatusCode.SUCCESS, "");
+    	QuitGameServerMessage response = new QuitGameServerMessage(request, statCode, errMsg);
     	return response.toString();
     }
 }
