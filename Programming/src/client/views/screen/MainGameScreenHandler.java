@@ -767,18 +767,36 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // option != null.
         Optional<ButtonType> option = alert.showAndWait();
         
-        Task<Void> acceptDrawTask = new Task<Void>() {
+        Task<Boolean> acceptDrawTask = new Task<Boolean>() {
 
 			@Override
-			protected Void call() throws Exception {
-				if(mainGameScreenController.sendDrawRequest()) {
-					// show a dialog box here 
-					notifySuccess("Waiting for confirmation...");
-					// freeze the table here
-				}
-				return null;
+			protected Boolean call() throws Exception {
+				return mainGameScreenController.sendDrawRequest();
+				
 			}
         };
+        
+        acceptDrawTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				try {
+					Boolean isOK = (Boolean) arg0.getSource().getValue();
+					if(isOK) {
+						// show a dialog box here 
+						notifySuccess("Waiting for confirmation...");
+						// freeze the table here
+					} else {
+						notifyError("An error occured when asking for draw...");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+        	
+        });
+        
         if (option.get() == null) {
             System.out.println("No selection!");
         } else if (option.get() == ButtonType.OK) {
@@ -787,7 +805,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         	acceptDrawThread.start();
             
         } else if (option.get() == ButtonType.CANCEL) {
-            System.out.println("Draw rejected!");
+            System.out.println("No draw request wanted");
         } else {
             System.out.println("-"); 
         }
