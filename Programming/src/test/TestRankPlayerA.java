@@ -63,7 +63,7 @@ public class TestRankPlayerA extends Application {
                     }
                     GameModeScreenController gameModeScreenController = new GameModeScreenController(loginFormController.getLoggedPlayer());
                     MainGameScreenController mainGameScreenController = new MainGameScreenController(gameModeScreenController.getCurPlayer(), "ranked");
-                    int foundResult = gameModeScreenController.findPracticeGame();
+                    int foundResult = gameModeScreenController.findRankedGame();
                     if (foundResult == 0) {
                         if (gameModeScreenController.amIFirstPlayer()) {
                             System.out.println("i play first mother fucker");

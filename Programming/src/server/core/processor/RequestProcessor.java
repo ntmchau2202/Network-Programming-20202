@@ -41,8 +41,11 @@ import server.core.authentication.T3Authenticator;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
 import server.entity.match.ChatMessage;
+import server.entity.match.MatchMode;
+import server.entity.match.MatchResult;
 import server.entity.network.completionHandler.ReadCompletionHandler;
 import server.model.LeaderboardModel;
+import server.model.RankPlayerModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -368,14 +371,38 @@ public class RequestProcessor {
                     RankPlayer lostPlayer =  (RankPlayer) match.getAnotherPlayer(movePlayer);
 
                     // update player info into both obj and db
-                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
-                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
+                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(wonPlayer, MatchResult.Win, MatchMode.Ranked);
+                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(lostPlayer, MatchResult.Lost, MatchMode.Ranked);
 
                     // update info of player into leaderboard
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+                } else {
+                    // update number of played & won match for RankPlayer even in match is not ranked
+                    Player movePlayerObj = match.getPlayerByName(movePlayer);
+                    if (movePlayerObj instanceof RankPlayer) {
+                        // who sending this quit request is the loser
+                        RankPlayer wonPlayer =  (RankPlayer) movePlayerObj;
+
+                        // update player info into both obj and db
+                        RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(wonPlayer, MatchResult.Win, MatchMode.Normal);
+
+                        // update info of player into leaderboard
+                        LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
+                    }
+
+                    Player opponent = match.getAnotherPlayer(movePlayer);
+                    if (opponent instanceof RankPlayer) {
+                        // who sending this quit request is the loser
+                        RankPlayer lostPlayer = (RankPlayer) opponent;
+
+                        // update player info into both obj and db
+                        RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(lostPlayer, MatchResult.Lost, MatchMode.Normal);
+
+                        // update info of player into leaderboard
+                        LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+                    }
                 }
-                // TODO: update number of played & won match for RankPlayer even in match is not ranked
             }
 
         } else if (moveMsg.getResult().compareToIgnoreCase("draw") == 0) {
@@ -774,20 +801,42 @@ public class RequestProcessor {
             } else {
                 // process player info only when this is ranked match
                 if (match.isRanked()) {
-                    System.out.println("Somebody is quitting game");
                     // who sending this quit request is the loser
                     RankPlayer lostPlayer = (RankPlayer) match.getPlayerByName(requestUsername);
                     RankPlayer wonPlayer =  (RankPlayer) opponent;
 
                     // update player info into both obj and db
-                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
-                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
+                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(wonPlayer, MatchResult.Win, MatchMode.Ranked);
+                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(lostPlayer, MatchResult.Lost, MatchMode.Ranked);
 
                     // update info of player into leaderboard
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+                } else {
+                    // update number of played & won match for RankPlayer even in match is not ranked
+                    if (opponent instanceof RankPlayer) {
+                        // who sending this quit request is the loser
+                        RankPlayer wonPlayer =  (RankPlayer) opponent;
+
+                        // update player info into both obj and db
+                        RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(wonPlayer, MatchResult.Win, MatchMode.Normal);
+
+                        // update info of player into leaderboard
+                        LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
+                    }
+
+                    Player quitPlayer = match.getPlayerByName(requestUsername);
+                    if (quitPlayer instanceof RankPlayer) {
+                        // who sending this quit request is the loser
+                        RankPlayer lostPlayer = (RankPlayer) quitPlayer;
+
+                        // update player info into both obj and db
+                        RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(lostPlayer, MatchResult.Lost, MatchMode.Normal);
+
+                        // update info of player into leaderboard
+                        LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+                    }
                 }
-                // TODO: update number of played & won match for RankPlayer even in match is not ranked
                 statCode = StatusCode.SUCCESS;
                 errMsg = "";
             }

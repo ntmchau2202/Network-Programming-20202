@@ -280,7 +280,7 @@ public class QueueController {
                         Match m = ingameListIterator.next();
                         if (m.isEnded()) {
                             ingameListIterator.remove();
-                            System.out.println("Number of game currently: " + ingameList.size());
+                            System.out.println("Number of games currently: " + ingameList.size());
                         }
                     }
 

@@ -57,13 +57,13 @@ public class TestRankPlayerB extends Application {
             fadeOut.setOnFinished((e) -> {
                 LoginFormController loginFormController = new LoginFormController();
                 try {
-                    if (!loginFormController.isLoginSuccessfully("haha", "123")) {
+                    if (!loginFormController.isLoginSuccessfully("kuuhaku", "haha")) {
                         System.out.println("Login failed");
                         System.exit(-1);
                     }
                     GameModeScreenController gameModeScreenController = new GameModeScreenController(loginFormController.getLoggedPlayer());
                     MainGameScreenController mainGameScreenController = new MainGameScreenController(gameModeScreenController.getCurPlayer(), "ranked");
-                    int foundResult = gameModeScreenController.findPracticeGame();
+                    int foundResult = gameModeScreenController.findRankedGame();
                     if (foundResult == 0) {
                         if (gameModeScreenController.amIFirstPlayer()) {
                             System.out.println("i play first mother fucker");
