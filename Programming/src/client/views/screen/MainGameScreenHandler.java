@@ -3,7 +3,6 @@ package client.views.screen;
 import client.controller.GameModeScreenController;
 import client.controller.HomeScreenController;
 import client.controller.MainGameScreenController;
-import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import client.utils.Misc;
 import entity.Player.RankPlayer;
@@ -11,7 +10,6 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,15 +27,11 @@ import message.drawconfirm.DrawConfirmServerMessage;
 import message.drawrequest.DrawRequestServerMessage;
 import server.entity.match.ChatMessage;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javafx.util.Pair;
 
 public class MainGameScreenHandler extends BaseScreenHandler implements Initializable {
     @FXML
@@ -244,10 +238,10 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             sendButton.setDisable(chatTextField.getText().isEmpty());
         });
         
-        Task<Void> listenDrawTask = new Task<Void>() {
+        Task<ServerMessage> listenDrawTask = new Task<ServerMessage>() {
 
 			@Override
-			protected Void call() throws Exception {
+			protected ServerMessage call() throws Exception {
 				while(true) {
 					ServerMessage request = mainGameScreenController.listenDrawRequest();
 					if (request != null) {

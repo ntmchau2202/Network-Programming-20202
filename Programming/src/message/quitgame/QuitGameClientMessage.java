@@ -22,6 +22,7 @@ public class QuitGameClientMessage extends ClientMessage {
 		super(input);
 		this.username = this.requestBody.getBody().getString("username");
 		this.sessionID = this.requestBody.getBody().getString("session_id");
+		this.matchID = this.requestBody.getBody().getInt("match_id");
 	}
 	
 	public String getUsername() {

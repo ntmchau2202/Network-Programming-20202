@@ -116,7 +116,7 @@ public class RequestProcessor {
             	break;
             }
             case QUIT_GAME: {
-                resMsg = this.processQuitGameRequest(resMsg);
+                resMsg = this.processQuitGameRequest(recvMsg);
                 break;
             }
             case LEADERBOARD: {
