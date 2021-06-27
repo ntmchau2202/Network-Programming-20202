@@ -161,7 +161,6 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // if not first player to play, listen move from opponent
         if (!this.mainGameScreenController.amIFirstPlayer()) {
         	System.out.println("Im not the first player :(");
-        	
         	isLockMove = true;
         	System.out.println("Is move locked? " + isLockMove);
         }
@@ -279,25 +278,30 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             sendButton.setDisable(chatTextField.getText().isEmpty());
         });
         
-        Task<ServerMessage> listenDrawTask = new Task<ServerMessage>() {
-
-			@Override
-			protected ServerMessage call() throws Exception {
-				while(true) {
-					ServerMessage request = mainGameScreenController.listenDrawRequest();
-					System.out.println("Are we here yet?: " + request.toString());
-					return request;
-				}
-			}
-        };
         
-        listenDrawTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+        EventHandler<WorkerStateEvent> listenDrawHandler = new EventHandler<WorkerStateEvent>() {
+        	Task<ServerMessage> listenDraw;
+        	public void listenAgain() {
+                 listenDraw = new Task<ServerMessage>() {
+          		
+  					@Override
+  					protected ServerMessage call() throws Exception {
+  						ServerMessage request = mainGameScreenController.listenDrawRequest();
+  						System.out.println("Are we here yet?: " + request.toString());
+  						return request;
+  					}
+  		        };
+  		        
+  		      listenDraw.setOnSucceeded(this);
+  		      
+  		      Thread listenAgainThread = new Thread(listenDraw);
+  		      listenAgainThread.start();
+          	}
 
-			@Override
-			public void handle(WorkerStateEvent arg0) {
+        	public void analyzingMessage(ServerMessage request) {
+
 				try {
-					ServerMessage request = (ServerMessage) arg0.getSource().getValue();
-					if (request != null) {
+	          		if (request != null) {
 						if (request instanceof DrawRequestServerMessage) {
 							DrawRequestServerMessage realReq = (DrawRequestServerMessage)request;
 							// display dialog box for confirming draw here
@@ -335,15 +339,41 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 							} else {
 								// notify request refused
 								notifyError("Sorry, your opponent " + realReq.getPlayer() + " does not accept your draw request :(");
+								listenAgain();
 							}
 						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+          	}
+          	
+
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				try {
+	          		ServerMessage request = (ServerMessage) arg0.getSource().getValue();
+	          		this.analyzingMessage(request);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
 			}
         	
-        });
+        };
+        
+        Task<ServerMessage> listenDrawTask = new Task<ServerMessage>() {
+			@Override
+			protected ServerMessage call() throws Exception {
+				ServerMessage request = mainGameScreenController.listenDrawRequest();
+				System.out.println("Are we here yet?: " + request.toString());
+				return request;
+			}
+        	
+        };
+        
+     
+        listenDrawTask.setOnSucceeded(listenDrawHandler);
         
         Thread listenDrawThread = new Thread(listenDrawTask);
         listenDrawThread.start();

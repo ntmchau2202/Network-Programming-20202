@@ -557,6 +557,8 @@ public class RequestProcessor {
         }
         DrawConfirmServerMessage serverMsg = new DrawConfirmServerMessage(confirmMsg.getMessageCommandID(), matchID, confirmUsername,
                 confirmSessionID, acceptance, statCode, errMsg);
+        // reset? is it ok to put it here?
+//        match.resetDrawRequest();
         return serverMsg.toString();
     }
     

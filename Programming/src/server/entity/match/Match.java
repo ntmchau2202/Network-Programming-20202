@@ -145,6 +145,11 @@ public class Match {
 		}
 		return false;
 	}
+	
+	public void resetDrawRequest() {
+		this.player1DrawRequestState = "";
+		this.player2DrawRequestState = "";
+	}
 
 	public boolean confirmDrawRequest(String drawResponseName) {
 		if (player1.getUsername().equals(drawResponseName)) {
