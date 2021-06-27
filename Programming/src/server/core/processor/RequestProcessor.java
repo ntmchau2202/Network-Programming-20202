@@ -60,7 +60,6 @@ public class RequestProcessor implements IProcessor {
     private CompletionHandlerController handlerController;
     private boolean isCancel;
     private boolean isStop;
-    private final CompletionHandlerController handlerController;
 
     public RequestProcessor(QueueController queueController, CompletionHandlerController handlerController) {
         this.queueController = queueController;
