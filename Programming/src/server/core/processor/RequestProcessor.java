@@ -364,7 +364,7 @@ public class RequestProcessor {
                 statCode = StatusCode.ERROR;
                 errMsg = "Cannot end the game...";
             } else {
-                // process player info only when this is ranked match
+                // process player info
                 if (match.isRanked()) {
                     // who sending this move is the winner
                     RankPlayer wonPlayer = (RankPlayer) match.getPlayerByName(movePlayer);
@@ -378,7 +378,7 @@ public class RequestProcessor {
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
                 } else {
-                    // update number of played & won match for RankPlayer even in match is not ranked
+                    // only update for ranked player
                     Player movePlayerObj = match.getPlayerByName(movePlayer);
                     if (movePlayerObj instanceof RankPlayer) {
                         // who sending this quit request is the loser
@@ -567,7 +567,43 @@ public class RequestProcessor {
                         statCode = StatusCode.ERROR;
                         errMsg = "Cannot end the game...";
                     } else {
-                        // TODO: update player info in database: RankPlayer and Leaderboard
+                        // process player info
+                        if (match.isRanked()) {
+                            RankPlayer confirmPlayer = (RankPlayer) match.getPlayerByName(confirmUsername);
+                            RankPlayer opponent =  (RankPlayer) match.getAnotherPlayer(confirmUsername);
+
+                            // update player info into both obj and db
+                            RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(confirmPlayer, MatchResult.Draw, MatchMode.Ranked);
+                            RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(opponent, MatchResult.Draw, MatchMode.Ranked);
+
+                            // update info of player into leaderboard
+                            LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(confirmPlayer);
+                            LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(opponent);
+                        } else {
+                            // only update for ranked player in normal match
+                            Player confirmPlayer = match.getPlayerByName(confirmUsername);
+                            if (confirmPlayer instanceof RankPlayer) {
+                                RankPlayer confirmRankPlayer =  (RankPlayer) confirmPlayer;
+
+                                // update player info into both obj and db
+                                RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(confirmRankPlayer, MatchResult.Draw, MatchMode.Normal);
+
+                                // update info of player into leaderboard
+                                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(confirmRankPlayer);
+                            }
+
+                            Player opponent = match.getAnotherPlayer(confirmUsername);
+                            if (opponent instanceof RankPlayer) {
+                                // who sending this quit request is the loser
+                                RankPlayer opponentRankPlayer = (RankPlayer) opponent;
+
+                                // update player info into both obj and db
+                                RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(opponentRankPlayer, MatchResult.Draw, MatchMode.Normal);
+
+                                // update info of player into leaderboard
+                                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(opponentRankPlayer);
+                            }
+                        }
                     }
 
                 } else {
@@ -799,7 +835,7 @@ public class RequestProcessor {
                 statCode = StatusCode.ERROR;
                 errMsg = "Cannot end the game...";
             } else {
-                // process player info only when this is ranked match
+                // process player info
                 if (match.isRanked()) {
                     // who sending this quit request is the loser
                     RankPlayer lostPlayer = (RankPlayer) match.getPlayerByName(requestUsername);
@@ -813,7 +849,7 @@ public class RequestProcessor {
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
                 } else {
-                    // update number of played & won match for RankPlayer even in match is not ranked
+                    // update info only for ranked player
                     if (opponent instanceof RankPlayer) {
                         // who sending this quit request is the loser
                         RankPlayer wonPlayer =  (RankPlayer) opponent;
