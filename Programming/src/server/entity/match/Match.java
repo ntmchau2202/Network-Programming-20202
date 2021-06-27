@@ -145,6 +145,18 @@ public class Match {
 		}
 		return false;
 	}
+
+	
+	public boolean pendingDrawRequest(String drawRequestName) {
+		if (player1.getUsername().equals(drawRequestName)) {
+			this.player1DrawRequestState = "pending";
+			return true;
+		} else if (player2.getUsername().equals(drawRequestName)) {
+			this.player2DrawRequestState = "pending";
+			return true;
+		}
+		return false;
+	}
 	
 	public void resetDrawRequest() {
 		this.player1DrawRequestState = "";

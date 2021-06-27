@@ -301,34 +301,8 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 							} else if (request instanceof DrawConfirmServerMessage) {
 								DrawConfirmServerMessage realReq = (DrawConfirmServerMessage)request;
 								System.out.println("Got into draw confirm svmsg");
-								if(realReq.getAcceptance()) {
-									// both accept
-									// display draw dialog box here
-									// then end the game
-									isGameEnded.set(-1);
-									notifySuccess("Game draw! You're awesome!");
-									// return to main screen
-									if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
-										try {
-											mainGameScreenController.updateUserInformation();
-											GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
-					                        gameModeHandler.setScreenTitle("Game mode");
-					                        gameModeHandler.show();
-										} catch (Exception e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-									} else {
-										// guest mode
-										HomeScreenHandler homeScreenHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
-										homeScreenHandler.setScreenTitle("Home Screen");
-										homeScreenHandler.show();
-									}
-								} else {
-									// notify request refused
-									notifyError("Sorry, your opponent " + realReq.getPlayer() + " does not accept your draw request :(");
-								}
-							}
+								showAfterConfirmationDraw(realReq);
+							} 
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -757,6 +731,46 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 			}
     	});
     }
+
+    private void showAfterConfirmationDraw(DrawConfirmServerMessage realReq) {
+    	Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					if(realReq.getAcceptance()) {
+						// both accept
+						// display draw dialog box here
+						// then end the game
+						isGameEnded.set(-1);
+						notifySuccess("Game draw! You're awesome!");
+						// return to main screen
+						if(mainGameScreenController.getCurrentGameMode().compareToIgnoreCase("guest")!=0) {
+							try {
+								mainGameScreenController.updateUserInformation();
+								GameModeScreenHandler gameModeHandler = new GameModeScreenHandler(stage, Configs.GAME_MODE_SCREEN_PATH, new GameModeScreenController((RankPlayer)mainGameScreenController.getCurrentPlayer()));
+		                        gameModeHandler.setScreenTitle("Game mode");
+		                        gameModeHandler.show();
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else {
+							// guest mode
+							HomeScreenHandler homeScreenHandler = new HomeScreenHandler(stage, Configs.HOME_SCREEN_PATH, new HomeScreenController());
+							homeScreenHandler.setScreenTitle("Home Screen");
+							homeScreenHandler.show();
+						}
+					} else {
+						notifyError("Sorry, your opponent " + realReq.getPlayer() + " does not accept your draw request :(");
+					}
+				} catch (Exception e ) {
+					e.printStackTrace();
+				}
+			}
+    	});	
+    }
+    	
     
     @FXML
     void showDrawDialog() {
@@ -875,6 +889,4 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             System.out.println("-");
         }
     }
-
-
 }

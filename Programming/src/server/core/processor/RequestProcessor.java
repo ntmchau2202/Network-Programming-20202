@@ -577,6 +577,7 @@ public class RequestProcessor {
                 Thread.sleep(500);
 
                 if (match.isIncomingDrawRequest(listenUsername)) {
+                	match.pendingDrawRequest(listenUsername);
                     String requestPlayerName = match.getAnotherPlayer(listenUsername) != null ? match.getAnotherPlayer(listenUsername).getUsername() : "";
                     DrawRequestServerMessage drawRequestServerMessage = new DrawRequestServerMessage(listenMsg.getMessageCommandID(),
                             matchID, requestPlayerName, listenSessionID, StatusCode.SUCCESS, "");
