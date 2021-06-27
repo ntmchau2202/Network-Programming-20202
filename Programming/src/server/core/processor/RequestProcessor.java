@@ -535,7 +535,6 @@ public class RequestProcessor {
             if (acceptance) {
                 if (match.confirmDrawRequest(confirmUsername)) {
                     statCode = StatusCode.SUCCESS;
-
                     // end this game with empty winner player name
                     if (!queueController.endGame("", matchID)) {
                         statCode = StatusCode.ERROR;
@@ -559,6 +558,8 @@ public class RequestProcessor {
         }
         DrawConfirmServerMessage serverMsg = new DrawConfirmServerMessage(confirmMsg.getMessageCommandID(), matchID, confirmUsername,
                 confirmSessionID, acceptance, statCode, errMsg);
+        // reset? is it ok to put it here?
+        
         return serverMsg.toString();
     }
     
@@ -578,6 +579,7 @@ public class RequestProcessor {
                 Thread.sleep(500);
 
                 if (match.isIncomingDrawRequest(listenUsername)) {
+                	match.pendingDrawRequest(listenUsername);
                     String requestPlayerName = match.getAnotherPlayer(listenUsername) != null ? match.getAnotherPlayer(listenUsername).getUsername() : "";
                     DrawRequestServerMessage drawRequestServerMessage = new DrawRequestServerMessage(listenMsg.getMessageCommandID(),
                             matchID, requestPlayerName, listenSessionID, StatusCode.SUCCESS, "");
@@ -587,11 +589,13 @@ public class RequestProcessor {
 
                 if (match.isDrawDeny()) {
                     acceptance = false;
+                    match.resetDrawRequest();
                     break;
                 }
 
                 if (match.isDrawSucceed()) {
                     acceptance = true;
+                    match.resetDrawRequest();
                     break;
                 }
             } catch (InterruptedException e) {
