@@ -436,15 +436,18 @@ public class RequestProcessor {
                 Thread.sleep(500);
 
                 if (match.getNumberOfMoves() > 0) {
+                    // get latest move
+                    latestMove = match.getLatestMove();
+
                     if (username.equalsIgnoreCase(match.getPlayer1().getUsername())) {
-                        if ((match.getNumberOfMoves() % 2) == 0) {
-                            latestMove = match.getLatestMove();
+                        if ((match.getNumberOfMoves() % 2) == 0 && !latestMove.isSeen()) {
+                            latestMove.setSeen(true);
                             movePlayer = match.getPlayer2().getUsername();
                             break;
                         }
                     } else {
-                        if ((match.getNumberOfMoves() % 2 == 1)) {
-                            latestMove = match.getLatestMove();
+                        if ((match.getNumberOfMoves() % 2 == 1) && !latestMove.isSeen()) {
+                            latestMove.setSeen(true);
                             movePlayer = match.getPlayer1().getUsername();
                             break;
                         }
@@ -452,7 +455,7 @@ public class RequestProcessor {
                 }
 
                 // check status of match: break if winner has been found (this case is for opponent quits the game)
-                if (match.isEnded()) {
+                if (match.isEnded() && !match.getWinner().isEmpty()) {
                     movePlayer = match.getAnotherPlayer(username) != null ? match.getAnotherPlayer(username).getUsername() : "";
                     match.addNewMoveRecord(-1, -1, movePlayer, "valid", "win");
                     // assign the last move
