@@ -253,9 +253,9 @@ public class RequestProcessor {
                 // add player to normal / ranked queue
                 queueController.pushToQueue(loggedPlayer, mode);
 
-                queueController.viewHall();
-                queueController.viewNormalQueue();
-                queueController.viewRankedQueue();
+//                queueController.viewHall();
+//                queueController.viewNormalQueue();
+//                queueController.viewRankedQueue();
 
                 // prepare message according to each player
                 Match match = null;
@@ -310,9 +310,9 @@ public class RequestProcessor {
                 serverResponse = new JoinQueueServerMessage(clientRequest.getMessageCommandID(), "", "", "", 0, -1, "", StatusCode.ERROR, "Invalid match request. Please try again");
             }
         }
-        queueController.viewHall();
-        queueController.viewNormalQueue();
-        queueController.viewRankedQueue();
+//        queueController.viewHall();
+//        queueController.viewNormalQueue();
+//        queueController.viewRankedQueue();
         return serverResponse.toString();
     }
 
@@ -770,6 +770,7 @@ public class RequestProcessor {
             } else {
                 // process player info only when this is ranked match
                 if (match.isRanked()) {
+                    System.out.println("Somebody is quitting game");
                     // who sending this quit request is the loser
                     RankPlayer lostPlayer = (RankPlayer) match.getPlayerByName(requestUsername);
                     RankPlayer wonPlayer =  (RankPlayer) opponent;

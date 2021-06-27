@@ -116,9 +116,9 @@ public class QueueController {
                 case "normal": {
                     mutex.acquire();
                     normalQueue.add(player);
-                    System.out.println("Mutex info before acquiring " + mutex.toString());
+//                    System.out.println("Mutex info before acquiring " + mutex.toString());
                     mutex.release();
-                    System.out.println("Mutex info after releasing " + mutex.toString());
+//                    System.out.println("Mutex info after releasing " + mutex.toString());
                     break;
                 }
                 case "ranked": {
@@ -178,11 +178,8 @@ public class QueueController {
                         T3Authenticator.getT3AuthenticatorInstance().logout(player2.getUsername(), player2.getSessionId());
                     }
 
-                    // just for sure
-                    System.out.println("List of player in hall after remove game " + matchID);
-                    for (Player rp : hall) {
-                        System.out.print(rp.getUsername() + "; ");
-                    }
+                    // just for sure: view list of players in hall
+                    this.viewHall();
                     endgameMutex.release();
                     return true;
                 }
