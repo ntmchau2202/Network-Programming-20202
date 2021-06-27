@@ -533,7 +533,6 @@ public class RequestProcessor {
             if (acceptance) {
                 if (match.confirmDrawRequest(confirmUsername)) {
                     statCode = StatusCode.SUCCESS;
-
                     // end this game with empty winner player name
                     if (!queueController.endGame("", matchID)) {
                         statCode = StatusCode.ERROR;
@@ -558,7 +557,7 @@ public class RequestProcessor {
         DrawConfirmServerMessage serverMsg = new DrawConfirmServerMessage(confirmMsg.getMessageCommandID(), matchID, confirmUsername,
                 confirmSessionID, acceptance, statCode, errMsg);
         // reset? is it ok to put it here?
-//        match.resetDrawRequest();
+        
         return serverMsg.toString();
     }
     
@@ -587,11 +586,13 @@ public class RequestProcessor {
 
                 if (match.isDrawDeny()) {
                     acceptance = false;
+                    match.resetDrawRequest();
                     break;
                 }
 
                 if (match.isDrawSucceed()) {
                     acceptance = true;
+                    match.resetDrawRequest();
                     break;
                 }
             } catch (InterruptedException e) {
