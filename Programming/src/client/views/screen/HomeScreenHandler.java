@@ -60,7 +60,7 @@ public class HomeScreenHandler extends BaseScreenHandler
     private void handleHomeAction(javafx.event.Event evt) throws IOException {
         if (evt.getSource() == guestPlayBtn) {
             System.out.println("guest player");
-            WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(this.stage);
+            WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(this.stage, null);
             waitingScreenHandler.show();
             // TODO: log guest player here
 			
@@ -154,16 +154,50 @@ public class HomeScreenHandler extends BaseScreenHandler
                 e.printStackTrace();
             }
         } else if (evt.getSource() == leaderBoardImageView) {
-//            System.out.println("leaderboard");
-//            try {
+            System.out.println("leaderboard");
+            try {
+            	HomeScreenHandler curHandler = this;
+            	LeaderBoardController leaderboardControllerTmp = new LeaderBoardController("", "");
+            	Task<Boolean> getLeaderboardTask = new Task<Boolean>() {
+
+					@Override
+					protected Boolean call() throws Exception {
+						return leaderboardControllerTmp.getLeaderboard();
+					}
+				};
+				
+				getLeaderboardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+					@Override
+					public void handle(WorkerStateEvent arg0) {
+						try {
+							Boolean isOK = (Boolean) arg0.getSource().getValue();
+							if(isOK) {
+								BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(curHandler.stage,
+										Configs.LEADERBOARD_SCREEN_PATH, leaderboardControllerTmp);
+								leaderboardHandler.setScreenTitle("Leaderboard");
+								leaderboardHandler.setPreviousScreen(curHandler);
+								System.out.println("Preparing for showing");
+								leaderboardHandler.show();
+							} else {
+								notifyError("Cannot fetch leaderboard at the moment. Please try again later");
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				Thread leaderboardThread = new Thread(getLeaderboardTask);
+				leaderboardThread.start();
+            	
 //                BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-//                        Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
+//                        Configs.LEADERBOARD_SCREEN_PATH, leaderboardControllerTmp);
 //                leaderboardHandler.setScreenTitle("Leaderboard");
 //                leaderboardHandler.setPreviousScreen(this);
 //                leaderboardHandler.show();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }

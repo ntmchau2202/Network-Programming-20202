@@ -2,6 +2,7 @@ package client.views.screen;
 
 import client.controller.BaseController;
 import client.network.ClientSocketChannel;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -147,5 +148,7 @@ public class BaseScreenHandler extends FXMLScreenHandler {
     	if(ClientSocketChannel.isConnected()) {
     		ClientSocketChannel.closeConnection();
     	}
+    	Platform.exit();
+    	System.exit(0);
     }
 }

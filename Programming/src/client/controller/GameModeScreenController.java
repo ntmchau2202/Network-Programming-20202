@@ -21,11 +21,9 @@ public class GameModeScreenController extends BaseController {
     private String opponentName;
     private String firstPlayer;
     private String sessionID;
-	private ArrayList<RankPlayer> listLeaderboardPlayer;
 
 
     public GameModeScreenController(RankPlayer curPlayer) {
-    	this.listLeaderboardPlayer = new ArrayList<RankPlayer>();
         this.curPlayer = curPlayer;
     }
 

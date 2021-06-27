@@ -95,6 +95,8 @@ public class ClientSocketChannel {
     }
     
    public static void closeConnection() throws Exception {
+	   socketChannelInstance.socketChannel.shutdownInput();
+	   socketChannelInstance.socketChannel.shutdownOutput();
 	   socketChannelInstance.socketChannel.close();
     }
 
