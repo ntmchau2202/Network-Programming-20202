@@ -61,7 +61,7 @@ public class HomeScreenHandler extends BaseScreenHandler
         if (evt.getSource() == guestPlayBtn) {
             System.out.println("guest player");
             WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(this.stage, null);
-            waitingScreenHandler.show();
+            waitingScreenHandler.show(true);
             // TODO: log guest player here
 			
 			HomeScreenHandler currentHandler = this;

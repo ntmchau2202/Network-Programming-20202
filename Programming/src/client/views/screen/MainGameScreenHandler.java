@@ -727,7 +727,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 		        } else {
 		            System.out.println("-"); // ?
 		        }
-		        this.notify();
+//		        this.notify();
 			}
     	});
     }
