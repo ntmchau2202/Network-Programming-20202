@@ -625,7 +625,6 @@ public class RequestProcessor {
         while (true) {
             try {
                 Thread.sleep(500);
-
                 if (match.isIncomingDrawRequest(listenUsername)) {
                 	match.pendingDrawRequest(listenUsername);
                     String requestPlayerName = match.getAnotherPlayer(listenUsername) != null ? match.getAnotherPlayer(listenUsername).getUsername() : "";
@@ -635,13 +634,14 @@ public class RequestProcessor {
                     break;
                 }
 
-                if (match.isDrawDeny()) {
+                String responsePlayerName = match.getAnotherPlayer(listenUsername) != null ? match.getAnotherPlayer(listenUsername).getUsername() : "";
+                if (match.isDrawDeny(responsePlayerName)) {
                     acceptance = false;
                     match.resetDrawRequest();
                     break;
                 }
 
-                if (match.isDrawSucceed()) {
+                if (match.isDrawSucceed(responsePlayerName)) {
                     acceptance = true;
                     match.resetDrawRequest();
                     break;

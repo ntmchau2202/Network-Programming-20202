@@ -1,6 +1,7 @@
 package client.network;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -67,6 +68,13 @@ public class MessageQueue {
 		isSending.set(true);
 //		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		Future<Integer> futureWrite = socketChannel.write(buffer);
+		try {
+			String tmp = null;
+			tmp = StandardCharsets.UTF_8.newDecoder().decode(buffer).toString();
+			System.out.println("Written message: " + tmp);
+		} catch (CharacterCodingException e) {
+			e.printStackTrace();
+		}
 		System.out.println("write returned");
 		try{
 			futureWrite.get();

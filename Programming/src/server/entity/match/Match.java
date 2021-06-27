@@ -137,10 +137,10 @@ public class Match {
 
 	public boolean initDrawRequest(String drawRequestName) {
 		if (player1.getUsername().equals(drawRequestName)) {
-			this.player1DrawRequestState = "confirm";
+			this.player1DrawRequestState = "request";
 			return true;
 		} else if (player2.getUsername().equals(drawRequestName)) {
-			this.player2DrawRequestState = "confirm";
+			this.player2DrawRequestState = "request";
 			return true;
 		}
 		return false;
@@ -187,18 +187,28 @@ public class Match {
 
 	public boolean isIncomingDrawRequest(String listenName) {
 		if (player1.getUsername().equals(listenName)) {
-			return this.player2DrawRequestState.equals("confirm") && this.player1DrawRequestState.isEmpty();
+			return this.player2DrawRequestState.equals("request") && this.player1DrawRequestState.isEmpty();
 		} else if (player2.getUsername().equals(listenName)) {
-			return this.player1DrawRequestState.equals("confirm") && this.player2DrawRequestState.isEmpty();
+			return this.player1DrawRequestState.equals("request") && this.player2DrawRequestState.isEmpty();
 		}
 		return false;
 	}
 
-	public boolean isDrawSucceed() {
-		return this.player1DrawRequestState.equals("confirm") && this.player2DrawRequestState.equals("confirm");
+	public boolean isDrawSucceed(String responseName) {
+		if (player1.getUsername().equals(responseName)) {
+			return this.player1DrawRequestState.equals("confirm");
+		} else if (player2.getUsername().equals(responseName)) {
+			return this.player2DrawRequestState.equals("confirm");
+		}
+		return false;
 	}
 
-	public boolean isDrawDeny() {
-		return this.player1DrawRequestState.equals("deny") || this.player2DrawRequestState.equals("deny");
+	public boolean isDrawDeny(String responseName) {
+		if (player1.getUsername().equals(responseName)) {
+			return this.player1DrawRequestState.equals("deny");
+		} else if (player2.getUsername().equals(responseName)) {
+			return this.player2DrawRequestState.equals("deny");
+		}
+		return false;
 	}
 }
