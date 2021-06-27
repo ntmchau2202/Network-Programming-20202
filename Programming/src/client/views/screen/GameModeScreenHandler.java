@@ -1,6 +1,7 @@
 package client.views.screen;
 
 import client.controller.*;
+import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -58,7 +59,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	private final GameModeScreenController gameModeScreenController;
 
 
-	private Thread findGameThread, quitQueueThread;
+	private Thread findGameThread;
 	/**
 	 * @param stage      stage of screen.
 	 * @param screenPath path to screen fxml
@@ -100,6 +101,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 
 					@Override
 					protected Boolean call() throws Exception {
+						ClientSocketChannel.getSocketInstance();
 						return leaderboardController.getLeaderboard();
 					}
 				};
@@ -145,7 +147,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		try {
 			
 			GameModeScreenHandler currentHandler = this;
-			WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(currentHandler.stage);
+			WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(currentHandler.stage, this.gameModeScreenController);
 			waitingScreenHandler.show();
 			if (evt.getSource() == practicePlay) {
 				MainGameScreenController mainGameScreenController = new MainGameScreenController(
@@ -298,57 +300,57 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		}
 	}
 	
-	@FXML
-	private void handleQuitQueueAction(javafx.event.Event evt) {
-		try {
-			System.out.println("Requested quit queue");
-			//quitQueue.setDisable(true);
-			
-			Task<Boolean> quitQueueTask = new Task<Boolean>() {
-				protected Boolean call() {
-					try {
-						return gameModeScreenController.quitQueue();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						return false;
-					}
-				}
-				
-			};
-			
-			quitQueueTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-
-				@Override
-				public void handle(WorkerStateEvent arg0) {
-					Boolean isSuccess = (Boolean) arg0.getSource().getValue();
-					System.out.println("quit queue done:" + isSuccess);	
-					try {
-						if(isSuccess) {
-							notifySuccess("Quit queue successfully!");
-							System.out.println("Quit queue successfully!");
-//							findGameThread.interrupt();
-							practicePlay.setDisable(false);
-							rankPlay.setDisable(false);
-						} else {
-							notifyError("Quit queue failed. Please try again later");
-							System.out.println("Quit queue failed. Please try again later");
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				
-			});
-			
-			quitQueueThread = new Thread(quitQueueTask);
-			quitQueueThread.run();
-		} catch (Exception e) {
-			e.printStackTrace();
-			//quitQueue.setDisable(false);
-			System.out.println("Cannot quit queue properly");
-		}
-	}
+//	@FXML
+//	private void handleQuitQueueAction(javafx.event.Event evt) {
+//		try {
+//			System.out.println("Requested quit queue");
+//			//quitQueue.setDisable(true);
+//			
+//			Task<Boolean> quitQueueTask = new Task<Boolean>() {
+//				protected Boolean call() {
+//					try {
+//						return gameModeScreenController.quitQueue();
+//					} catch (Exception e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//						return false;
+//					}
+//				}
+//				
+//			};
+//			
+//			quitQueueTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+//
+//				@Override
+//				public void handle(WorkerStateEvent arg0) {
+//					Boolean isSuccess = (Boolean) arg0.getSource().getValue();
+//					System.out.println("quit queue done:" + isSuccess);	
+//					try {
+//						if(isSuccess) {
+//							notifySuccess("Quit queue successfully!");
+//							System.out.println("Quit queue successfully!");
+////							findGameThread.interrupt();
+//							practicePlay.setDisable(false);
+//							rankPlay.setDisable(false);
+//						} else {
+//							notifyError("Quit queue failed. Please try again later");
+//							System.out.println("Quit queue failed. Please try again later");
+//						}
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				
+//			});
+//			
+//			quitQueueThread = new Thread(quitQueueTask);
+//			quitQueueThread.run();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			//quitQueue.setDisable(false);
+//			System.out.println("Cannot quit queue properly");
+//		}
+//	}
 	
 	@FXML
 	public void handlerGetLeaderboardAction() {
