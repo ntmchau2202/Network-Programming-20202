@@ -2,6 +2,11 @@ package server.core.processor;
 
 import entity.Player.GuestPlayer;
 import entity.Player.LeaderboardPlayer;
+import message.drawconfirm.DrawConfirmClientMessage;
+import message.drawconfirm.DrawConfirmServerMessage;
+import message.drawrequest.DrawRequestClientMessage;
+import message.drawrequest.DrawRequestServerMessage;
+import message.drawrequest.ListenDrawClientMessage;
 import message.leaderboard.LeaderboardClientMessage;
 import message.leaderboard.LeaderboardServerMessage;
 import message.logout.LogoutClientMessage;
@@ -112,7 +117,7 @@ public class RequestProcessor {
                 break;
             }
             case LISTEN_DRAW: {
-            	resMsg = this.processListenDrawRequest(recvMsg);
+            	resMsg = this.processListenDraw(recvMsg);
             	break;
             }
             case QUIT_GAME: {
@@ -355,21 +360,21 @@ public class RequestProcessor {
             if (!queueController.endGame(movePlayer, matchID)) {
                 statCode = StatusCode.ERROR;
                 errMsg = "Cannot end the game...";
-            }
+            } else {
+                // process player info only when this is ranked match
+                if (match.isRanked()) {
+                    // who send this move is the winner
+                    RankPlayer wonPlayer = (RankPlayer) match.getPlayerByName(movePlayer);
+                    RankPlayer lostPlayer =  (RankPlayer) match.getAnotherPlayer(movePlayer);
 
-            // process player info only when this is ranked match
-            if (match.isRanked()) {
-                // who send this move is the winner
-                RankPlayer wonPlayer = (RankPlayer) match.getPlayerByName(movePlayer);
-                RankPlayer lostPlayer =  (RankPlayer) match.getAnotherPlayer(movePlayer);
+                    // update player info into both obj and db
+                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
+                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
 
-                // update player info into both obj and db
-                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
-                T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
-
-                // update info of player into leaderboard
-                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
-                LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+                    // update info of player into leaderboard
+                    LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
+                    LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+                }
             }
         }
 
@@ -468,20 +473,121 @@ public class RequestProcessor {
     }
 
     private String processRequestDrawRequest(String input) throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
+        String errMsg = "";
+        StatusCode statCode;
+        DrawRequestClientMessage requestMsg = new DrawRequestClientMessage(input);
+        String requestUsername = requestMsg.getRequestPlayerName();
+        String requestSessionID = requestMsg.getRequestSessionID();
+        int matchID = requestMsg.getMatchID();
+
+        Match match = queueController.getMatchById(matchID);
+        if (match == null) {
+            statCode = StatusCode.ERROR;
+            errMsg = "Cannot process draw request: match " + matchID + " doesn't exist";
+        } else {
+            if (match.initDrawRequest(requestUsername)) {
+                statCode = StatusCode.SUCCESS;
+            } else {
+                statCode = StatusCode.ERROR;
+                errMsg = "Cannot process draw request: request player doesn't exist in match " + matchID;
+            }
+        }
+        DrawRequestServerMessage serverMsg = new DrawRequestServerMessage(requestMsg.getMessageCommandID(), matchID, requestUsername,
+                requestSessionID, statCode, errMsg);
+        return serverMsg.toString();
     }
 
     private String processConfirmDrawRequest(String input) throws Exception {
-        // TODO: Finish the function here
-        String serverResponse = "";
-        return serverResponse;
+        String errMsg = "";
+        StatusCode statCode;
+        DrawConfirmClientMessage confirmMsg = new DrawConfirmClientMessage(input);
+        String confirmUsername = confirmMsg.getConfirmPlayer();
+        String confirmSessionID = confirmMsg.getSessionID();
+        boolean acceptance = confirmMsg.getAcceptance();
+        int matchID = confirmMsg.getMatchID();
+
+        Match match = queueController.getMatchById(matchID);
+        if (match == null) {
+            statCode = StatusCode.ERROR;
+            errMsg = "Cannot process draw confirmation: match " + matchID + " doesn't exist";
+        } else {
+            if (acceptance) {
+                if (match.confirmDrawRequest(confirmUsername)) {
+                    statCode = StatusCode.SUCCESS;
+
+                    // end this game with empty winner player name
+                    if (!queueController.endGame("", matchID)) {
+                        statCode = StatusCode.ERROR;
+                        errMsg = "Cannot end the game...";
+                    } else {
+                        // TODO: update player info in database: RankPlayer and Leaderboard
+                    }
+
+                } else {
+                    statCode = StatusCode.ERROR;
+                    errMsg = "Cannot process draw confirmation: request player doesn't exist in match " + matchID;
+                }
+            } else {
+                if (match.denyDrawRequest(confirmUsername)) {
+                    statCode = StatusCode.SUCCESS;
+                } else {
+                    statCode = StatusCode.ERROR;
+                    errMsg = "Cannot process draw declination: request player doesn't exist in match " + matchID;
+                }
+            }
+        }
+        DrawConfirmServerMessage serverMsg = new DrawConfirmServerMessage(confirmMsg.getMessageCommandID(), matchID, confirmUsername,
+                confirmSessionID, acceptance, statCode, errMsg);
+        return serverMsg.toString();
     }
     
-    private String processListenDrawRequest(String input) throws Exception {
-    	String serverResponse = "";
-    	return serverResponse;
+    private String processListenDraw(String input) throws Exception {
+        String serverMsg = "";
+
+        ListenDrawClientMessage listenMsg = new ListenDrawClientMessage(input);
+        String listenUsername = listenMsg.getUsername();
+        String listenSessionID = listenMsg.getSessionID();
+        int matchID = listenMsg.getMatchID();
+        boolean acceptance = false;
+
+        Match match = queueController.getMatchById(matchID);
+
+        while (true) {
+            try {
+                Thread.sleep(500);
+
+                if (match.isIncomingDrawRequest(listenUsername)) {
+                    String requestPlayerName = match.getAnotherPlayer(listenUsername) != null ? match.getAnotherPlayer(listenUsername).getUsername() : "";
+                    DrawRequestServerMessage drawRequestServerMessage = new DrawRequestServerMessage(listenMsg.getMessageCommandID(),
+                            matchID, requestPlayerName, listenSessionID, StatusCode.SUCCESS, "");
+                    serverMsg = drawRequestServerMessage.toString();
+                    break;
+                }
+
+                if (match.isDrawDeny()) {
+                    acceptance = false;
+                    break;
+                }
+
+                if (match.isDrawSucceed()) {
+                    acceptance = true;
+                    break;
+                }
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+        // if null -> server needs to send back draw confirm message from opponent
+        if (serverMsg == null || serverMsg.isEmpty()) {
+            String confirmPlayerName = match.getAnotherPlayer(listenUsername) != null ? match.getAnotherPlayer(listenUsername).getUsername() : "";
+            DrawConfirmServerMessage fwdMsg = new DrawConfirmServerMessage(listenMsg.getMessageCommandID(), matchID,
+                    confirmPlayerName, listenSessionID, acceptance, StatusCode.SUCCESS, "");
+            serverMsg = fwdMsg.toString();
+        }
+
+        return serverMsg;
     }
 
     private String processGetLeaderBoardRequest(String input) throws Exception {

@@ -5,17 +5,17 @@ import protocol.Command;
 
 public class DrawRequestClientMessage extends ClientMessage {
 	private int matchID;
-	private String movePlayer, sessionID;
+	private String requestPlayerName, requestSessionID;
 	
-	public DrawRequestClientMessage(int matchID, String player, String sessionID) {
+	public DrawRequestClientMessage(int matchID, String requestPlayerName, String requestSessionID) {
 		super();
 		
 		this.matchID = matchID;
-		this.movePlayer = player;
-		this.sessionID = sessionID;
+		this.requestPlayerName = requestPlayerName;
+		this.requestSessionID = requestSessionID;
 		
 		this.setCommand(Command.DRAW_REQUEST);
-		this.requestBody.createDrawRequestBody(matchID, sessionID, player);
+		this.requestBody.createDrawRequestBody(matchID, requestSessionID, requestPlayerName);
 		this.finalizeMessageObject();
 	}
 	
@@ -23,19 +23,19 @@ public class DrawRequestClientMessage extends ClientMessage {
 		super(inputMessage);
 		
 		this.matchID = this.requestBody.getBody().getInt("match_id");
-		this.movePlayer = this.requestBody.getBody().getString("move_player");
-		this.sessionID = this.requestBody.getBody().getString("session_id");
-	}	
+		this.requestSessionID = this.requestBody.getBody().getString("session_id");
+		this.requestPlayerName = this.requestBody.getBody().getString("move_player");
+	}
 	
 	public int getMatchID() {
 		return this.matchID;
 	}
-	
-	public String getSessionID() {
-		return this.sessionID;
+
+	public String getRequestPlayerName() {
+		return requestPlayerName;
 	}
-	
-	public String getPlayer() {
-		return this.movePlayer;
+
+	public String getRequestSessionID() {
+		return requestSessionID;
 	}
 }

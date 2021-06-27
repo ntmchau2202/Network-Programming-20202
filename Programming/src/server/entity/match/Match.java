@@ -8,14 +8,27 @@ import entity.Move.Move;
 import entity.Player.Player;
 
 public class Match {
+	// match basic info
 	private final Player player1;
 	private final Player player2;
 	private final int matchID;
 	private final boolean isRanked;
-	private final ArrayList<Move> moveRecord;
-	private final ArrayList<ChatMessage> chatMsgRecord;
-	private String winner; // sorry I dont know how to best place a winner as a Player in this case ; _ ;
+
+	// match state
+	// if match ends but winner is empty -> draw
+	private String winner = ""; // sorry I dont know how to best place a winner as a Player in this case ; _ ;
 	private AtomicBoolean isEnded;
+
+	// move record
+	private final ArrayList<Move> moveRecord;
+
+	// chat msg record
+	private final ArrayList<ChatMessage> chatMsgRecord;
+
+	// draw request & state: for easy and short implementation: we use a state field for each player
+	private String player1DrawRequestState = "";
+	private String player2DrawRequestState = "";
+
 	
 	public Match(Player player1, Player player2, boolean isRanked) {
 		// TODO: think about duplicated match ID here
@@ -118,5 +131,55 @@ public class Match {
 		ChatMessage chatMsg = new ChatMessage(matchID, sendPlayer, recvPlayer, messageID, message);
 		this.chatMsgRecord.add(chatMsg);
 		return true;
+	}
+
+	public boolean initDrawRequest(String drawRequestName) {
+		if (player1.getUsername().equals(drawRequestName)) {
+			this.player1DrawRequestState = "confirm";
+			return true;
+		} else if (player2.getUsername().equals(drawRequestName)) {
+			this.player2DrawRequestState = "confirm";
+			return true;
+		}
+		return false;
+	}
+
+	public boolean confirmDrawRequest(String drawResponseName) {
+		if (player1.getUsername().equals(drawResponseName)) {
+			this.player1DrawRequestState = "confirm";
+			return true;
+		} else if (player2.getUsername().equals(drawResponseName)) {
+			this.player2DrawRequestState = "confirm";
+			return true;
+		}
+		return false;
+	}
+
+	public boolean denyDrawRequest(String drawResponseName) {
+		if (player1.getUsername().equals(drawResponseName)) {
+			this.player1DrawRequestState = "deny";
+			return true;
+		} else if (player2.getUsername().equals(drawResponseName)) {
+			this.player2DrawRequestState = "deny";
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isIncomingDrawRequest(String listenName) {
+		if (player1.getUsername().equals(listenName)) {
+			return this.player2DrawRequestState.equals("confirm") && this.player1DrawRequestState.isEmpty();
+		} else if (player2.getUsername().equals(listenName)) {
+			return this.player1DrawRequestState.equals("confirm") && this.player2DrawRequestState.isEmpty();
+		}
+		return false;
+	}
+
+	public boolean isDrawSucceed() {
+		return this.player1DrawRequestState.equals("confirm") && this.player2DrawRequestState.equals("confirm");
+	}
+
+	public boolean isDrawDeny() {
+		return this.player1DrawRequestState.equals("deny") || this.player2DrawRequestState.equals("deny");
 	}
 }

@@ -76,9 +76,10 @@ public class RequestBody {
 		this.requestBody.put("move_player", move_player);
 	}
 	
-	public void createListenDrawRequestBody(String username, int matchID) {
+	public void createListenDrawRequestBody(String username, String session_id, int matchID) {
 		this.requestBody.clear();
 		this.requestBody.put("username", username);
+		this.requestBody.put("session_id", session_id);
 		this.requestBody.put("match_id", matchID);
 	}
 	

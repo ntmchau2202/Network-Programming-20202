@@ -231,8 +231,8 @@ public class ClientSocketChannel {
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 
-    public String listenDrawRequest(String username, int matchID) throws Exception {
-    	ListenDrawClientMessage msg = new ListenDrawClientMessage(username, matchID);
+    public String listenDrawRequest(String username, String sessionID, int matchID) throws Exception {
+    	ListenDrawClientMessage msg = new ListenDrawClientMessage(username, sessionID, matchID);
     	return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 }

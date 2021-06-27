@@ -203,7 +203,7 @@ public class MainGameScreenController extends BaseController {
     }
     
     public ServerMessage listenDrawRequest() throws Exception {
-    	String result = ClientSocketChannel.getSocketInstance().listenDrawRequest(this.getCurrentPlayer().getUsername(), this.matchID);
+    	String result = ClientSocketChannel.getSocketInstance().listenDrawRequest(this.getCurrentPlayer().getUsername(), this.getCurrentPlayer().getSessionId(), this.matchID);
     	// parsing to get the command
     	JSONObject jsRes = new JSONObject(result);
     	Command cmd = Command.toCommand(jsRes.getString("command_code"));
