@@ -4,6 +4,8 @@ import entity.Player.GuestPlayer;
 import entity.Player.LeaderboardPlayer;
 import entity.Player.RankPlayer;
 import server.entity.database.T3DB;
+import server.entity.match.MatchMode;
+import server.entity.match.MatchResult;
 import server.model.GuestPlayerModel;
 import server.model.LeaderboardModel;
 
@@ -233,29 +235,6 @@ public class T3Authenticator {
 
         // TODO: check if record exists in table GuestPlayer
 
-        return true;
-    }
-
-    // TODO: move this method to more suitable class: RankPlayerModel?
-    public boolean updateRankPlayerInfo(RankPlayer rankPlayer, boolean isWon) throws SQLException {
-        // rule: win + 100, lose - 100
-
-        int modifyElo = isWon ? 100 : -100;
-        int modifyNoWonMatch = isWon ? 1 : 0;
-
-        // update into obj
-        rankPlayer.updatePlayerInfo(rankPlayer.getRank(), rankPlayer.getElo() + modifyElo, rankPlayer.getNoPlayedMatch() + 1, rankPlayer.getNoWonMatch() + modifyNoWonMatch);
-
-        // update into RankPlayer table
-        PreparedStatement stm = T3DB.getConnection().prepareStatement(
-                "UPDATE RankPlayer SET no_match_played = ?, no_match_won = ?, elo = ? WHERE username=?");
-        stm.setInt(1, rankPlayer.getNoPlayedMatch());
-        stm.setInt(2, rankPlayer.getNoWonMatch());
-        stm.setInt(3, rankPlayer.getElo());
-        stm.setString(4, rankPlayer.getUsername());
-        stm.executeUpdate();
-
-        // TODO: check if player info has been updated successfully: query again and compare result
         return true;
     }
 

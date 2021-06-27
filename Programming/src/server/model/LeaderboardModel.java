@@ -112,16 +112,17 @@ public class LeaderboardModel {
 
         // node 0.yes: user exists in lb -> update
         if (oldLeaderboardPlayer != null) {
-            // new rank in current top players
-            LeaderboardPlayer newLeaderboardPlayer = getLeaderboardPlayerByUsername(rankPlayer.getUsername(), null);
-
-            // no update only player exists in current top players and rank doesn't change
-            if (newLeaderboardPlayer != null && newLeaderboardPlayer.getRank() == oldLeaderboardPlayer.getRank()) {
-                // don't do anything
-            } else {
-                // update
-                updateLeaderboard();
-            }
+//            // new rank in current top players
+//            LeaderboardPlayer newLeaderboardPlayer = getLeaderboardPlayerByUsername(rankPlayer.getUsername(), null);
+//
+//            // no update only player exists in current top players and rank doesn't change
+//            if (newLeaderboardPlayer != null && newLeaderboardPlayer.getRank() == oldLeaderboardPlayer.getRank()) {
+//                // don't do anything
+//            } else {
+//                // update
+//                updateLeaderboard();
+//            }
+            updateLeaderboard();
         } else {
             // node 0.no: check user's elo > the last in db
             String sql = "select usr_elo from LeaderBoard order by usr_rank desc limit 1";
