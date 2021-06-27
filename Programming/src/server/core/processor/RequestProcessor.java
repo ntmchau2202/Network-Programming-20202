@@ -417,6 +417,8 @@ public class RequestProcessor {
         // strategy: polling until there is a new move
 
         ListenMoveClientMessage listenMsg = new ListenMoveClientMessage(input);
+        String errMsg = "";
+        StatusCode statCode;
 
         String username = listenMsg.getUsername();
         int matchID = listenMsg.getMatchID();
@@ -446,10 +448,10 @@ public class RequestProcessor {
 
                 // check status of match: break if winner has been found (this case is for opponent quits the game)
                 if (match.isEnded()) {
-                    // assign the last move (logically is the last move from this listening user)
-                    latestMove = match.getLatestMove();
                     movePlayer = match.getAnotherPlayer(username) != null ? match.getAnotherPlayer(username).getUsername() : "";
-                    match.addNewMoveRecord(latestMove.getX(), latestMove.getY(), movePlayer, "valid", "win");
+                    match.addNewMoveRecord(-1, -1, movePlayer, "valid", "win");
+                    // assign the last move
+                    latestMove = match.getLatestMove();
                     break;
                 }
 
@@ -459,7 +461,9 @@ public class RequestProcessor {
             }
 
         }
-        MoveServerMessage fwdMsg = new MoveServerMessage(listenMsg.getMessageCommandID(), matchID, movePlayer, latestMove.getX(), latestMove.getY(), latestMove.getState(), latestMove.getResult(), StatusCode.SUCCESS, "");
+        statCode = StatusCode.SUCCESS;
+        errMsg = "";
+        MoveServerMessage fwdMsg = new MoveServerMessage(listenMsg.getMessageCommandID(), matchID, movePlayer, latestMove.getX(), latestMove.getY(), latestMove.getState(), latestMove.getResult(), statCode, errMsg);
 //        listResponse.put(sock, fwdMsg.toString());
         return fwdMsg.toString();
     }

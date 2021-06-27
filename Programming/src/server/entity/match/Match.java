@@ -80,6 +80,7 @@ public class Match {
 	}
 	
 	public Move getLatestMove(){
+		if (moveRecord.size() <= 0) return null;
 		return this.moveRecord.get(moveRecord.size()-1);
 	}
 	
