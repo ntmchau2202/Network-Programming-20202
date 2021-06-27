@@ -363,7 +363,7 @@ public class RequestProcessor {
             } else {
                 // process player info only when this is ranked match
                 if (match.isRanked()) {
-                    // who send this move is the winner
+                    // who sending this move is the winner
                     RankPlayer wonPlayer = (RankPlayer) match.getPlayerByName(movePlayer);
                     RankPlayer lostPlayer =  (RankPlayer) match.getAnotherPlayer(movePlayer);
 
@@ -375,9 +375,11 @@ public class RequestProcessor {
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
                 }
+                // TODO: update number of played & won match for RankPlayer even in match is not ranked
             }
 
-            // TODO: update number of played & won match for RankPlayer even in match is not ranked
+        } else if (moveMsg.getResult().compareToIgnoreCase("draw") == 0) {
+            // TODO: process when it's draw game
         }
 
         MoveServerMessage fwdMsg = new MoveServerMessage(moveMsg.getMessageCommandID(), matchID, movePlayer, x, y, state, result, statCode, errMsg);
@@ -754,18 +756,33 @@ public class RequestProcessor {
         StatusCode statCode;
 
     	// parse info from request
-        String username = request.getUsername();
-        String sessionID = request.getSessionID();
+        String requestUsername = request.getUsername();
+        String requestSessionID = request.getSessionID();
         int matchID = request.getMatchID();
         Match match = queueController.getMatchById(matchID);
 
     	// update info of match
-        Player opponent = match.getAnotherPlayer(username);
+        Player opponent = match.getAnotherPlayer(requestUsername);
         if (opponent != null) {
             if (!queueController.endGame(opponent.getUsername(), matchID)) {
                 statCode = StatusCode.ERROR;
                 errMsg = "Cannot end the game...";
             } else {
+                // process player info only when this is ranked match
+                if (match.isRanked()) {
+                    // who sending this quit request is the loser
+                    RankPlayer lostPlayer = (RankPlayer) match.getPlayerByName(requestUsername);
+                    RankPlayer wonPlayer =  (RankPlayer) opponent;
+
+                    // update player info into both obj and db
+                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(wonPlayer, true);
+                    T3Authenticator.getT3AuthenticatorInstance().updateRankPlayerInfo(lostPlayer, false);
+
+                    // update info of player into leaderboard
+                    LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
+                    LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
+                }
+                // TODO: update number of played & won match for RankPlayer even in match is not ranked
                 statCode = StatusCode.SUCCESS;
                 errMsg = "";
             }
