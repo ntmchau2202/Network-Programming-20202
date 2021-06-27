@@ -26,10 +26,12 @@ public class DrawRequestServerMessage extends ServerMessage {
 	
 	public DrawRequestServerMessage(String inputMessage) {
 		super(inputMessage);
-		
+		System.out.println("Done for the second time");
 		this.matchID = this.responseBody.getBody().getInt("match_id");
+		System.out.println("Done for the third time");
 		this.movePlayer = this.responseBody.getBody().getString("move_player");
-		this.sessionID = this.responseBody.getBody().getString("session_id");
+		System.out.println("Done for the fourth time");
+//		this.sessionID = this.responseBody.getBody().getString("session_id");
 
 	}
 

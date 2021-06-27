@@ -204,25 +204,34 @@ public class MainGameScreenController extends BaseController {
     
     public ServerMessage listenDrawRequest() throws Exception {
     	String result = ClientSocketChannel.getSocketInstance().listenDrawRequest(this.getCurrentPlayer().getUsername(), this.getCurrentPlayer().getSessionId(), this.matchID);
+    	System.out.println("Hello are you there??????: " + result);
+    	
     	// parsing to get the command
     	JSONObject jsRes = new JSONObject(result);
     	Command cmd = Command.toCommand(jsRes.getString("command_code"));
     	switch(cmd) {
     	case DRAW_REQUEST:{
+    		System.out.println("Ano ano yameteeeeeeeeeee");
     		DrawRequestServerMessage ret = new DrawRequestServerMessage(result);
     		// only return if the response does not come from current user to avoid duplication
-    		if (ret.getStatusCode().compareTo(StatusCode.ERROR) != 0 && ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0) {
+    		System.out.println("REturn code from draw request: " + ret.getStatusCode().toString());
+    		if (ret.getStatusCode().compareTo(StatusCode.SUCCESS) == 0/* && ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0*/) {
+    			System.out.println("yamete cdmmmmmmmmmmmmm");
     			return ret;	
     		} else {
+    			System.out.println("uhmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
     			return null;
     		}
     	}
     	case DRAW_CONFIRM:{
     		DrawConfirmServerMessage ret = new DrawConfirmServerMessage(result);
+    		System.out.println("Im on the stageeeeeeeeeeeeee");
     		// only return if the response does not come from current user to avoid duplication
-    		if (ret.getStatusCode().compareTo(StatusCode.ERROR) != 0 && ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0) {
+    		if (ret.getStatusCode().compareTo(StatusCode.SUCCESS) == 0 /*&& ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0*/) {
+    			System.out.println("This stage is mineeeeeeeeeeee");
     			return ret;	
     		} else {
+    			System.out.println("No one can touch meeeeeeeeeeeeeeeeeee");
     			return null;
     		}
     	}

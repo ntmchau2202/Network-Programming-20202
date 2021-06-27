@@ -602,6 +602,8 @@ public class RequestProcessor {
                     confirmPlayerName, listenSessionID, acceptance, StatusCode.SUCCESS, "");
             serverMsg = fwdMsg.toString();
         }
+        
+        System.out.println("Server message for returning draw request: " + serverMsg);
 
         return serverMsg;
     }
