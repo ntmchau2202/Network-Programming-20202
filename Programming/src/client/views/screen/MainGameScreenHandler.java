@@ -155,59 +155,52 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
         // unlock move
         isLockMove = false;
+        System.out.println("Is move locked? " + isLockMove);
         isGameEnded = new AtomicInteger(0);
 
         // if not first player to play, listen move from opponent
         if (!this.mainGameScreenController.amIFirstPlayer()) {
-            Task<Boolean> listenMoveTask = new Task<Boolean>() {
-                protected Boolean call() {
+        	System.out.println("Im not the first player :(");
+        	
+        	isLockMove = true;
+        	System.out.println("Is move locked? " + isLockMove);
+        }
+            Task<Void> listenMoveTask = new Task<Void>() {
+                protected Void call() {
                     Boolean isSuccessfull = false;
-                    try {
-                        // send move to server
-                        isSuccessfull = mainGameScreenController.listenMove();
-                        if (mainGameScreenController.getMoveResult().compareToIgnoreCase("")==0) {
-	                        int recvX1 = mainGameScreenController.getX();
-	                        int recvY1 = mainGameScreenController.getY();
-	                        System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+                while(true) {
+	                    try {
+	                        // send move to server
+	                        isSuccessfull = mainGameScreenController.listenMove();
+	                        if (mainGameScreenController.getMoveResult().compareToIgnoreCase("")==0) {
+		                        int recvX1 = mainGameScreenController.getX();
+		                        int recvY1 = mainGameScreenController.getY();
+		                        System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+		
+		                        // display move on pane ??
+		                        addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+		
+		                        mainGameScreenController.setTurn(true);
+		                        isLockMove = false;
+	                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
+	                        	isGameEnded.set(1);
+	                        	this.cancel();
+	                        	break;
+	                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("draw")==0) {
+	                        	isGameEnded.set(-1);
+	                        	this.cancel();
+	                        	break;
+	                        }
 	
-	                        // display move on pane ??
-	                        addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
-	
-	                        mainGameScreenController.setTurn(true);
-                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
-                        	isGameEnded.set(1);
-                        	this.cancel();
-                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("draw")==0) {
-                        	isGameEnded.set(-1);
-                        	this.cancel();
-                        }
-
-                    } catch (Exception e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
-                    return isSuccessfull;
+	                    } catch (Exception e1) {
+	                        // TODO Auto-generated catch block
+	                        e1.printStackTrace();
+	                    }
+	                }
+                return null;
                 }
+
             };
-
-            listenMoveTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-
-                public void handle(WorkerStateEvent t) {
-                    Boolean isFound = (Boolean) t.getSource().getValue();
-                    System.out.println("done:" + isFound);
-                    if (isFound) {
-                        System.out.println("listen move successfully");
-                        // display move on pane ??
-                    } else {
-                        try {
-                            notifyError("Can not listen move");
-                        } catch (IOException e3) {
-                            // TODO Auto-generated catch block
-                            e3.printStackTrace();
-                        }
-                    }
-                }
-            });
             
             listenMoveTask.setOnCancelled(new EventHandler<WorkerStateEvent>() {
 
@@ -249,7 +242,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
             
             Thread thread = new Thread(listenMoveTask);
             thread.start();
-        };
+        
         
         // thread for chat listening
         
@@ -400,6 +393,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
 
             // clickable only when it's player turn
             if (this.mainGameScreenController.isMyTurn() && !isLockMove) {
+            	System.out.println("Is move locked? " + isLockMove);
                 if (pane.getChildren().isEmpty()) {
                     System.out.printf("Mouse clicked cell [%d, %d]%n", rowIndex, colIndex);
                     addImageToPane(pane, this.mainGameScreenController.getCurrentPlayer().getUsername());
@@ -414,6 +408,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                     try {
                         // lock move
                         isLockMove = true;
+                        System.out.println("Is move locked? " + isLockMove);
                         Task<Boolean> sendMoveTask = new Task<Boolean>() {
                             protected Boolean call() {
                                 Boolean isSuccessfull = false;
@@ -450,9 +445,7 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                         	if (mainGameScreenController.listenMove()) {
                                                 int recvX1 = mainGameScreenController.getX();
                                                 int recvY1 = mainGameScreenController.getY();
-                                                System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
-                                                // display move on pane ??
-                                                addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+                                                
                                                 if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
                                                 	System.out.println("Result from listen: Win player: " + mainGameScreenController.getFinalMovePlayer());
                                                 	isGameEnded.set(1);
@@ -461,12 +454,18 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                                                 	System.out.println("Result from listen: draw");
                                                 	isGameEnded.set(-1);
                                                 	this.cancel();
+                                                } else {
+                                                	System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+	                                                // display move on pane ??
+	                                                addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+	
+	                                                mainGameScreenController.setTurn(true);
+	
+	                                                // release lock move
+	                                                isLockMove = false;
+	                                                System.out.println("Is move locked? " + isLockMove);
+	                                                isSuccessfull = true;
                                                 }
-                                                mainGameScreenController.setTurn(true);
-
-                                                // release lock move
-                                                isLockMove = false;
-                                                isSuccessfull = true;
                                             } else {
                                                 // TODO: handle send failed here
                                                 isSuccessfull = false;

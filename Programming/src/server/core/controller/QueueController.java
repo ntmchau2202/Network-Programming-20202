@@ -272,7 +272,7 @@ public class QueueController {
         public void run() {
             while (true) {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(5000);
                     Iterator<Match> ingameListIterator = ingameList.iterator();
 //					for(Match m : ingameList) {
 //						if (m.isEnded()) {
