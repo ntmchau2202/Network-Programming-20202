@@ -19,8 +19,8 @@ public class UpdateUserServerMessage extends ServerMessage {
 		this.noMatchWon = nMatchWon;
 		this.winRate = wRate;
 		
-		this.setCommand(Command.LOGIN);
-		this.responseBody.createUpdateUserBody(username, nMatchPlayed, nMatchWon, elo, Float.toString(winRate));
+		this.setCommand(Command.UPDATE_USER);
+		this.responseBody.createUpdateUserBody(username, nMatchPlayed, nMatchWon, elo, rank, Float.toString(winRate));
 		this.finalizeMessageObject();
 	}
 	

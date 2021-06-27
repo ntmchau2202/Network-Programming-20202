@@ -1,11 +1,18 @@
 package client.views.screen;
 
 import client.controller.BaseController;
+import client.network.ClientSocketChannel;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Optional;
 
 public class BaseScreenHandler extends FXMLScreenHandler {
     private Scene scene;
@@ -18,12 +25,51 @@ public class BaseScreenHandler extends FXMLScreenHandler {
         super(screenPath);
         this.stage = new Stage();
         this.stage.setResizable(false);
+        this.stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+            	 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                 alert.setTitle("Exit confirmation");
+                 alert.setHeaderText("Are you sure to exit the application?");
+
+                 // option != null.
+                 Optional<ButtonType> option = alert.showAndWait();
+                 try {
+                	if(option.get() == ButtonType.OK) {
+	                	 closeConnection();
+	                 } else {
+	                	 we.consume();
+	                 }
+                } catch (Exception e) {
+                	e.printStackTrace();
+                }
+            }
+        });       
     }
 
     public BaseScreenHandler(Stage stage, String screenPath) throws IOException {
         super(screenPath);
         this.stage = stage;
         this.stage.setResizable(false);
+        
+        this.stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+            	 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                 alert.setTitle("Exit confirmation");
+                 alert.setHeaderText("Are you sure to exit the application?");
+
+                 // option != null.
+                 Optional<ButtonType> option = alert.showAndWait();
+                 try {
+                	if(option.get() == ButtonType.OK) {
+	                	 closeConnection();
+	                 } else {
+	                	 we.consume();
+	                 }
+                } catch (Exception e) {
+                	e.printStackTrace();
+                }
+            }
+        });       
     }
 
     public void setPreviousScreen(BaseScreenHandler prev) {
@@ -76,5 +122,33 @@ public class BaseScreenHandler extends FXMLScreenHandler {
     void notifySuccess(String success) throws IOException {
         System.out.println(success);
         PopupScreen.success(success);
+    }
+
+    /**
+     * notifying game over
+     * @param gameResult success game over message
+     * @throws IOException io exception
+     */
+    void notifyGameOver(String gameResult) throws IOException {
+        System.out.println(gameResult);
+        PopupScreen.success(gameResult);
+    }
+
+    void notifyWin(String gameResult) throws IOException {
+        System.out.println(gameResult);
+        PopupScreen.success(gameResult);
+    }
+
+    void notifyLose(String gameResult) throws IOException {
+        System.out.println(gameResult);
+        PopupScreen.success(gameResult);
+    }
+    
+    void closeConnection() throws Exception {
+    	if(ClientSocketChannel.isConnected()) {
+    		ClientSocketChannel.closeConnection();
+    	}
+    	Platform.exit();
+    	System.exit(0);
     }
 }

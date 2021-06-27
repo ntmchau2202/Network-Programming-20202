@@ -48,13 +48,13 @@ public class ClientApp extends Application {
             fadeIn.setOnFinished((e) -> {
                 fadeOut.play();
                 // connect client
-                try {
-                	ClientSocketChannel.getSocketInstance();
-                    LeaderboardPlayerList.getLeaderboardPlayerListInstance().synchronizeLeaderboardPlayerWithDb();
-                    System.out.println("synchronize done");
-                } catch (SQLException ioException) {
-                    ioException.printStackTrace();
-                }
+//                try {
+//                	ClientSocketChannel.getSocketInstance();
+//                    LeaderboardPlayerList.getLeaderboardPlayerListInstance().synchronizeLeaderboardPlayerWithDb();
+//                    System.out.println("synchronize done");
+//                } catch (SQLException ioException) {
+//                    ioException.printStackTrace();
+//                }
             });
 
             // After fade out, load actual content
@@ -70,6 +70,8 @@ public class ClientApp extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        
     }
 
     public static void main(String[] args) {

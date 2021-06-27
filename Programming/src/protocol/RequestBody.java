@@ -76,6 +76,13 @@ public class RequestBody {
 		this.requestBody.put("move_player", move_player);
 	}
 	
+	public void createListenDrawRequestBody(String username, String session_id, int matchID) {
+		this.requestBody.clear();
+		this.requestBody.put("username", username);
+		this.requestBody.put("session_id", session_id);
+		this.requestBody.put("match_id", matchID);
+	}
+	
 	public void createDrawConfirmBody(int match_id, String session_id, String move_player, boolean acceptance) throws JSONException {
 		this.requestBody.clear();
 		this.requestBody.put("match_id", match_id);
@@ -111,5 +118,12 @@ public class RequestBody {
 		this.requestBody.clear();
 		this.requestBody.put("username", username);
 		this.requestBody.put("session_id", session_id);
+	}
+	
+	public void createQuitGameBody(int matchID, String username, String sessionID) {
+		this.requestBody.clear();
+		this.requestBody.put("match_id", matchID);
+		this.requestBody.put("username", username);
+		this.requestBody.put("session_id", sessionID);
 	}
 }

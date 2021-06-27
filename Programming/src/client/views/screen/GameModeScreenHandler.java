@@ -1,19 +1,24 @@
 package client.views.screen;
 
 import client.controller.*;
+import client.network.ClientSocketChannel;
 import client.utils.Configs;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class GameModeScreenHandler extends BaseScreenHandler implements Initializable {
@@ -42,18 +47,19 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	@FXML
 	private Button rankPlay;
 	@FXML
-	private ImageView prevScreenImageView;
-	@FXML
-	private ImageView homeScreenImageView;
+	private ImageView logoutImageView;
+//	@FXML
+//	private ImageView homeScreenImageView;
+	
 	@FXML
 	private ImageView leaderboardImageView;
 	
-	@FXML
-	private Button quitQueue;
+
 	
 	private final GameModeScreenController gameModeScreenController;
 
-	private Thread findGameThread, quitQueueThread;
+
+	private Thread findGameThread;
 	/**
 	 * @param stage      stage of screen.
 	 * @param screenPath path to screen fxml
@@ -62,6 +68,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	public GameModeScreenHandler(Stage stage, String screenPath, GameModeScreenController gameModeScreenController)
 			throws IOException {
 		super(stage, screenPath);
+
 		this.gameModeScreenController = gameModeScreenController;
 		this.username.setText(this.gameModeScreenController.getCurPlayer().getUsername());
 		this.elo.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getElo()));
@@ -69,29 +76,65 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		this.noPlayedMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoPlayedMatch()));
 		this.noWonMatch.setText(Integer.toString(this.gameModeScreenController.getCurPlayer().getNoWonMatch()));
 		this.winningRate.setText(Float.toString(this.gameModeScreenController.getCurPlayer().getWinningRate()*100));
-		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
-				new HomeScreenController());
-		prevScreenImageView.setOnMouseClicked(e -> {
-			homeHandler.show();
-			homeHandler.setScreenTitle("Home Screen");
+//		HomeScreenHandler homeHandler = new HomeScreenHandler(this.stage, Configs.HOME_SCREEN_PATH,
+//				new HomeScreenController());
+//		homeScreenImageView.setOnMouseClicked(e -> {
+//			// TODO: gotta rethink ab this...
+//			homeHandler.show();
+//			homeHandler.setScreenTitle("Home Screen");
+//		});
+
+		logoutImageView.setOnMouseClicked(e -> {
+			// logout
+			showLogoutPrompt();
 		});
-		homeScreenImageView.setOnMouseClicked(e -> {
-			homeHandler.show();
-			homeHandler.setScreenTitle("Home Screen");
-		});
+		Tooltip.install(logoutImageView, new Tooltip("Logout"));
+		GameModeScreenHandler curHandler = this;
+		LeaderBoardController leaderboardController = new LeaderBoardController(gameModeScreenController.getCurPlayer().getUsername(),
+				gameModeScreenController.getCurPlayer().getSessionId());
 		leaderboardImageView.setOnMouseClicked(ev -> {
 			System.out.println("leaderboard");
 			try {
-				BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(this.stage,
-						Configs.LEADERBOARD_SCREEN_PATH, new LeaderBoardController());
-				leaderboardHandler.setScreenTitle("Leaderboard");
-				leaderboardHandler.setPreviousScreen(this);
-				leaderboardHandler.show();
-			} catch (IOException e) {
+				
+				
+				Task<Boolean> getLeaderboardTask = new Task<Boolean>() {
+
+					@Override
+					protected Boolean call() throws Exception {
+						ClientSocketChannel.getSocketInstance();
+						return leaderboardController.getLeaderboard();
+					}
+				};
+				
+				getLeaderboardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+					@Override
+					public void handle(WorkerStateEvent arg0) {
+						try {
+							Boolean isOK = (Boolean) arg0.getSource().getValue();
+							if(isOK) {
+								BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(curHandler.stage,
+										Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
+								leaderboardHandler.setScreenTitle("Leaderboard");
+								leaderboardHandler.setPreviousScreen(curHandler);
+								System.out.println("Preparing for showing");
+								leaderboardHandler.show();
+							} else {
+								notifyError("Cannot fetch leaderboard at the moment. Please try again later");
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				Thread leaderboardThread = new Thread(getLeaderboardTask);
+				leaderboardThread.start();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
-		quitQueue.setDisable(true);
+		
+		//quitQueue.setDisable(true);
 	}
 
 	@Override
@@ -104,8 +147,8 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		try {
 			
 			GameModeScreenHandler currentHandler = this;
-			
-
+			WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(currentHandler.stage, this.gameModeScreenController);
+			waitingScreenHandler.show();
 			if (evt.getSource() == practicePlay) {
 				MainGameScreenController mainGameScreenController = new MainGameScreenController(
 						this.gameModeScreenController.getCurPlayer(), "normal");
@@ -113,7 +156,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				// Boolean isFound = false;
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
-				quitQueue.setDisable(false);
+				//quitQueue.setDisable(false);
 				Task<Integer> findGameTask = new Task<Integer>() {
 					protected Integer call() {
 						Integer isFound = 1;
@@ -162,7 +205,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 								notifyError("Can not find practice play match, please try again later");
 								practicePlay.setDisable(false);
 								rankPlay.setDisable(false);
-								quitQueue.setDisable(true);
+								//quitQueue.setDisable(true);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -171,7 +214,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							// join queue interrupted by user
 							practicePlay.setDisable(false);
 							rankPlay.setDisable(false);
-							quitQueue.setDisable(true);
+							//quitQueue.setDisable(true);
 						}
 					}
 				});
@@ -182,7 +225,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			} else if (evt.getSource() == rankPlay) {
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
-				quitQueue.setDisable(false);
+				//quitQueue.setDisable(false);
 				MainGameScreenController mainGameScreenController = new MainGameScreenController(
 						this.gameModeScreenController.getCurPlayer(), "ranked" );
 				Task<Integer> findGameTask = new Task<Integer>() {
@@ -211,7 +254,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
 							try {
-								notifySuccess("Yeah! Found a match! Let's practice");
+								notifySuccess("Yeah! Found a match! Let's solo");
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -230,10 +273,11 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							
 						} else if (isFound == 1) {
 							try {
-								notifyError("Can not find practice play match, please try again later");
+								notifyError("Can not find ranked play match, please try again later");
 								practicePlay.setDisable(false);
 								rankPlay.setDisable(false);
-								quitQueue.setDisable(true);
+								currentHandler.show();
+								//quitQueue.setDisable(true);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -242,7 +286,7 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 							// join queue interrupted by user
 							practicePlay.setDisable(false);
 							rankPlay.setDisable(false);
-							quitQueue.setDisable(true);
+							//quitQueue.setDisable(true);
 						}
 					}
 				});
@@ -250,61 +294,152 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 				findGameThread = new Thread(findGameTask);
 				findGameThread.start();
 
-			}
+			} 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+//	@FXML
+//	private void handleQuitQueueAction(javafx.event.Event evt) {
+//		try {
+//			System.out.println("Requested quit queue");
+//			//quitQueue.setDisable(true);
+//			
+//			Task<Boolean> quitQueueTask = new Task<Boolean>() {
+//				protected Boolean call() {
+//					try {
+//						return gameModeScreenController.quitQueue();
+//					} catch (Exception e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//						return false;
+//					}
+//				}
+//				
+//			};
+//			
+//			quitQueueTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+//
+//				@Override
+//				public void handle(WorkerStateEvent arg0) {
+//					Boolean isSuccess = (Boolean) arg0.getSource().getValue();
+//					System.out.println("quit queue done:" + isSuccess);	
+//					try {
+//						if(isSuccess) {
+//							notifySuccess("Quit queue successfully!");
+//							System.out.println("Quit queue successfully!");
+////							findGameThread.interrupt();
+//							practicePlay.setDisable(false);
+//							rankPlay.setDisable(false);
+//						} else {
+//							notifyError("Quit queue failed. Please try again later");
+//							System.out.println("Quit queue failed. Please try again later");
+//						}
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				
+//			});
+//			
+//			quitQueueThread = new Thread(quitQueueTask);
+//			quitQueueThread.run();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			//quitQueue.setDisable(false);
+//			System.out.println("Cannot quit queue properly");
+//		}
+//	}
+	
 	@FXML
-	private void handleQuitQueueAction(javafx.event.Event evt) {
-		try {
-			System.out.println("Requested quit queue");
-			quitQueue.setDisable(true);
-			
-			Task<Boolean> quitQueueTask = new Task<Boolean>() {
-				protected Boolean call() {
-					try {
-						return gameModeScreenController.quitQueue();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						return false;
-					}
+	public void handlerGetLeaderboardAction() {
+		System.out.println("leaderboard");
+        try {
+        	LeaderBoardController leaderboardController = new LeaderBoardController(this.gameModeScreenController.getCurPlayer().getUsername(), this.gameModeScreenController.getCurPlayer().getSessionId());
+            GameModeScreenHandler curScreen = this;
+            
+            Task<Boolean> leaderboardTask = new Task<Boolean>() {
+
+				@Override
+				protected Boolean call() throws Exception {
+					return leaderboardController.getLeaderboard();
 				}
-				
-			};
-			
-			quitQueueTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            	
+            };
+            
+            leaderboardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 				@Override
 				public void handle(WorkerStateEvent arg0) {
 					Boolean isSuccess = (Boolean) arg0.getSource().getValue();
-					System.out.println("quit queue done:" + isSuccess);	
 					try {
-						if(isSuccess) {
-							notifySuccess("Quit queue successfully!");
-							System.out.println("Quit queue successfully!");
-//							findGameThread.interrupt();
-							practicePlay.setDisable(false);
-							rankPlay.setDisable(false);
+						if(!isSuccess) {
+							notifyError("Cannot get leaderboard. Please try again later");
 						} else {
-							notifyError("Quit queue failed. Please try again later");
-							System.out.println("Quit queue failed. Please try again later");
+							BaseScreenHandler leaderboardHandler = new LeaderBoardHandler(curScreen.stage,
+				                    Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
+				            leaderboardHandler.setScreenTitle("Leaderboard");
+				            leaderboardHandler.setPreviousScreen(curScreen);
+							leaderboardHandler.show();
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
-				
-			});
-			
-			quitQueueThread = new Thread(quitQueueTask);
-			quitQueueThread.run();
-		} catch (Exception e) {
-			e.printStackTrace();
-			quitQueue.setDisable(false);
-			System.out.println("Cannot quit queue properly");
-		}
+            	
+            });
+            Thread leaderboardThread = new Thread(leaderboardTask);
+            leaderboardThread.start();
+        
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
+	
+	private void showLogoutPrompt() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Log out");
+        alert.setHeaderText("Are you sure to log out?");
+        GameModeScreenHandler curHandler = this;
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+        if(option.get() == ButtonType.OK) {
+        	Task<Boolean> logoutTask = new Task<Boolean>() {
+
+				@Override
+				protected Boolean call() throws Exception {
+					return gameModeScreenController.logout(gameModeScreenController.getCurPlayer().getUsername(), gameModeScreenController.getCurPlayer().getSessionId());
+					
+				}
+        	};
+        	
+        	logoutTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					try {
+						Boolean isFound = (Boolean) arg0.getSource().getValue();
+						if(isFound) {
+							notifySuccess("Log out successfully");
+							// return to home screen
+							HomeScreenHandler homeHandler = new HomeScreenHandler(curHandler.stage, Configs.HOME_SCREEN_PATH,
+									new HomeScreenController());
+							homeHandler.setScreenTitle("Home Screen");
+							homeHandler.show();
+						} else {
+							notifyError("An error occured when logging out. Please try again");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					
+				}
+        		
+        	});
+        	Thread logoutThread = new Thread(logoutTask);
+        	logoutThread.start();
+        } 
 	}
 }

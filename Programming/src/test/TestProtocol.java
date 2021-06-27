@@ -1,45 +1,67 @@
 package test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
+
+import entity.Player.RankPlayer;
+import message.leaderboard.LeaderboardClientMessage;
+import message.leaderboard.LeaderboardServerMessage;
 import protocol.StatusCode;
 
 public class TestProtocol {
 
 	public static void main(String[] args) {
-//		ClientMessage loginRequest = new ClientMessage();
-//		loginRequest.createLoginRequest("hikaru", "abcde");
-//		System.out.println(loginRequest.toString());
-//
-//		ServerMessage loginResponse = new ServerMessage();
-//		loginResponse.createLoginResponse("hikaru", "AOUJBSGOAW01p39u5P", 15000, StatusCode.SUCCESS, "");
-//		System.out.println(loginResponse.toString());
-//
-//		// Test register
-//		ClientMessage registerRequest = new ClientMessage();
-//		registerRequest.createRegisterRequest("hikaru", "abcde");
-//		System.out.println(registerRequest.toString());
-//
-//		ServerMessage registerResponse = new ServerMessage();
-//		registerResponse.createRegisterResponse("hikaru", "AOUJBSGOAW01p39u5P", 15000, StatusCode.SUCCESS, "");
-//		System.out.println(registerResponse.toString());
-//
-//		// Test move
-//		ClientMessage moveRequest = new ClientMessage();
-//		moveRequest.createMoveRequest("1234", "AOFBDHBD", "phuc", "6", "9", "valid", "");
-//		System.out.println(moveRequest.toString());
-//
-//		ServerMessage moveResponse = new ServerMessage();
-//		moveResponse.createMoveResponse("1234", "phuc", "6","9", "valid", "", StatusCode.SUCCESS, "");
-//		System.out.println(moveResponse.toString());
-//
-//		// Test leaderboard
-//		ClientMessage leaderboardRequest = new ClientMessage();
-//		leaderboardRequest.createLeaderboardRequest("GSDGDGd", "phuc");
-//		System.out.println(leaderboardRequest.toString());
-//
-//		ServerMessage leaderboardResponse = new ServerMessage();
-//		leaderboardResponse.createLeaderboardResponse(new JSONArray(new String[]{"hikaru", "phuc", "chau"}), new JSONArray(new int[]{1234, 1233, 1232}), new JSONArray(new int[]{1, 2, 3}), StatusCode.SUCCESS, "");
-//		System.out.println(leaderboardResponse.toString());
+
+		// Test leaderboard
+		LeaderboardClientMessage leaderboardRequest = new LeaderboardClientMessage("nAULRJBG", "hikaru");
+		System.out.println(leaderboardRequest.toString());
+		LeaderboardClientMessage leaderboardRequest2 =  new LeaderboardClientMessage(leaderboardRequest.toString());
+		System.out.println(leaderboardRequest2.toString());
+
+		ArrayList<String> listUsr = new ArrayList<String>();
+		listUsr.add("duong");
+		listUsr.add("chau");
+		listUsr.add("haha");
+		
+		ArrayList<Integer> listElo = new ArrayList<Integer>();
+		listElo.add(1900);
+		listElo.add(1500);
+		listElo.add(1400);
+		
+		ArrayList<Integer> listRank = new ArrayList<Integer>();
+		listRank.add(2);
+		listRank.add(9);
+		listRank.add(13);
+		
+		ArrayList<Integer> listMatchPlayed = new ArrayList<Integer>();
+		listMatchPlayed.add(17);
+		listMatchPlayed.add(13);
+		listMatchPlayed.add(12);
+		
+		
+		ArrayList<Integer> listMatchWon = new ArrayList<Integer>();
+		listMatchWon.add(16);
+		listMatchWon.add(9);
+		listMatchWon.add(7);
+		
+		//LeaderboardServerMessage(int messageCommandID, List<String> listUsr, List<Integer> listElo, List<Integer> listRank, List<Integer> listNoMatchPlayed, List<Integer> listNoMatchWon, StatusCode statCode, String errMsg)
+		LeaderboardServerMessage leaderboardResponse = new LeaderboardServerMessage(leaderboardRequest2.getMessageCommandID(), listUsr, listElo, listRank, listMatchPlayed, listMatchWon, StatusCode.SUCCESS, "");
+		System.out.println(leaderboardResponse.toString());
+		LeaderboardServerMessage leaderboardResponse2 = new LeaderboardServerMessage(leaderboardResponse.toString());
+		System.out.println(leaderboardResponse2.toString());
+		
+		ArrayList<RankPlayer> listPlayer = new ArrayList<RankPlayer>();
+		for(int i = 0; i < listUsr.size(); i++) {
+			// merge
+			// mock player
+			RankPlayer rp = new RankPlayer(listUsr.get(i), "", listElo.get(i));
+			rp.updatePlayerInfo(listRank.get(i), listElo.get(i), listMatchPlayed.get(i), listMatchWon.get(i));
+			listPlayer.add(rp);
+			
+		}
+		System.out.println(listPlayer);
 	}
 
 }

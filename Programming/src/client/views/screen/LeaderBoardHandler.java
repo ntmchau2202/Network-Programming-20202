@@ -51,7 +51,8 @@ public class LeaderBoardHandler extends BaseScreenHandler implements Initializab
 
         try {
             List<LeaderboardPlayer> lstLeaderboardPlayer =
-                    this.leaderBoardController.getTopPlayers();
+                    this.leaderBoardController.getLeaderboardList();
+            System.out.println(lstLeaderboardPlayer);
             rankTableColumn.setCellValueFactory(
                     new PropertyValueFactory<>("rank"));
             eloTableColumn.setCellValueFactory(
@@ -69,7 +70,7 @@ public class LeaderBoardHandler extends BaseScreenHandler implements Initializab
                 leaderboardTableView.getItems().add(leaderboardPlayer);
             }
 //            System.out.println(lstLeaderboardPlayer);
-        } catch (SQLException | IOException | InterruptedException throwables) {
+        } catch (Exception throwables) {
             throwables.printStackTrace();
         }
     }
@@ -83,10 +84,10 @@ public class LeaderBoardHandler extends BaseScreenHandler implements Initializab
      * this method get base controller of current screen.
      * @return LeaderBoardController
      */
-    public LeaderBoardController getBaseController() {
-        if (super.getBaseController() == null) {
-            return new LeaderBoardController();
-        }
-        return (LeaderBoardController) super.getBaseController();
-    }
+//    public LeaderBoardController getBaseController() {
+//        if (super.getBaseController() == null) {
+//            return new LeaderBoardController();
+//        }
+//        return (LeaderBoardController) super.getBaseController();
+//    }
 }

@@ -41,13 +41,14 @@ public class ResponseBody {
 		this.responseBody.put("elo", elo);
 	}
 	
-	public void createUpdateUserBody(String username, int noOfMatchPlayed, int noOfMatchWon, int elo, String winRate) {
+	public void createUpdateUserBody(String username, int noOfMatchPlayed, int noOfMatchWon, int elo, int rank, String winRate) {
 		this.responseBody.clear();
 		this.responseBody.put("username", username);
-		this.responseBody.put("no_of_match_played", noOfMatchPlayed);
-		this.responseBody.put("no_of_match_won", noOfMatchWon);
+		this.responseBody.put("num_game_played", noOfMatchPlayed);
+		this.responseBody.put("num_game_won", noOfMatchWon);
 		this.responseBody.put("elo", elo);
 		this.responseBody.put("win_rate", winRate);
+		this.responseBody.put("rank", rank);
 	}
 	
 	public void createJoinQueueBody(String username, String sessionID, String opponent, int elo, int matchID, String player1) throws JSONException {
@@ -106,10 +107,11 @@ public class ResponseBody {
 		this.responseBody.put("move_player", move_player);
 	}
 	
-	public void createDrawConfirmBody(int match_id, String move_player, boolean acceptance) throws JSONException {
+	public void createDrawConfirmBody(int match_id, String move_player, String session_id, boolean acceptance) throws JSONException {
 		this.responseBody.clear();
 		this.responseBody.put("match_id", match_id);
 		this.responseBody.put("move_player", move_player);
+		this.responseBody.put("session_id", session_id);
 		this.responseBody.put("acceptance", acceptance);
 	}
 	
@@ -138,6 +140,12 @@ public class ResponseBody {
 	}
 
 	public void createLogoutBody(String username, String sessionID) throws JSONException {
+		this.responseBody.clear();
+		this.responseBody.put("username", username);
+		this.responseBody.put("session_id", sessionID);
+	}
+	
+	public void createQuitGameBody(String username, String sessionID) throws JSONException {
 		this.responseBody.clear();
 		this.responseBody.put("username", username);
 		this.responseBody.put("session_id", sessionID);

@@ -6,14 +6,20 @@ import message.chat.ChatClientMessage;
 import message.chat.ChatServerMessage;
 import message.chat.ListenChatClientMessage;
 import message.chatack.ChatACKServerMessage;
+import message.drawconfirm.DrawConfirmClientMessage;
 import message.drawconfirm.DrawConfirmServerMessage;
+import message.drawrequest.DrawRequestClientMessage;
 import message.drawrequest.DrawRequestServerMessage;
+import message.drawrequest.ListenDrawClientMessage;
 import message.joinqueue.JoinQueueClientMessage;
+import message.leaderboard.LeaderboardClientMessage;
 import message.login.LoginClientMessage;
+import message.logout.LogoutClientMessage;
 import message.matchfound.MatchFoundServerMessage;
 import message.move.ListenMoveClientMessage;
 import message.move.MoveClientMessage;
 import message.move.MoveServerMessage;
+import message.quitgame.QuitGameClientMessage;
 import message.quitqueue.QuitQueueClientMessage;
 import message.register.RegisterClientMessage;
 import message.updateuser.UpdateUserClientMessage;
@@ -76,6 +82,22 @@ public class ClientSocketChannel {
 
     public static ClientSocketChannel getSocketInstance() {
         return ClientSocketChannel.ClientSocketChannelSingleton.INSTANCE;
+    }
+    
+    public static boolean isConnected() {
+    	if(socketChannelInstance!=null) {
+        	if(socketChannelInstance.socketChannel != null && socketChannelInstance.socketChannel.isOpen()) {
+        		return true;
+        	} 
+    	}
+    	
+    	return false;
+    }
+    
+   public static void closeConnection() throws Exception {
+	   socketChannelInstance.socketChannel.shutdownInput();
+	   socketChannelInstance.socketChannel.shutdownOutput();
+	   socketChannelInstance.socketChannel.close();
     }
 
     // =================== FUNCTIONS =======================
@@ -152,8 +174,18 @@ public class ClientSocketChannel {
         QuitQueueClientMessage quitQueueRequest = new QuitQueueClientMessage(username, sessionID);
 //		return sendRequestAsync(quitQueueRequest.toString());
         return sendRequest(quitQueueRequest.toString(), quitQueueRequest.getMessageCommandID());
-
     }
+
+	public String logout(String username, String sessionID) throws Exception {
+		LogoutClientMessage logoutRequest = new LogoutClientMessage(username, sessionID);
+		return sendRequest(logoutRequest.toString(), logoutRequest.getMessageCommandID());
+	}
+
+//	public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
+//			throws Exception {
+//		MoveClientMessage msg = new MoveClientMessage(matchID, player, sesID, x, y, state, result);
+//		return sendRequest(msg.toString(), msg.getMessageCommandID());
+//	}
 
     public String move(String player, String sesID, int matchID, int x, int y, String state, String result)
             throws Exception {
@@ -171,23 +203,27 @@ public class ClientSocketChannel {
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 
-//	public String requestDraw() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
-//
-//	public String confirmDraw() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
-//
-//	public String getLeaderBoard() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
+	public String requestDraw(int matchID, String username, String sessionID) throws Exception {
+		DrawRequestClientMessage msg = new DrawRequestClientMessage(matchID, username, sessionID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
+	
+	public String quitGame(int matchID, String username, String sessionID) throws Exception {
+		QuitGameClientMessage msg = new QuitGameClientMessage(matchID, username, sessionID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
+
+	public String confirmDraw(int matchID, String player, String sessionID, boolean acceptance) throws Exception {
+		DrawConfirmClientMessage msg = new DrawConfirmClientMessage(matchID, player, sessionID, acceptance);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
+
+	public String getLeaderBoard(String usr, String sesID) throws Exception {
+		LeaderboardClientMessage msg = new LeaderboardClientMessage(usr, sesID);
+		return sendRequest(msg.toString(), msg.getMessageCommandID());
+	}
 
     public String chat(String fromUsr, String toUsr, String chatMsg, int matchID) throws Exception {
-        // TODO: Finish function
         ChatClientMessage msg = new ChatClientMessage(fromUsr, toUsr, chatMsg, matchID);
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
@@ -197,67 +233,8 @@ public class ClientSocketChannel {
         return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 
-//	public String chatACK() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
-//
-//	public String logout() throws Exception {
-//		// TODO: Finish function
-//		return sendRequest("");
-//	}
-
-    public ServerMessage listenIngameMessage() {
-
-        ByteBuffer inputBuffer = ByteBuffer.allocate(4096);
-        String returnMsg = "";
-
-        Future<Integer> result = this.socketChannel.read(inputBuffer);
-        try {
-            result.get();
-            inputBuffer.flip();
-            returnMsg = StandardCharsets.UTF_8.newDecoder().decode(inputBuffer).toString();
-            System.out.println("This is printed from client: " + returnMsg);
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        // analyze things here?
-
-        JSONObject jsMsg = new JSONObject(returnMsg);
-        Command cmd = Command.toCommand(jsMsg.getString("command_code"));
-
-        switch (cmd) {
-            case MATCH_FOUND: {
-                MatchFoundServerMessage matchFoundMsg = new MatchFoundServerMessage(returnMsg);
-                return matchFoundMsg;
-            }
-            case MOVE: {
-                MoveServerMessage moveMsg = new MoveServerMessage(returnMsg);
-                return moveMsg;
-            }
-            case CHAT: {
-                ChatServerMessage chatMsg = new ChatServerMessage(returnMsg);
-                return chatMsg;
-
-            }
-            case CHATACK: {
-                ChatACKServerMessage ack = new ChatACKServerMessage(returnMsg);
-                return ack;
-            }
-
-            case DRAW_REQUEST: {
-                DrawRequestServerMessage drawRequest = new DrawRequestServerMessage(returnMsg);
-                return drawRequest;
-            }
-            case DRAW_CONFIRM: {
-                DrawConfirmServerMessage drawConfirm = new DrawConfirmServerMessage(returnMsg);
-                return drawConfirm;
-
-            }
-        }
-
-        return null;
+    public String listenDrawRequest(String username, String sessionID, int matchID) throws Exception {
+    	ListenDrawClientMessage msg = new ListenDrawClientMessage(username, sessionID, matchID);
+    	return sendRequest(msg.toString(), msg.getMessageCommandID());
     }
 }

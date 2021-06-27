@@ -8,8 +8,12 @@ public class DrawConfirmServerMessage extends ServerMessage {
 	private int matchID;
 	private String movePlayer, sessionID;
 	private boolean acceptance;
-	
-	public DrawConfirmServerMessage(int messageCommandID, int matchID, String player, String sessionID, boolean acceptance, StatusCode statCode, String errMsg) {
+	// should we add a field of draw msg id here?
+
+	// player: confirm player
+	// sessionID is the sessionID of listen message
+	public DrawConfirmServerMessage(int messageCommandID, int matchID, String player, String sessionID,
+									boolean acceptance, StatusCode statCode, String errMsg) {
 		super(statCode, errMsg, messageCommandID);
 		
 		this.matchID = matchID;
@@ -18,7 +22,7 @@ public class DrawConfirmServerMessage extends ServerMessage {
 		this.acceptance = acceptance;
 		
 		this.setCommand(Command.DRAW_CONFIRM);
-		this.responseBody.createDrawConfirmBody(matchID, player, acceptance);
+		this.responseBody.createDrawConfirmBody(matchID, player, sessionID, acceptance);
 		this.finalizeMessageObject();
 	}
 	
