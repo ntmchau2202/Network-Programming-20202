@@ -403,23 +403,39 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
         // option != null.
         Optional<ButtonType> option = alert.showAndWait();
         if(option.get() == ButtonType.OK) {
-        	Task<Void> logoutTask = new Task<Void>() {
+        	Task<Boolean> logoutTask = new Task<Boolean>() {
 
 				@Override
-				protected Void call() throws Exception {
-					if(gameModeScreenController.logout(gameModeScreenController.getCurPlayer().getUsername(), gameModeScreenController.getCurPlayer().getSessionId())) {
-						notifySuccess("Log out successfully");
-						// return to home screen
-						HomeScreenHandler homeHandler = new HomeScreenHandler(curHandler.stage, Configs.HOME_SCREEN_PATH,
-								new HomeScreenController());
-						homeHandler.setScreenTitle("Home Screen");
-						homeHandler.show();
-					} else {
-						notifyError("An error occured when logging out. Please try again");
-					}
-					return null;
+				protected Boolean call() throws Exception {
+					return gameModeScreenController.logout(gameModeScreenController.getCurPlayer().getUsername(), gameModeScreenController.getCurPlayer().getSessionId());
+					
 				}
         	};
+        	
+        	logoutTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					try {
+						Boolean isFound = (Boolean) arg0.getSource().getValue();
+						if(isFound) {
+							notifySuccess("Log out successfully");
+							// return to home screen
+							HomeScreenHandler homeHandler = new HomeScreenHandler(curHandler.stage, Configs.HOME_SCREEN_PATH,
+									new HomeScreenController());
+							homeHandler.setScreenTitle("Home Screen");
+							homeHandler.show();
+						} else {
+							notifyError("An error occured when logging out. Please try again");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					
+				}
+        		
+        	});
         	Thread logoutThread = new Thread(logoutTask);
         	logoutThread.start();
         } 
