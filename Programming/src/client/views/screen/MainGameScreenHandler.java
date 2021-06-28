@@ -176,27 +176,30 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
                 while(true) {
 	                    try {
 	                        // send move to server
-	                        isSuccessfull = mainGameScreenController.listenMove();
-	                        if (mainGameScreenController.getMoveResult().compareToIgnoreCase("")==0) {
-		                        int recvX1 = mainGameScreenController.getX();
-		                        int recvY1 = mainGameScreenController.getY();
-		                        System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
-		
-		                        // display move on pane ??
-		                        addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
-		
-		                        mainGameScreenController.setTurn(true);
-		                        isLockMove = false;
-	                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
-	                        	isGameEnded.set(1);
-	                        	this.cancel();
-	                        	break;
-	                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("draw")==0) {
-	                        	isGameEnded.set(-1);
-	                        	this.cancel();
+	                        if(isGameEnded.get() == 0) {
+	                        	isSuccessfull = mainGameScreenController.listenMove();
+		                        if (mainGameScreenController.getMoveResult().compareToIgnoreCase("")==0) {
+			                        int recvX1 = mainGameScreenController.getX();
+			                        int recvY1 = mainGameScreenController.getY();
+			                        System.out.printf("Opponent plays move on coordinate [%d, %d]%n", recvX1, recvY1);
+			
+			                        // display move on pane ??
+			                        addImageToPane((Pane)getNodeByRowColumnIndex(recvX1, recvY1, gameBoardGridPane), mainGameScreenController.getOpponentPlayerName());
+			
+			                        mainGameScreenController.setTurn(true);
+			                        isLockMove = false;
+		                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("win")==0) {
+		                        	isGameEnded.set(1);
+		                        	this.cancel();
+		                        	break;
+		                        } else if (mainGameScreenController.getMoveResult().compareToIgnoreCase("draw")==0) {
+		                        	isGameEnded.set(-1);
+		                        	this.cancel();
+		                        	break;
+		                        }
+	                        } else {
 	                        	break;
 	                        }
-	
 	                    } catch (Exception e1) {
 	                        // TODO Auto-generated catch block
 	                        e1.printStackTrace();
