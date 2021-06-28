@@ -19,7 +19,7 @@ public class MessageQueue {
 	private ArrayList<Attachment> pendingWriteList, pendingReadList, messageDoneList;
 	private AsynchronousSocketChannel socketChannel;
 	private AtomicBoolean isSending, isReading;
-	private Semaphore sendMutex, addMutex;
+	private Semaphore decodeMutex, addMutex;
 	
 	public MessageQueue(AsynchronousSocketChannel socketChan) {
 //		messageToSendQueue = new LinkedList<Attachment>();
@@ -29,7 +29,7 @@ public class MessageQueue {
 		this.socketChannel = socketChan;
 		this.isSending = new AtomicBoolean(false);
 		this.isReading = new AtomicBoolean(false);
-		this.sendMutex = new Semaphore(1);
+		this.decodeMutex = new Semaphore(1);
 		this.addMutex = new Semaphore(1);
 	}
 	
@@ -40,8 +40,6 @@ public class MessageQueue {
 		addMutex.acquire();
 		this.pendingWriteList.add(attachment);
 		addMutex.release();
-		System.out.println("Added: Size of msg queue is: " + pendingWriteList.size());
-		System.out.println("Attachment ID: " + attachment.getAttachmentID());
 		return attachment.getAttachmentID();
 	}
 	
@@ -66,10 +64,11 @@ public class MessageQueue {
 		isSending.set(true);
 		Future<Integer> futureWrite = socketChannel.write(buffer);
 		try {
-			String tmp = null;
-			tmp = StandardCharsets.UTF_8.newDecoder().reset().decode(buffer).toString();
-			System.out.println("Written message: " + tmp);
-		} catch (CharacterCodingException e) {
+			decodeMutex.acquire();
+			String tmp = StandardCharsets.UTF_8.newDecoder().reset().decode(buffer).toString();
+			System.out.println("Message to be sent: " + tmp);
+			decodeMutex.release();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try{
@@ -92,7 +91,6 @@ public class MessageQueue {
 			mergeMessage(buffer);
 			isReading.set(false);
 		} catch (Exception e) {
-			System.out.println("Error when reading...");
 			e.printStackTrace();
 		}
 	}
@@ -106,7 +104,6 @@ public class MessageQueue {
 			int msgID = tmpJS.getInt("message_id");
 			
 			for(Attachment a : pendingReadList) {
-				System.out.println("item: " + a.getAttachmentID());
 				if(a.getAttachmentID() == msgID) {
 					a.setReturnMessage(tmp);
 					messageDoneList.add(a);
