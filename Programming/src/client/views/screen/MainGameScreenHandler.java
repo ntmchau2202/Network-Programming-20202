@@ -117,10 +117,12 @@ public class MainGameScreenHandler extends BaseScreenHandler implements Initiali
         // display player info
         xPlayerName.setText(mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
         oPlayerName.setText(!mainGameScreenController.amIFirstPlayer() ? mainGameScreenController.getCurrentPlayer().getUsername() : mainGameScreenController.getOpponentPlayerName());
-        if (mainGameScreenController.getCurrentPlayer() instanceof RankPlayer) {
-            xPlayerElo.setText(Integer.toString(mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
-            oPlayerElo.setText(Integer.toString(!mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
-        }
+//        if (mainGameScreenController.getCurrentPlayer() instanceof RankPlayer) {
+//            xPlayerElo.setText(Integer.toString(mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+//            oPlayerElo.setText(Integer.toString(!mainGameScreenController.amIFirstPlayer() ? ((RankPlayer) mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+        xPlayerElo.setText(Integer.toString(mainGameScreenController.amIFirstPlayer() ? ( mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+        oPlayerElo.setText(Integer.toString(!mainGameScreenController.amIFirstPlayer() ? ( mainGameScreenController.getCurrentPlayer()).getElo() : mainGameScreenController.getOpponentElo()));
+//        }
 
         // display player turn
 //        if (mainGameScreenController.isMyTurn()) {
