@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.paint.*?>
 <?import java.lang.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
@@ -101,7 +103,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <ImageView fitHeight="43.0" fitWidth="56.0" layoutX="843.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="drawRequestImageView" fitHeight="43.0" fitWidth="56.0" layoutX="843.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/flag.png" />
          </image>
@@ -149,7 +151,7 @@
          <effect>
             <DropShadow>
                <color>
-                  <Color red="0.9473684430122375" green="0.5087719559669495" blue="0.9473684430122375" />
+                  <Color blue="0.9473684430122375" green="0.5087719559669495" red="0.9473684430122375" />
                </color>
             </DropShadow>
          </effect></Text>
