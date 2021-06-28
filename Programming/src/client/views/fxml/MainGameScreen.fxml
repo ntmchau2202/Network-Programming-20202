@@ -11,11 +11,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
@@ -31,7 +33,7 @@
             <Image url="@assets/img/vs.png" />
          </image>
       </ImageView>
-      <Label alignment="CENTER_RIGHT" layoutX="609.0" layoutY="56.0" prefHeight="35.0" prefWidth="191.0" text="PhucNguyen" textAlignment="RIGHT" fx:id="xPlayerName">
+      <Label alignment="CENTER_RIGHT" layoutX="609.0" layoutY="56.0" prefHeight="35.0" prefWidth="191.0" text="PhucNguyen" textAlignment="RIGHT" textFill="#ff1c1c" fx:id="xPlayerName">
          <font>
             <Font size="24.0" />
          </font>
@@ -49,7 +51,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label fx:id="oPlayerName" layoutX="1060.0" layoutY="56.0" prefHeight="35.0" prefWidth="184.0" text="DzuongThai">
+      <Label fx:id="oPlayerName" layoutX="1060.0" layoutY="56.0" prefHeight="35.0" prefWidth="184.0" text="DzuongThai" textFill="#007aff">
          <font>
             <Font size="24.0" />
          </font>
@@ -68,12 +70,12 @@
          </cursor>
       </ImageView>
       <TextField fx:id="chatTextField" layoutX="605.0" layoutY="548.0" prefHeight="43.0" prefWidth="558.0" styleClass="chat-text-field" stylesheets="@assets/css/style.css" />
-      <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="843.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="843.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true" fx:id="xImageView">
          <image>
             <Image url="@assets/img/cross.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="993.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="oImageView" disable="true" fitHeight="40.0" fitWidth="40.0" layoutX="993.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/circle.png" />
          </image>
@@ -83,17 +85,23 @@
             <Cursor fx:constant="HAND" />
          </cursor></Button>
       <ScrollPane fx:id="chatScrollPane" layoutX="605.0" layoutY="257.0" prefHeight="290.0" prefWidth="634.0" stylesheets="@assets/css/style.css" />
-      <Label layoutX="744.0" layoutY="140.0" text="1" fx:id="xPlayerWin">
-         <font>
-            <Font name="System Bold" size="24.0" />
-         </font>
-      </Label>
-      <Label fx:id="oPlayerWin" layoutX="1097.0" layoutY="140.0" text="0">
-         <font>
-            <Font name="System Bold" size="24.0" />
-         </font>
-      </Label>
-      <ImageView fx:id="drawRequestImageView" fitHeight="43.0" fitWidth="56.0" layoutX="843.0" layoutY="175.0" onMouseClicked="#showDrawDialog" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="prevScreenImageView" fitHeight="35.0" fitWidth="35.0" layoutX="607.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@assets/img/back.png" />
+         </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ImageView>
+      <ImageView fx:id="homeScreenImageView" fitHeight="35.0" fitWidth="40.0" layoutX="1202.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@assets/img/home.png" />
+         </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ImageView>
+      <ImageView fitHeight="43.0" fitWidth="56.0" layoutX="843.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/img/flag.png" />
          </image>
@@ -134,9 +142,16 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Pane>
-      <Text fx:id="playerTurnText" layoutX="738.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player" />
-      <Label layoutX="701.0" layoutY="28.0" text="Turn:" />
-      <Label layoutX="851.0" layoutY="29.0" text="You are:" />
-      <Label fx:id="yourMove" layoutX="911.0" layoutY="29.0" text="Label" />
+      <Text fx:id="playerTurnText" fill="#ba53ff" layoutX="806.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="phuc's turn" textAlignment="CENTER" wrappingWidth="270.4000244140625">
+         <font>
+            <Font name="System Bold Italic" size="22.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color red="0.9473684430122375" green="0.5087719559669495" blue="0.9473684430122375" />
+               </color>
+            </DropShadow>
+         </effect></Text>
    </children>
 </AnchorPane>

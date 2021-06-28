@@ -5,12 +5,16 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Bloom?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.Glow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1239.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
@@ -75,6 +79,17 @@
                <image>
                   <Image url="@assets/img/cross.png" />
                </image>
+               <effect>
+                  <Glow level="0.9">
+                     <input>
+                        <DropShadow>
+                           <color>
+                              <Color red="0.5473684072494507" green="0.5212163925170898" blue="0.024327484890818596" opacity="0.5199999809265137" />
+                           </color>
+                        </DropShadow>
+                     </input>
+                  </Glow>
+               </effect>
             </ImageView>
             <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="6">
                <image>
@@ -90,6 +105,13 @@
                <image>
                   <Image url="@assets/img/circle.png" />
                </image>
+               <effect>
+                  <DropShadow>
+                     <color>
+                        <Color red="1.0" green="0.3686274588108063" />
+                     </color>
+                  </DropShadow>
+               </effect>
             </ImageView>
             <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="7">
                <image>
@@ -125,11 +147,21 @@
                <image>
                   <Image url="@assets/img/cross.png" />
                </image>
+               <effect>
+                  <Bloom />
+               </effect>
             </ImageView>
             <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="8" GridPane.rowIndex="8">
                <image>
                   <Image url="@assets/img/cross.png" />
                </image>
+               <effect>
+                  <DropShadow>
+                     <color>
+                        <Color green="0.3333333432674408" blue="1.0" />
+                     </color>
+                  </DropShadow>
+               </effect>
             </ImageView>
          </children>
       </GridPane>
@@ -225,6 +257,9 @@
          <image>
             <Image url="@assets/img/bg2%20-%20Copy.jpg" />
          </image>
+         <effect>
+            <Glow />
+         </effect>
       </ImageView>
    </children>
 </AnchorPane>
