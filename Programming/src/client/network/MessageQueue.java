@@ -70,7 +70,7 @@ public class MessageQueue {
 		Future<Integer> futureWrite = socketChannel.write(buffer);
 		try {
 			String tmp = null;
-			tmp = StandardCharsets.UTF_8.newDecoder().decode(buffer).toString();
+			tmp = StandardCharsets.UTF_8.newDecoder().reset().decode(buffer).toString();
 			System.out.println("Written message: " + tmp);
 		} catch (CharacterCodingException e) {
 			e.printStackTrace();
