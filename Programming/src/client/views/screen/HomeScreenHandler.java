@@ -115,6 +115,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 						try {
 							notifyError("Can not find practice play match, please try again later");
 							guestPlayBtn.setDisable(false);
+							currentHandler.show();
 //							rankPlay.setDisable(false);
 //							quitQueue.setDisable(true);
 						} catch (IOException e) {
