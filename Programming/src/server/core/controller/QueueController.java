@@ -90,10 +90,52 @@ public class QueueController {
         }
     }
 
+    public boolean isPlayerInHall(String username) {
+        for (Player player : hall) {
+            if (player.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPlayerInNormalQueue(String username) {
+        for (Player player : normalQueue) {
+            if (player.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPlayerInRankedQueue(String username) {
+        for (Player player : rankedQueue) {
+            if (player.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void removeFromHall(Player player) {
         try {
             mutex.acquire();
             hall.remove(player);
+            mutex.release();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeFromHall(String playerName) {
+        try {
+            mutex.acquire();
+            for (Player player: hall) {
+                if (player.getUsername().equals(playerName)) {
+                    hall.remove(player);
+                    break;
+                }
+            }
             mutex.release();
         } catch (Exception e) {
             e.printStackTrace();
