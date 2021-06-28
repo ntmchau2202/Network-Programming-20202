@@ -63,9 +63,17 @@ public class MessageQueue {
 		ByteBuffer buffer = ByteBuffer.wrap(attachment.getSendMessage().getBytes(StandardCharsets.UTF_8));
 		isSending.set(true);
 		Future<Integer> futureWrite = socketChannel.write(buffer);
+//		try {
+//			decodeMutex.acquire();
+//			String tmp = StandardCharsets.UTF_8.newDecoder().reset().decode(buffer).toString();
+//			System.out.println("Message to be sent: " + tmp);
+//			decodeMutex.release();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		try {
 			decodeMutex.acquire();
-			String tmp = StandardCharsets.UTF_8.newDecoder().reset().decode(buffer).toString();
+			String tmp = new String(buffer.array());
 			System.out.println("Message to be sent: " + tmp);
 			decodeMutex.release();
 		} catch (Exception e) {
