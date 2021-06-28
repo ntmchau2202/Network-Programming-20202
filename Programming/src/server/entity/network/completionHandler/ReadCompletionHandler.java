@@ -4,17 +4,22 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.logging.Logger;
 
 import protocol.Attachment;
 import protocol.Command;
+import server.core.ServerCore;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
+import server.core.logger.T3Logger;
 import server.core.processor.RequestProcessor;
 import server.core.processor.ResponseProcessor;
+import server.core.utils.Misc;
 
 
 public class ReadCompletionHandler implements CompletionHandler<Integer, Attachment>{
+	public static Logger LOGGER = T3Logger.getLogger(ReadCompletionHandler.class.getName());
+
 	private final ByteBuffer buffer;
 	private final CompletionHandlerController completionHandlerController;
 	private final RequestProcessor reqProc;
@@ -28,12 +33,20 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		// init processors
 		this.reqProc = new RequestProcessor(queueController, completionHandlerController);
 		this.resProc = new ResponseProcessor(socketChannel);
-		this.handlerID = UUID.randomUUID().toString();
+		this.handlerID = this.completionHandlerController.getHandlerCtrlID() + ">>>" + Misc.genShortUUID();
 	}
 	
 	public void cancelHandler() {
-		System.out.println("Canceling request");
-		this.reqProc.stopProcessingRequest();
+		LOGGER.info("Canceling handler " + this.handlerID);
+		this.reqProc.cancelProcessingRequest();
+		this.resProc.cancelProcessingRequest();
+	}
+
+	public void forceStopHandler() {
+		// stop all processors
+		LOGGER.info("Force stopping handler " + this.handlerID);
+		this.reqProc.stopAll();
+		this.resProc.stopAll();
 	}
 
 	public String getHandlerID() {
@@ -47,9 +60,8 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	@Override
 	public void completed(Integer result, Attachment attachment) {
 		// log out what received
-		System.out.println("Bytes received: " + result.toString());
-		System.out.println("***Handler ID: " + handlerID + "***");
-		
+		System.out.println("Bytes received: " + result.toString() + " in handler " + this.handlerID);
+
 		// parsing data
 		if (result > 0) {
 		
@@ -103,16 +115,18 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		}
 
 	}
+
 	@Override
 	public void failed(Throwable exc, Attachment attachment) {
+		// this is when connection is shutdown expectedly
+		LOGGER.info("***Handler " + this.handlerID + " shutdowns incorrectly***");
+		// summon the ctrl to shutdown all handlers
+		this.completionHandlerController.forceStopAllHandlers();
+
 		exc.printStackTrace();
 	}
 	
 	public CompletionHandlerController getHandlerController() {
 		return this.completionHandlerController;
-	}
-	
-	public void stopHandler() {
-		reqProc.stopProcessingRequest();
 	}
 }
