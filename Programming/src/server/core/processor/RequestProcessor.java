@@ -121,7 +121,7 @@ public class RequestProcessor implements IProcessor {
             for (int i = 0; i < 10; i++) {
                 try {
                     Thread.sleep(500);
-                    System.out.println("im herererrrere " + i);
+//                    System.out.println("im herererrrere " + i);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -453,7 +453,17 @@ public class RequestProcessor implements IProcessor {
             }
         }
 
+        MatchResult matchResult = null;
         if (moveMsg.getResult().compareToIgnoreCase("win") == 0) {
+            // win case
+            matchResult = MatchResult.Win;
+        } else if (moveMsg.getResult().compareToIgnoreCase("draw") == 0){
+            // draw case
+            movePlayer = "";
+            matchResult = MatchResult.Draw;
+        }
+
+        if (moveMsg.getResult().compareToIgnoreCase("win") == 0 || moveMsg.getResult().compareToIgnoreCase("draw") == 0) {
             if (!queueController.endGame(movePlayer, matchID)) {
                 statCode = StatusCode.ERROR;
                 errMsg = "Cannot end the game...";
@@ -472,7 +482,7 @@ public class RequestProcessor implements IProcessor {
                     RankPlayer wonPlayer =  (RankPlayer) movePlayerObj;
 
                     // update player info into both obj and db
-                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(wonPlayer, MatchResult.Win, matchMode);
+                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(wonPlayer, matchResult, matchMode);
 
                     // update info of player into leaderboard
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(wonPlayer);
@@ -484,15 +494,12 @@ public class RequestProcessor implements IProcessor {
                     RankPlayer lostPlayer = (RankPlayer) opponent;
 
                     // update player info into both obj and db
-                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(lostPlayer, MatchResult.Lost, matchMode);
+                    RankPlayerModel.getRankPlayerModelInstance().updateRankPlayerInfo(lostPlayer, matchResult, matchMode);
 
                     // update info of player into leaderboard
                     LeaderboardModel.getLeaderboardModelInstance().updateLeaderboard(lostPlayer);
                 }
             }
-
-        } else if (moveMsg.getResult().compareToIgnoreCase("draw") == 0) {
-            // TODO: process when it's draw game
         }
 
         MoveServerMessage fwdMsg = new MoveServerMessage(moveMsg.getMessageCommandID(), matchID, movePlayer, x, y, state, result, statCode, errMsg);
@@ -576,6 +583,7 @@ public class RequestProcessor implements IProcessor {
                 // check status of match: break if winner has been found (this case is for opponent quits the game)
                 if (match.isEnded() && !match.getWinner().isEmpty()) {
                     // now move player becomes the winner
+                    System.out.println("the winner is: " + match.getWinner());
 //                    movePlayer = match.getAnotherPlayer(username) != null ? match.getAnotherPlayer(username).getUsername() : "";
                     movePlayer = match.getPlayerByName(match.getWinner()) != null ? match.getPlayerByName(match.getWinner()).getUsername() : "";
                     match.addNewMoveRecord(-1, -1, movePlayer, "valid", "win");
