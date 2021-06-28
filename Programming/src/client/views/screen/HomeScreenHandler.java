@@ -61,7 +61,7 @@ public class HomeScreenHandler extends BaseScreenHandler
         if (evt.getSource() == guestPlayBtn) {
             System.out.println("guest player");
             WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(this.stage, null);
-            waitingScreenHandler.show(true);
+            waitingScreenHandler.show();
             // TODO: log guest player here
 			
 			HomeScreenHandler currentHandler = this;
@@ -115,6 +115,7 @@ public class HomeScreenHandler extends BaseScreenHandler
 						try {
 							notifyError("Can not find practice play match, please try again later");
 							guestPlayBtn.setDisable(false);
+							currentHandler.show();
 //							rankPlay.setDisable(false);
 //							quitQueue.setDisable(true);
 						} catch (IOException e) {
