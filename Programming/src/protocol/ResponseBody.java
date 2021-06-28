@@ -51,14 +51,13 @@ public class ResponseBody {
 		this.responseBody.put("rank", rank);
 	}
 	
-	public void createJoinQueueBody(String username, String sessionID, String opponent, int elo, int matchID, String player1) throws JSONException {
+	public void createJoinQueueBody(String username, String sessionID, String opponent, int opponentElo, int matchID, String player1) throws JSONException {
 		this.responseBody.clear();
 		this.responseBody.put("session_id", sessionID);
 		this.responseBody.put("username", username);
 		this.responseBody.put("match_id", matchID);
 		this.responseBody.put("opponent", opponent);
-		this.responseBody.put("opponent_elo", elo);
-		this.responseBody.put("elo", elo);
+		this.responseBody.put("opponent_elo", opponentElo);
 		this.responseBody.put("player_1", player1);
 	}
 	
