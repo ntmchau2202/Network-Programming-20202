@@ -65,7 +65,7 @@ public class MessageQueue {
 		Future<Integer> futureWrite = socketChannel.write(buffer);
 		try {
 			decodeMutex.acquire();
-			String tmp = StandardCharsets.UTF_8.newDecoder().reset().decode(buffer).toString();
+			String tmp = new String(buffer.array());
 			System.out.println("Message to be sent: " + tmp);
 			decodeMutex.release();
 		} catch (Exception e) {
