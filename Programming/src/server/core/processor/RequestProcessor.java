@@ -13,6 +13,7 @@ import message.leaderboard.LeaderboardServerMessage;
 import message.logout.LogoutClientMessage;
 import message.logout.LogoutServerMessage;
 import protocol.RequestBody;
+import server.core.logger.T3Logger;
 import server.entity.match.Match;
 import entity.Move.Move;
 import entity.Player.Player;
@@ -50,14 +51,20 @@ import server.entity.network.completionHandler.ReadCompletionHandler;
 import server.model.LeaderboardModel;
 import server.model.RankPlayerModel;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class RequestProcessor implements IProcessor {
+    public static Logger LOGGER = T3Logger.getLogger(RequestProcessor.class.getName());
 
     private final QueueController queueController;
+    private final CompletionHandlerController handlerController;
+
+
     private Command cmd;
-    private CompletionHandlerController handlerController;
+
     private boolean isCancel;
     private boolean isStop;
 
@@ -65,6 +72,7 @@ public class RequestProcessor implements IProcessor {
         this.queueController = queueController;
         this.handlerController = handlerController;
         this.isCancel = false;
+        this.isStop = false;
     }
 
     @Override
@@ -75,6 +83,59 @@ public class RequestProcessor implements IProcessor {
     @Override
     public void stopAll() {
         this.isStop = true;
+        if (this.handlerController.curPlayer == null) {
+            LOGGER.info("Current player is null");
+        } else {
+            if (handlerController.curMatch != null) {
+                Player opponent = handlerController.curMatch.getAnotherPlayer(handlerController.curPlayer.getUsername());
+                if (opponent != null) {
+                    if (!queueController.endGame(opponent.getUsername(), handlerController.curMatch.getMatchID())) {
+                        LOGGER.info("Cannot endgame: " + handlerController.curMatch.getMatchID() + " with the winner is: " + opponent.getUsername());
+                    }
+                    // find player in hall to logout after endgame only when player is ranked player
+                    safeLogoutPlayer();
+                }
+            } else {
+                // check if current player exists in queue
+                for (int i = 0; i < 10; i++) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (this.queueController.isPlayerInNormalQueue(handlerController.curPlayer.getUsername()) || this.queueController.isPlayerInRankedQueue(handlerController.curPlayer.getUsername())) {
+                        this.queueController.removeFromQueue(handlerController.curPlayer.getUsername());
+                        break;
+                    }
+                }
+                safeLogoutPlayer();
+            }
+        }
+        this.queueController.viewHall();
+        this.queueController.viewNormalQueue();
+        this.queueController.viewRankedQueue();
+    }
+
+    private void safeLogoutPlayer() {
+        if (this.handlerController.curPlayer instanceof RankPlayer) {
+            for (int i = 0; i < 10; i++) {
+                try {
+                    Thread.sleep(500);
+                    System.out.println("im herererrrere " + i);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (this.queueController.isPlayerInHall(this.handlerController.curPlayer.getUsername())) {
+                    this.queueController.removeFromHall(this.handlerController.curPlayer);
+                    break;
+                }
+            }
+            try {
+                T3Authenticator.getT3AuthenticatorInstance().logout(this.handlerController.curPlayer.getUsername(), this.handlerController.curPlayer.getSessionId());
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
     }
 
     public void storeCurrentCommand(String recvMsg) {
@@ -189,6 +250,9 @@ public class RequestProcessor implements IProcessor {
         } else {
 //            loggedPlayer.setUserSocket(sock);
             queueController.pushToHall(loggedPlayer);
+            // store current player
+            this.handlerController.curPlayer = loggedPlayer;
+
             serverResponse = new LoginServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
                     loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
                     loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
@@ -213,6 +277,9 @@ public class RequestProcessor implements IProcessor {
         } else {
 //            loggedPlayer.setUserSocket(sock);
             queueController.pushToHall(loggedPlayer);
+            // store current playername
+            this.handlerController.curPlayer = loggedPlayer;
+
             serverResponse = new RegisterServerMessage(clientRequest.getMessageCommandID(), username, loggedPlayer.getSessionId(), loggedPlayer.getElo(),
                     loggedPlayer.getRank(), loggedPlayer.getWinningRate(), loggedPlayer.getNoPlayedMatch(),
                     loggedPlayer.getNoWonMatch(), StatusCode.SUCCESS, "");
@@ -265,6 +332,9 @@ public class RequestProcessor implements IProcessor {
         if (serverResponse == null) {
             if (mode.compareToIgnoreCase("normal") == 0 || mode.compareToIgnoreCase("ranked") == 0) {
                 System.out.println("requested username: " + loggedPlayer.getUsername());
+                // store current playername
+                this.handlerController.curPlayer = loggedPlayer;
+
                 queueController.viewHall();
                 queueController.viewNormalQueue();
                 queueController.viewRankedQueue();
@@ -280,7 +350,11 @@ public class RequestProcessor implements IProcessor {
                 // prepare message according to each player
                 Match match = null;
 
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 10; i++) {
+                    // force stop joining queue
+                    if (isStop) {
+                        return "";
+                    }
                     if (!isCancel) {
                         match = queueController.getMatchByPlayer(loggedPlayer);
                         if (match != null) {
@@ -295,6 +369,9 @@ public class RequestProcessor implements IProcessor {
 
                 Player opponent;
                 if (match != null) {
+                    // store current match id
+                    this.handlerController.curMatch = match;
+
                     if (loggedPlayer.getUsername().equalsIgnoreCase(match.getPlayer1().getUsername())) {
                         // user is player 1
                         opponent = match.getPlayer2();
@@ -473,6 +550,10 @@ public class RequestProcessor implements IProcessor {
             try {
                 Thread.sleep(500);
 
+                if (isStop) {
+                    return "";
+                }
+
                 if (match.getNumberOfMoves() > 0) {
                     // get latest move
                     latestMove = match.getLatestMove();
@@ -643,6 +724,10 @@ public class RequestProcessor implements IProcessor {
             try {
                 Thread.sleep(500);
 
+                if (isStop) {
+                    return "";
+                }
+
                 if (match.isIncomingDrawRequest(listenUsername)) {
                 	match.pendingDrawRequest(listenUsername);
                     String requestPlayerName = match.getAnotherPlayer(listenUsername) != null ? match.getAnotherPlayer(listenUsername).getUsername() : "";
@@ -777,6 +862,11 @@ public class RequestProcessor implements IProcessor {
             while (true) {
                 try {
                     Thread.sleep(500);
+
+                    if (isStop) {
+                        return "";
+                    }
+
                     chatMsg = match.getUnreadMsg(username);
                     if (chatMsg == null) {
                         // if no message, just continue

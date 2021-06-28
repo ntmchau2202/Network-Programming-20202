@@ -5,14 +5,18 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.logging.Logger;
 //import java.util.ArrayList;
 
 import protocol.Attachment;
 import server.core.controller.CompletionHandlerController;
 import server.core.controller.QueueController;
+import server.core.logger.T3Logger;
 import server.entity.network.completionHandler.ReadCompletionHandler;
 
 public class ServerCore {
+    public static Logger LOGGER = T3Logger.getLogger(ServerCore.class.getName());
+
     private AsynchronousServerSocketChannel serverSocketChannel;
     private QueueController queueController;
 
@@ -23,7 +27,7 @@ public class ServerCore {
     public void start(int port) throws Exception {
         serverSocketChannel.bind(new InetSocketAddress(port));
 
-        System.out.println("Server started");
+        LOGGER.info("Server started");
 
         queueController = new QueueController();
         queueController.startQueueController();
@@ -38,7 +42,7 @@ public class ServerCore {
 
                     if (serverSocketChannel.isOpen()) {
                         serverSocketChannel.accept(null, this);
-                        System.out.println("Connection accepted: " + result.toString());
+                        LOGGER.info("Connection accepted: " + result.toString());
                     }
                     AsynchronousSocketChannel clientChannel = result;
                     try {
@@ -57,7 +61,7 @@ public class ServerCore {
                             // add current handler to current client's handler controller
                             completionHandlerController.addToListController(readCompletionHandler);
 
-                            System.out.println("Listening...");
+                            LOGGER.info("Listening for more messages from client: " + completionHandlerController.getHandlerCtrlID());
                             // when current handler parse new message successfully -> this `while` loop is exited
                             // -> init new handler for new message
                             while (socketAttachment.getActive().get()) {
@@ -83,7 +87,7 @@ public class ServerCore {
                 @Override
                 public void failed(Throwable exc, Object attachment) {
                     // TODO Auto-generated method stub
-                    System.out.println("Fuckkk we lost connection");
+                    System.out.println("Hmmmmm we cannot accept the connection");
                 }
 
             });

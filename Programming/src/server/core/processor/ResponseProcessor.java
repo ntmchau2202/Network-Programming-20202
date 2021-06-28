@@ -1,14 +1,19 @@
 package server.core.processor;
 
 import protocol.Attachment;
+import server.core.logger.T3Logger;
 import server.entity.network.IProcessor;
+import server.entity.network.completionHandler.ReadCompletionHandler;
 import server.entity.network.completionHandler.WriteCompletionHandler;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 public class ResponseProcessor implements IProcessor {
+    public static Logger LOGGER = T3Logger.getLogger(ResponseProcessor.class.getName());
+
     private final AsynchronousSocketChannel socketChannel;
     private boolean isCancel;
     private boolean isStop;
@@ -41,10 +46,10 @@ public class ResponseProcessor implements IProcessor {
             while (newAttachment.getActive().get()) {
                 // waiting for the write complete
             }
-            System.out.println("Done sending msg: " + resMsg);
-            System.out.println("Is socket still open?: " + this.socketChannel.isOpen());
+            LOGGER.info("Done sending msg: " + resMsg);
+//            System.out.println("Is socket still open?: " + this.socketChannel.isOpen());
         } else {
-            System.out.println("Connection to client has been shutdown: " + resMsg);
+            LOGGER.info("Connection to client has been shutdown " + resMsg);
         }
 
     }

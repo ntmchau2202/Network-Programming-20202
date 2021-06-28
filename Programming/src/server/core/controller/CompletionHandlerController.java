@@ -1,15 +1,31 @@
 package server.core.controller;
 
+import entity.Player.Player;
 import protocol.Command;
+import server.core.utils.Misc;
+import server.entity.match.Match;
 import server.entity.network.completionHandler.ReadCompletionHandler;
 
 import java.util.ArrayList;
+import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 public class CompletionHandlerController {
+	public Player curPlayer;
+	public Match curMatch;
+	private Semaphore mutex;
+
 	private final ArrayList<ReadCompletionHandler> listReadHandler;
+	private final String handlerCtrlID;
 	
 	public CompletionHandlerController() {
 		listReadHandler = new ArrayList<ReadCompletionHandler>();
+		this.handlerCtrlID = "HandlerCtrl-" + Misc.genShortUUID();
+		mutex = new Semaphore(1);
+	}
+
+	public String getHandlerCtrlID() {
+		return this.handlerCtrlID;
 	}
 	
 	public void addToListController(ReadCompletionHandler handler) {
@@ -28,6 +44,18 @@ public class CompletionHandlerController {
 	public boolean removeHandlerFromList(ReadCompletionHandler handler) {
 		System.out.println(">>>>>> remove handler successfully: " + handler.getHandlerID());
 		return listReadHandler.remove(handler);
+	}
+
+	public void forceStopAllHandlers() {
+		try {
+			mutex.acquire();
+			for(ReadCompletionHandler h : listReadHandler) {
+				h.forceStopHandler();
+			}
+			mutex.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public boolean cancelLowPriorityHandler(Command cmd) {
