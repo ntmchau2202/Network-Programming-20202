@@ -38,14 +38,11 @@ public class LeaderBoardController extends BaseController{
     		int size3 = msg.getListMatchWon().size();
     		int size4 = msg.getListMatchPlayed().size();
     		int size5 = msg.getListELO().size();
-    		System.out.println("Get all the sizes");
     		if (size1 != size2 || size1 != size3 || size1 != size4 || size1 != size5) {
-    			System.out.println("Sizes are different");
     			return false;
     		} else {
     			// parsing
     			this.listLeaderboard.clear();
-    			System.out.println("Start parsing data");
     			for(int i = 0; i < msg.getListUsers().size(); i++) {
     				//(int rank, String username, int noPlayedMatch, int noWonMatch, int elo)
     				LeaderboardPlayer lp = new LeaderboardPlayer(msg.getListRank().get(i), msg.getListUsers().get(i), msg.getListMatchPlayed().get(i), msg.getListMatchWon().get(i), msg.getListELO().get(i));

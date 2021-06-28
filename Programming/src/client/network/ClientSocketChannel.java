@@ -113,27 +113,8 @@ public class ClientSocketChannel {
         return attachment;
     }
 
-    public String receiveResponseAsync(Attachment att) throws Exception {
-        while (attachment.getActive().get()) {
-
-        }
-        System.out.println("This is printed from client: " + attachment.getReturnMessage());
-        return attachment.getReturnMessage();
-    }
-
     private String sendRequest(String strMsgToSend, int msgCmdID) throws Exception {
-//		System.out.println(this.getSocketInstance().socketChannel.toString());
-//		attachment = new Attachment(strMsgToSend, true);
-//		buffer = ByteBuffer.wrap(strMsgToSend.getBytes(StandardCharsets.UTF_8));
-//		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
-//		socketChannel.write(buffer, attachment, writeCompletionHandler);
-//		while (attachment.getActive().get()) {
-//
-//		}
-//		System.out.println("This is printed from client: " + attachment.getReturnMessage());
-//		return attachment.getReturnMessage();
         int msgID = messageQueue.pushMessageToSendQueue(strMsgToSend, msgCmdID);
-        System.out.println("sendRequest: received msgID: " + msgID);
         while (true) {
             Thread.sleep(500);
             Attachment attachment = messageQueue.getAttachmentByID(msgID);
@@ -148,7 +129,6 @@ public class ClientSocketChannel {
         // return sendRequest(loginRequest.toString());
 //		return sendRequest(loginRequest.toString());
         int msgID = messageQueue.pushMessageToSendQueue(loginRequest.toString(), loginRequest.getMessageCommandID());
-        System.out.println("Returned msg ID: " + msgID);
         while (true) {
             Thread.sleep(500);
             Attachment attachment = messageQueue.getAttachmentByID(msgID);

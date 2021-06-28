@@ -19,12 +19,10 @@ public class HomeScreenController extends BaseController{
 	}
 	
 	public int findGuestGame() {
-		 System.out.println("Waiting for a game...");
 
 	        // TODO: make an interactive pop up here for waiting for server response
 	        try {
 			String result = ClientSocketChannel.getSocketInstance().joinQueue("", "normal");
-			System.out.println("Returned message to findGuestGame: " + result);
 			 JoinQueueServerMessage response = new JoinQueueServerMessage(result);
 		        if (response.getStatusCode().compareTo(StatusCode.ERROR) == 0) {
 		            if(response.getErrorMessage().contains("QUIT_QUEUE")) {
@@ -42,7 +40,6 @@ public class HomeScreenController extends BaseController{
 //		        curPlayer.setUserSocket(ClientSocketChannel.getSocketInstance());
 		        return 0;
 	        } catch (Exception e) {
-	        	System.out.println("============= Error from join queue");
 	        	e.printStackTrace();
 	        	return 1;
 	        }

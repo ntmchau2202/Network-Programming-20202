@@ -52,7 +52,6 @@ public class LeaderBoardHandler extends BaseScreenHandler implements Initializab
         try {
             List<LeaderboardPlayer> lstLeaderboardPlayer =
                     this.leaderBoardController.getLeaderboardList();
-            System.out.println(lstLeaderboardPlayer);
             rankTableColumn.setCellValueFactory(
                     new PropertyValueFactory<>("rank"));
             eloTableColumn.setCellValueFactory(

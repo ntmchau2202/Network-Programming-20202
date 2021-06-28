@@ -93,7 +93,6 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 		LeaderBoardController leaderboardController = new LeaderBoardController(gameModeScreenController.getCurPlayer().getUsername(),
 				gameModeScreenController.getCurPlayer().getSessionId());
 		leaderboardImageView.setOnMouseClicked(ev -> {
-			System.out.println("leaderboard");
 			try {
 				
 				
@@ -117,7 +116,6 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 										Configs.LEADERBOARD_SCREEN_PATH, leaderboardController);
 								leaderboardHandler.setScreenTitle("Leaderboard");
 								leaderboardHandler.setPreviousScreen(curHandler);
-								System.out.println("Preparing for showing");
 								leaderboardHandler.show();
 							} else {
 								notifyError("Cannot fetch leaderboard at the moment. Please try again later");
@@ -152,7 +150,6 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 			if (evt.getSource() == practicePlay) {
 				MainGameScreenController mainGameScreenController = new MainGameScreenController(
 						this.gameModeScreenController.getCurPlayer(), "normal");
-				System.out.println("practice play");
 				// Boolean isFound = false;
 				practicePlay.setDisable(true);
 				rankPlay.setDisable(true);
@@ -174,12 +171,10 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 
 					public void handle(WorkerStateEvent t) {
 						Integer isFound = (Integer) t.getSource().getValue();
-						System.out.println("done:" + isFound);
 						if (isFound == 0) {
 							mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
 									gameModeScreenController.getOpponentElo());
 							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
-							System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
 							try {
@@ -246,12 +241,10 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 
 					public void handle(WorkerStateEvent t) {
 						Integer isFound = (Integer) t.getSource().getValue();
-						System.out.println("done:" + isFound);
 						if (isFound == 0) {
 							mainGameScreenController.setOpponent(gameModeScreenController.getOpponentName(),
 									gameModeScreenController.getOpponentElo());
 							mainGameScreenController.setMatchID(gameModeScreenController.getMatchID());
-							System.out.println("Am I first player? " + gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setIsFirstPlayer(gameModeScreenController.amIFirstPlayer());
 							mainGameScreenController.setTurn(gameModeScreenController.amIFirstPlayer());
 							try {
@@ -355,7 +348,6 @@ public class GameModeScreenHandler extends BaseScreenHandler implements Initiali
 	
 	@FXML
 	public void handlerGetLeaderboardAction() {
-		System.out.println("leaderboard");
         try {
         	LeaderBoardController leaderboardController = new LeaderBoardController(this.gameModeScreenController.getCurPlayer().getUsername(), this.gameModeScreenController.getCurPlayer().getSessionId());
             GameModeScreenHandler curScreen = this;
