@@ -61,7 +61,7 @@ public class ServerCore {
                             // add current handler to current client's handler controller
                             completionHandlerController.addToListController(readCompletionHandler);
 
-                            LOGGER.info("Listening for more messages from client: " + completionHandlerController.getHandlerCtrlID());
+//                            LOGGER.info("Listening for more messages from client: " + completionHandlerController.getHandlerCtrlID());
                             // when current handler parse new message successfully -> this `while` loop is exited
                             // -> init new handler for new message
                             while (socketAttachment.getActive().get()) {

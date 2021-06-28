@@ -86,7 +86,7 @@ public class RequestProcessor implements IProcessor {
         if (this.handlerController.curPlayer == null) {
             LOGGER.info("Current player is null");
         } else {
-            if (handlerController.curMatch != null) {
+            if (handlerController.curMatch != null && !handlerController.curMatch.isEnded()) {
                 Player opponent = handlerController.curMatch.getAnotherPlayer(handlerController.curPlayer.getUsername());
                 if (opponent != null) {
                     if (!queueController.endGame(opponent.getUsername(), handlerController.curMatch.getMatchID())) {
@@ -350,7 +350,7 @@ public class RequestProcessor implements IProcessor {
                 // prepare message according to each player
                 Match match = null;
 
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 100; i++) {
                     // force stop joining queue
                     if (isStop) {
                         return "";
@@ -575,7 +575,9 @@ public class RequestProcessor implements IProcessor {
 
                 // check status of match: break if winner has been found (this case is for opponent quits the game)
                 if (match.isEnded() && !match.getWinner().isEmpty()) {
-                    movePlayer = match.getAnotherPlayer(username) != null ? match.getAnotherPlayer(username).getUsername() : "";
+                    // now move player becomes the winner
+//                    movePlayer = match.getAnotherPlayer(username) != null ? match.getAnotherPlayer(username).getUsername() : "";
+                    movePlayer = match.getPlayerByName(match.getWinner()) != null ? match.getPlayerByName(match.getWinner()).getUsername() : "";
                     match.addNewMoveRecord(-1, -1, movePlayer, "valid", "win");
                     // assign the last move
                     latestMove = match.getLatestMove();

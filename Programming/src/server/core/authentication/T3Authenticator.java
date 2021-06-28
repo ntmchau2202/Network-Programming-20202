@@ -187,7 +187,7 @@ public class T3Authenticator {
                 result = m.group();
             }
             int anonID = Integer.parseInt(result);
-            System.out.println(">>> last id : (" + lastDisplayName + " - " + anonID + ")");
+//            System.out.println(">>> last id : (" + lastDisplayName + " - " + anonID + ")");
             if (lastGuestID.get() < anonID) {
                 lastGuestID.set(anonID);
             }

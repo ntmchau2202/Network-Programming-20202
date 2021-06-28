@@ -14,6 +14,7 @@ public class CompletionHandlerController {
 	public Player curPlayer;
 	public Match curMatch;
 	private Semaphore mutex;
+	private boolean isStop;
 
 	private final ArrayList<ReadCompletionHandler> listReadHandler;
 	private final String handlerCtrlID;
@@ -22,6 +23,7 @@ public class CompletionHandlerController {
 		listReadHandler = new ArrayList<ReadCompletionHandler>();
 		this.handlerCtrlID = "HandlerCtrl-" + Misc.genShortUUID();
 		mutex = new Semaphore(1);
+		this.isStop = false;
 	}
 
 	public String getHandlerCtrlID() {
@@ -49,12 +51,17 @@ public class CompletionHandlerController {
 	public void forceStopAllHandlers() {
 		try {
 			mutex.acquire();
-			for(ReadCompletionHandler h : listReadHandler) {
-				h.forceStopHandler();
+			if (!isStop) {
+				for(ReadCompletionHandler h : listReadHandler) {
+					h.forceStopHandler();
+				}
+				isStop = true;
 			}
 			mutex.release();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+//		} catch (InterruptedException e) {
+		} catch (Exception e) {
+			System.out.println("Concurrent force stop in handler ctrl");
+//			e.printStackTrace();
 		}
 	}
 

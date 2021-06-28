@@ -26,6 +26,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	private final ResponseProcessor resProc;
 	private Command cmd;
 	private final String handlerID;
+	private boolean isStop;
 
 	public ReadCompletionHandler(AsynchronousSocketChannel socketChannel, ByteBuffer buffer, QueueController queueController, CompletionHandlerController completionHandlerController) {
 		this.buffer = buffer;
@@ -34,6 +35,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		this.reqProc = new RequestProcessor(queueController, completionHandlerController);
 		this.resProc = new ResponseProcessor(socketChannel);
 		this.handlerID = this.completionHandlerController.getHandlerCtrlID() + ">>>" + Misc.genShortUUID();
+		this.isStop = false;
 	}
 	
 	public void cancelHandler() {
@@ -43,10 +45,13 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 	}
 
 	public void forceStopHandler() {
-		// stop all processors
-		LOGGER.info("Force stopping handler " + this.handlerID);
-		this.reqProc.stopAll();
-		this.resProc.stopAll();
+		if (!isStop) {
+			// stop all processors
+			LOGGER.info("Force stopping handler " + this.handlerID);
+			this.reqProc.stopAll();
+			this.resProc.stopAll();
+			this.isStop = true;
+		}
 	}
 
 	public String getHandlerID() {
@@ -123,7 +128,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, Attachm
 		// summon the ctrl to shutdown all handlers
 		this.completionHandlerController.forceStopAllHandlers();
 
-		exc.printStackTrace();
+//		exc.printStackTrace();
 	}
 	
 	public CompletionHandlerController getHandlerController() {
