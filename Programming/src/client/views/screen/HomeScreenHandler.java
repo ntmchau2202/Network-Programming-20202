@@ -59,7 +59,6 @@ public class HomeScreenHandler extends BaseScreenHandler
     @FXML
     private void handleHomeAction(javafx.event.Event evt) throws IOException {
         if (evt.getSource() == guestPlayBtn) {
-            System.out.println("guest player");
             WaitingScreenHandler waitingScreenHandler = new WaitingScreenHandler(this.stage, null);
             waitingScreenHandler.show();
             // TODO: log guest player here
@@ -83,13 +82,11 @@ public class HomeScreenHandler extends BaseScreenHandler
 
 				public void handle(WorkerStateEvent t) {
 					Integer isFound = (Integer) t.getSource().getValue();
-					System.out.println("done:" + isFound);
 					if (isFound == 0) {
 						MainGameScreenController mainGameScreenController = new MainGameScreenController(homeScreenController.getCurrentPlayer(), "guest");
 						mainGameScreenController.setOpponent(homeScreenController.getOpponentName(),
 								homeScreenController.getOpponentElo());
 						mainGameScreenController.setMatchID(homeScreenController.getMatchID());
-						System.out.println("Am I first player? " + homeScreenController.amIFirstPlayer());
 						mainGameScreenController.setIsFirstPlayer(homeScreenController.amIFirstPlayer());
 						mainGameScreenController.setTurn(homeScreenController.amIFirstPlayer());
 						try {
@@ -104,7 +101,6 @@ public class HomeScreenHandler extends BaseScreenHandler
 									Configs.MAINGAME_SCREEN_PATH, mainGameScreenController);
 							mainGameScreenHandler.setScreenTitle("Tic Tac Toe - In game");
 							mainGameScreenHandler.setPreviousScreen(currentHandler);
-							System.out.println("Prepare to show up!");
 							mainGameScreenHandler.show();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -132,7 +128,6 @@ public class HomeScreenHandler extends BaseScreenHandler
 			Thread findGameThread = new Thread(findGameTask);
 			findGameThread.start();
         } else if (evt.getSource() == returnPlayerBtn) {
-            System.out.println("back to player");
             try {
             	// TODO: must implement Task here to avoid freezing the client while waiting for the server
                 BaseScreenHandler loginFormHandler = new LoginFormHandler(this.stage,
@@ -144,7 +139,6 @@ public class HomeScreenHandler extends BaseScreenHandler
                 e.printStackTrace();
             }
         } else if (evt.getSource() == registerLabel) {
-            System.out.println("register time");
             try {
                 BaseScreenHandler registerFormHandler = new RegisterFormHandler(this.stage,
                         Configs.REGISTER_FORM_PATH, new RegisterFormController());
@@ -155,7 +149,6 @@ public class HomeScreenHandler extends BaseScreenHandler
                 e.printStackTrace();
             }
         } else if (evt.getSource() == leaderBoardImageView) {
-            System.out.println("leaderboard");
             try {
             	HomeScreenHandler curHandler = this;
             	LeaderBoardController leaderboardControllerTmp = new LeaderBoardController("", "");
@@ -178,7 +171,6 @@ public class HomeScreenHandler extends BaseScreenHandler
 										Configs.LEADERBOARD_SCREEN_PATH, leaderboardControllerTmp);
 								leaderboardHandler.setScreenTitle("Leaderboard");
 								leaderboardHandler.setPreviousScreen(curHandler);
-								System.out.println("Preparing for showing");
 								leaderboardHandler.show();
 							} else {
 								notifyError("Cannot fetch leaderboard at the moment. Please try again later");

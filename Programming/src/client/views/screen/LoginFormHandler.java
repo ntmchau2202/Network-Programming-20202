@@ -54,12 +54,10 @@ public class LoginFormHandler extends BaseScreenHandler
         String username = usernameTextField.getText();
         String password = passwordTextField.getText();
         if (username.isEmpty()) {
-            System.out.println("username is null. Insert again");
             notifyError("Username is empty. Insert again");
             return ;
         }
         if (password.isEmpty()) {
-            System.out.println("password is null. Insert again");
             notifyError("Password is null. Insert again");
             return ;
         }
@@ -68,7 +66,6 @@ public class LoginFormHandler extends BaseScreenHandler
         try {
 
             if (!this.loginFormController.isLoginSuccessfully(username, password)) {
-                System.out.println("Login failed");
                 notifyError("Login failed");
                 return ;
             }

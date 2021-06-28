@@ -62,11 +62,8 @@ public class MessageQueue {
 	}
 		
 	private void sendMessage(Attachment attachment) {
-//		Attachment attachment = new Attachment(strMsgToSend, true);
 		ByteBuffer buffer = ByteBuffer.wrap(attachment.getSendMessage().getBytes(StandardCharsets.UTF_8));
-//		WriteCompletionHandler writeCompletionHandler = new WriteCompletionHandler(socketChannel);
 		isSending.set(true);
-//		socketChannel.write(buffer, attachment, writeCompletionHandler);
 		Future<Integer> futureWrite = socketChannel.write(buffer);
 		try {
 			String tmp = null;
@@ -75,40 +72,20 @@ public class MessageQueue {
 		} catch (CharacterCodingException e) {
 			e.printStackTrace();
 		}
-		System.out.println("write returned");
 		try{
 			futureWrite.get();
 			pendingReadList.add(attachment);
 			isSending.set(false);
-		}catch (Exception e) {
-			System.out.println("Error when sending message: " + attachment.getSendMessage());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
-////		isBusy.set(true);
-//		while (attachment.getActive().get()) {
-//
-//		}
-//		System.out.println("This is printed from client: " + attachment.getReturnMessage());
-////		return attachment.getReturnMessage();
-//		try {
-//			addMutex.acquire();
-//			messageDoneList.add(attachment);
-//			addMutex.release();
-////			isBusy.set(false);
-//			System.out.println("Added to messageDoneList. Size: " + messageDoneList.size());
-//		} catch (Exception e) {
-//			System.out.println("sendMessage get error");
-//			e.printStackTrace();
-//		}
 	}
+
 	
 	private void readMessage() {
 		// Attachment tmpAttachment = new Attachment();
 		ByteBuffer buffer = ByteBuffer.allocate(4096);
 		Future<Integer> futureRead = socketChannel.read(buffer);
-		System.out.println("read returned");
 		try {
 			isReading.set(true);
 			futureRead.get();
@@ -127,7 +104,6 @@ public class MessageQueue {
 			System.out.println("Msg received: " + tmp);
 			JSONObject tmpJS = new JSONObject(tmp);
 			int msgID = tmpJS.getInt("message_id");
-			System.out.println("Msg ID received from server: " + msgID);
 			
 			for(Attachment a : pendingReadList) {
 				System.out.println("item: " + a.getAttachmentID());
@@ -135,13 +111,11 @@ public class MessageQueue {
 					a.setReturnMessage(tmp);
 					messageDoneList.add(a);
 					pendingReadList.remove(a);
-					System.out.println("Size of pendingReadList: " + pendingReadList.size());
 					return true;
 				}
 			}
 			return false;
 		} catch (Exception e) {
-			System.out.println("Error when merging message");
 			e.printStackTrace();
 			return false;
 		}
@@ -155,15 +129,12 @@ public class MessageQueue {
 					Thread.sleep(500);
 						// send
 						if(pendingWriteList.size()!=0) {
-							System.out.println("Pending send queue size is not 0. Start polling");
 							if(!isSending.get()) {
-								System.out.println("Channel not busy. Start sending");
 								Attachment atchmtToSend = pendingWriteList.remove(0);
 								sendMessage(atchmtToSend);
 							}
 						} 
 				}  catch (Exception e) {
-					System.out.println("Error in run of MessageThread");
 					e.printStackTrace();
 				}
 			}
@@ -179,14 +150,11 @@ public class MessageQueue {
 				try {
 				Thread.sleep(500);
 					if(pendingReadList.size()!=0) {
-						System.out.println("Pending read queue is not 0. Start reading and merging");
 						if(!isReading.get()) {
-							System.out.println("Channel not busy. Start receiving");
 							readMessage();
 						}
 					}
 				} catch (Exception e) {
-					System.out.println("Error in run of MessageThread");
 					e.printStackTrace();
 				}
 	

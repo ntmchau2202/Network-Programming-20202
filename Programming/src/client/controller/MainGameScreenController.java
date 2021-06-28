@@ -96,8 +96,6 @@ public class MainGameScreenController extends BaseController {
     }
 
     public boolean sendMove(int x, int y, String gameResult) throws Exception {
-        System.out.println("Match id: " + this.matchID);
-        System.out.println("=====================Sending move: " + x + " - " + y);
         String result = ClientSocketChannel.getSocketInstance().move(currentPlayer.getUsername(),
                 currentPlayer.getSessionId(), this.matchID, x, y, "valid", gameResult);
         MoveServerMessage move = new MoveServerMessage(result);
@@ -116,7 +114,6 @@ public class MainGameScreenController extends BaseController {
     }
 
     public boolean listenMove() throws Exception {
-        System.out.println("=====================listening move");
         String result = ClientSocketChannel.getSocketInstance().listenMove(currentPlayer.getUsername(), this.matchID);
         MoveServerMessage move = new MoveServerMessage(result);
 
@@ -133,7 +130,6 @@ public class MainGameScreenController extends BaseController {
     }
 
     public ChatMessage listenChat() throws Exception {
-        System.out.println("=====================listening chat");
         String result = ClientSocketChannel.getSocketInstance().listenChat(currentPlayer.getUsername(), this.matchID);
         ChatServerMessage chat = new ChatServerMessage(result);
 
@@ -163,7 +159,6 @@ public class MainGameScreenController extends BaseController {
 
     public ChatMessage sendChatMessage(String chatMsg) throws Exception {
         //(String fromUsr, String toUsr, String msg, int matchID)
-        System.out.println("Gotta send msg: " + chatMsg);
         String result = ClientSocketChannel.getSocketInstance().chat(currentPlayer.getUsername(), opponentPlayerName, chatMsg, matchID);
         ChatServerMessage ret = new ChatServerMessage(result);
         if (ret.getStatusCode().compareTo(StatusCode.ERROR) == 0) {
@@ -179,7 +174,6 @@ public class MainGameScreenController extends BaseController {
     }
 
     public boolean updateUserInformation() throws Exception {
-        System.out.println("We gonna update ourselves here, not like the dumbass Windows :)");
         String result = ClientSocketChannel.getSocketInstance().updateUser(currentPlayer.getUsername(), currentPlayer.getSessionId());
         UpdateUserServerMessage ret = new UpdateUserServerMessage(result);
         if (ret.getStatusCode().compareTo(StatusCode.ERROR) == 0) {
@@ -204,34 +198,27 @@ public class MainGameScreenController extends BaseController {
     
     public ServerMessage listenDrawRequest() throws Exception {
     	String result = ClientSocketChannel.getSocketInstance().listenDrawRequest(this.getCurrentPlayer().getUsername(), this.getCurrentPlayer().getSessionId(), this.matchID);
-    	System.out.println("Hello are you there??????: " + result);
     	
     	// parsing to get the command
     	JSONObject jsRes = new JSONObject(result);
     	Command cmd = Command.toCommand(jsRes.getString("command_code"));
     	switch(cmd) {
     	case DRAW_REQUEST:{
-    		System.out.println("Ano ano yameteeeeeeeeeee");
     		DrawRequestServerMessage ret = new DrawRequestServerMessage(result);
     		// only return if the response does not come from current user to avoid duplication
     		System.out.println("REturn code from draw request: " + ret.getStatusCode().toString());
     		if (ret.getStatusCode().compareTo(StatusCode.SUCCESS) == 0/* && ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0*/) {
-    			System.out.println("yamete cdmmmmmmmmmmmmm");
     			return ret;	
     		} else {
-    			System.out.println("uhmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
     			return null;
     		}
     	}
     	case DRAW_CONFIRM:{
     		DrawConfirmServerMessage ret = new DrawConfirmServerMessage(result);
-    		System.out.println("Im on the stageeeeeeeeeeeeee");
     		// only return if the response does not come from current user to avoid duplication
     		if (ret.getStatusCode().compareTo(StatusCode.SUCCESS) == 0 /*&& ret.getPlayer().compareToIgnoreCase(this.getCurrentPlayer().getUsername())==0*/) {
-    			System.out.println("This stage is mineeeeeeeeeeee");
     			return ret;	
     		} else {
-    			System.out.println("No one can touch meeeeeeeeeeeeeeeeeee");
     			return null;
     		}
     	}
