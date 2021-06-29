@@ -121,6 +121,7 @@ public class MainGameScreenController extends BaseController {
             moveX = move.getX();
             moveY = move.getY();
             movePlayer = move.getMovePlayer();
+            System.out.println("move player: " + this.movePlayer);
             moveResult = move.getResult();
             moveState = move.getState();
             return true;
